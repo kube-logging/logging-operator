@@ -15,31 +15,23 @@
 package elasticsearch_multiversion
 
 import (
-	"context"
 	"fmt"
-	"os"
 	"os/exec"
-	"path/filepath"
 	"strings"
 	"testing"
 	"time"
 
-	"github.com/cisco-open/operator-tools/pkg/types"
 	"github.com/stretchr/testify/require"
 	appsv1 "k8s.io/api/apps/v1"
-	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
-	rbacv1 "k8s.io/api/rbac/v1"
-	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/cluster"
 
 	"github.com/kube-logging/logging-operator/e2e/common"
 	"github.com/kube-logging/logging-operator/e2e/common/setup"
+	"github.com/kube-logging/logging-operator/e2e/internal/harness"
 	"github.com/kube-logging/logging-operator/e2e/internal/image"
 	"github.com/kube-logging/logging-operator/e2e/internal/wait"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
@@ -57,26 +49,11 @@ const (
 	esReadyMargin = 90 * time.Second
 )
 
-var TestTempDir string
-
-func init() {
-	var ok bool
-	TestTempDir, ok = os.LookupEnv("PROJECT_DIR")
-	if !ok {
-		TestTempDir = "../.."
-	}
-	TestTempDir = filepath.Join(TestTempDir, "build/_test")
-	err := os.MkdirAll(TestTempDir, os.FileMode(0o755))
-	if err != nil {
-		panic(err)
-	}
-}
-
 // logContainerRestarts names a restart loop while a readiness wait is still
 // running, so it is a reported number rather than an unexplained stall.
-func logContainerRestarts(t *testing.T, c common.Cluster, ctx context.Context, ns, app string) {
+func logContainerRestarts(t *testing.T, env *harness.Env, ns, app string) {
 	var pods corev1.PodList
-	if err := c.GetClient().List(ctx, &pods, client.InNamespace(ns), client.MatchingLabels{"app": app}); err != nil {
+	if err := env.Client.List(env.Ctx, &pods, client.InNamespace(ns), client.MatchingLabels{"app": app}); err != nil {
 		t.Logf("listing %s pods failed: %v", app, err)
 		return
 	}
@@ -151,665 +128,401 @@ func TestBudgetLeavesRoomForTheRemainingWaits(t *testing.T) {
 	require.LessOrEqual(t, 3*first, remaining-esReadyMargin)
 }
 
+// esClient reads Elasticsearch through the curl pod, which is the only way in
+// from the test binary. It stays suite-local: no other suite has a curl pod, so
+// on the harness it would be a helper with one caller.
+type esClient struct {
+	pod string
+	ns  string
+	env *harness.Env
+}
+
+// hasDocuments asks _cat/count for one index pattern. An empty body is what a
+// pattern that matches nothing returns, so it counts as not yet rather than as
+// an error.
+func (c esClient) hasDocuments(t *testing.T, host, index string) bool {
+	t.Helper()
+
+	url := fmt.Sprintf("http://%s.%s.svc:9200/_cat/count/%s?h=count", host, c.ns, index)
+	rawOut, err := common.CmdEnv(exec.Command("kubectl", "exec", c.pod, "-n", c.ns, "--",
+		"curl", "-s", url), c.env.Cluster).Output()
+	if err != nil {
+		t.Logf("Error checking %s: %v", host, err)
+		return false
+	}
+
+	count := strings.TrimSpace(string(rawOut))
+	t.Logf("%s document count: %s", host, count)
+	return count != "" && count != "0"
+}
+
+// esVersion is the whole difference between the three deployments. Container
+// spec, probes, resources, env and ports are identical across them, so the
+// versions are a table and the objects are built from it.
+type esVersion struct {
+	name    string
+	version string
+}
+
+var esVersions = []esVersion{
+	{"elasticsearch7", "7.17.16"},
+	{"elasticsearch8", "8.12.0"},
+	{"elasticsearch9", "9.1.5"},
+}
+
+func (v esVersion) labels() map[string]string {
+	return map[string]string{"app": v.name, "version": v.version}
+}
+
+func esService(ns string, v esVersion) *corev1.Service {
+	return &corev1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      v.name,
+			Namespace: ns,
+			Labels:    v.labels(),
+		},
+		Spec: corev1.ServiceSpec{
+			Type: corev1.ServiceTypeClusterIP,
+			Ports: []corev1.ServicePort{
+				{
+					Name:     "http",
+					Port:     9200,
+					Protocol: corev1.ProtocolTCP,
+				},
+				{
+					Name:     "transport",
+					Port:     9300,
+					Protocol: corev1.ProtocolTCP,
+				},
+			},
+			Selector: map[string]string{"app": v.name},
+		},
+	}
+}
+
+func esDeployment(ns string, v esVersion) *appsv1.Deployment {
+	return &appsv1.Deployment{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      v.name,
+			Namespace: ns,
+			Labels:    v.labels(),
+		},
+		Spec: appsv1.DeploymentSpec{
+			Replicas: new(int32(1)),
+			Selector: &metav1.LabelSelector{
+				MatchLabels: map[string]string{"app": v.name},
+			},
+			Template: corev1.PodTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{Labels: v.labels()},
+				Spec: corev1.PodSpec{
+					Containers: []corev1.Container{
+						{
+							Name:  "elasticsearch",
+							Image: "docker.elastic.co/elasticsearch/elasticsearch:" + v.version,
+							Ports: []corev1.ContainerPort{
+								{
+									Name:          "http",
+									ContainerPort: 9200,
+									Protocol:      corev1.ProtocolTCP,
+								},
+								{
+									Name:          "transport",
+									ContainerPort: 9300,
+									Protocol:      corev1.ProtocolTCP,
+								},
+							},
+							Env: []corev1.EnvVar{
+								{
+									Name:  "discovery.type",
+									Value: "single-node",
+								},
+								{
+									Name:  "ES_JAVA_OPTS",
+									Value: "-Xms512m -Xmx512m",
+								},
+								{
+									Name:  "xpack.security.enabled",
+									Value: "false",
+								},
+							},
+							Resources: corev1.ResourceRequirements{
+								Requests: corev1.ResourceList{
+									corev1.ResourceMemory: resource.MustParse("1Gi"),
+									corev1.ResourceCPU:    resource.MustParse("500m"),
+								},
+								Limits: corev1.ResourceList{
+									corev1.ResourceMemory: resource.MustParse("1536Mi"),
+									corev1.ResourceCPU:    resource.MustParse("1000m"),
+								},
+							},
+							// No liveness probe: readiness already gates the wait, and a
+							// 60s + 3x10s deadline killed the JVM mid-boot on a loaded runner.
+							ReadinessProbe: &corev1.Probe{
+								ProbeHandler: corev1.ProbeHandler{
+									HTTPGet: &corev1.HTTPGetAction{
+										Path: "/_cluster/health",
+										Port: intstr.FromInt(9200),
+									},
+								},
+								InitialDelaySeconds: 30,
+								PeriodSeconds:       10,
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
 func TestElasticsearch_MultiVersion(t *testing.T) {
-	common.Initialize(t)
-	ns := "logging"
-	releaseNameOverride := "e2e"
-	common.WithCluster("elasticsearch-multiversion", t, func(t *testing.T, c common.Cluster) {
-		setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(options *setup.LoggingOperatorOptions) {
-			options.Namespace = ns
-			options.NameOverride = releaseNameOverride
-		}))
+	const (
+		ns      = "logging"
+		release = "e2e"
+	)
 
-		ctx := context.Background()
+	env := harness.New(t).
+		WithCluster("elasticsearch-multiversion").
+		WithRelease(release).
+		WithControlNamespace(ns).
+		Start()
 
-		es7Service := &corev1.Service{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      "elasticsearch7",
-				Namespace: ns,
-				Labels: map[string]string{
-					"app":     "elasticsearch7",
-					"version": "7.17.16",
-				},
-			},
-			Spec: corev1.ServiceSpec{
-				Type: corev1.ServiceTypeClusterIP,
-				Ports: []corev1.ServicePort{
-					{
-						Name:     "http",
-						Port:     9200,
-						Protocol: corev1.ProtocolTCP,
-					},
-					{
-						Name:     "transport",
-						Port:     9300,
-						Protocol: corev1.ProtocolTCP,
-					},
-				},
-				Selector: map[string]string{
-					"app": "elasticsearch7",
-				},
-			},
-		}
-		common.RequireNoError(t, c.GetClient().Create(ctx, es7Service))
-
-		es7Deployment := &appsv1.Deployment{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      "elasticsearch7",
-				Namespace: ns,
-				Labels: map[string]string{
-					"app":     "elasticsearch7",
-					"version": "7.17.16",
-				},
-			},
-			Spec: appsv1.DeploymentSpec{
-				Replicas: new(int32(1)),
-				Selector: &metav1.LabelSelector{
-					MatchLabels: map[string]string{
-						"app": "elasticsearch7",
-					},
-				},
-				Template: corev1.PodTemplateSpec{
-					ObjectMeta: metav1.ObjectMeta{
-						Labels: map[string]string{
-							"app":     "elasticsearch7",
-							"version": "7.17.16",
-						},
-					},
-					Spec: corev1.PodSpec{
-						Containers: []corev1.Container{
-							{
-								Name:  "elasticsearch",
-								Image: "docker.elastic.co/elasticsearch/elasticsearch:7.17.16",
-								Ports: []corev1.ContainerPort{
-									{
-										Name:          "http",
-										ContainerPort: 9200,
-										Protocol:      corev1.ProtocolTCP,
-									},
-									{
-										Name:          "transport",
-										ContainerPort: 9300,
-										Protocol:      corev1.ProtocolTCP,
-									},
-								},
-								Env: []corev1.EnvVar{
-									{
-										Name:  "discovery.type",
-										Value: "single-node",
-									},
-									{
-										Name:  "ES_JAVA_OPTS",
-										Value: "-Xms512m -Xmx512m",
-									},
-									{
-										Name:  "xpack.security.enabled",
-										Value: "false",
-									},
-								},
-								Resources: corev1.ResourceRequirements{
-									Requests: corev1.ResourceList{
-										corev1.ResourceMemory: resource.MustParse("1Gi"),
-										corev1.ResourceCPU:    resource.MustParse("500m"),
-									},
-									Limits: corev1.ResourceList{
-										corev1.ResourceMemory: resource.MustParse("1536Mi"),
-										corev1.ResourceCPU:    resource.MustParse("1000m"),
-									},
-								},
-								// No liveness probe: readiness already gates the wait, and a
-								// 60s + 3x10s deadline killed the JVM mid-boot on a loaded runner.
-								ReadinessProbe: &corev1.Probe{
-									ProbeHandler: corev1.ProbeHandler{
-										HTTPGet: &corev1.HTTPGetAction{
-											Path: "/_cluster/health",
-											Port: intstr.FromInt(9200),
-										},
-									},
-									InitialDelaySeconds: 30,
-									PeriodSeconds:       10,
-								},
-							},
-						},
-					},
-				},
-			},
-		}
-		common.RequireNoError(t, c.GetClient().Create(ctx, es7Deployment))
-
-		es8Service := &corev1.Service{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      "elasticsearch8",
-				Namespace: ns,
-				Labels: map[string]string{
-					"app":     "elasticsearch8",
-					"version": "8.12.0",
-				},
-			},
-			Spec: corev1.ServiceSpec{
-				Type: corev1.ServiceTypeClusterIP,
-				Ports: []corev1.ServicePort{
-					{
-						Name:     "http",
-						Port:     9200,
-						Protocol: corev1.ProtocolTCP,
-					},
-					{
-						Name:     "transport",
-						Port:     9300,
-						Protocol: corev1.ProtocolTCP,
-					},
-				},
-				Selector: map[string]string{
-					"app": "elasticsearch8",
-				},
-			},
-		}
-		common.RequireNoError(t, c.GetClient().Create(ctx, es8Service))
-
-		es8Deployment := &appsv1.Deployment{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      "elasticsearch8",
-				Namespace: ns,
-				Labels: map[string]string{
-					"app":     "elasticsearch8",
-					"version": "8.12.0",
-				},
-			},
-			Spec: appsv1.DeploymentSpec{
-				Replicas: new(int32(1)),
-				Selector: &metav1.LabelSelector{
-					MatchLabels: map[string]string{
-						"app": "elasticsearch8",
-					},
-				},
-				Template: corev1.PodTemplateSpec{
-					ObjectMeta: metav1.ObjectMeta{
-						Labels: map[string]string{
-							"app":     "elasticsearch8",
-							"version": "8.12.0",
-						},
-					},
-					Spec: corev1.PodSpec{
-						Containers: []corev1.Container{
-							{
-								Name:  "elasticsearch",
-								Image: "docker.elastic.co/elasticsearch/elasticsearch:8.12.0",
-								Ports: []corev1.ContainerPort{
-									{
-										Name:          "http",
-										ContainerPort: 9200,
-										Protocol:      corev1.ProtocolTCP,
-									},
-									{
-										Name:          "transport",
-										ContainerPort: 9300,
-										Protocol:      corev1.ProtocolTCP,
-									},
-								},
-								Env: []corev1.EnvVar{
-									{
-										Name:  "discovery.type",
-										Value: "single-node",
-									},
-									{
-										Name:  "ES_JAVA_OPTS",
-										Value: "-Xms512m -Xmx512m",
-									},
-									{
-										Name:  "xpack.security.enabled",
-										Value: "false",
-									},
-								},
-								Resources: corev1.ResourceRequirements{
-									Requests: corev1.ResourceList{
-										corev1.ResourceMemory: resource.MustParse("1Gi"),
-										corev1.ResourceCPU:    resource.MustParse("500m"),
-									},
-									Limits: corev1.ResourceList{
-										corev1.ResourceMemory: resource.MustParse("1536Mi"),
-										corev1.ResourceCPU:    resource.MustParse("1000m"),
-									},
-								},
-								// No liveness probe: readiness already gates the wait, and a
-								// 60s + 3x10s deadline killed the JVM mid-boot on a loaded runner.
-								ReadinessProbe: &corev1.Probe{
-									ProbeHandler: corev1.ProbeHandler{
-										HTTPGet: &corev1.HTTPGetAction{
-											Path: "/_cluster/health",
-											Port: intstr.FromInt(9200),
-										},
-									},
-									InitialDelaySeconds: 30,
-									PeriodSeconds:       10,
-								},
-							},
-						},
-					},
-				},
-			},
-		}
-		common.RequireNoError(t, c.GetClient().Create(ctx, es8Deployment))
-
-		es9Service := &corev1.Service{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      "elasticsearch9",
-				Namespace: ns,
-				Labels: map[string]string{
-					"app":     "elasticsearch9",
-					"version": "9.1.5",
-				},
-			},
-			Spec: corev1.ServiceSpec{
-				Type: corev1.ServiceTypeClusterIP,
-				Ports: []corev1.ServicePort{
-					{
-						Name:     "http",
-						Port:     9200,
-						Protocol: corev1.ProtocolTCP,
-					},
-					{
-						Name:     "transport",
-						Port:     9300,
-						Protocol: corev1.ProtocolTCP,
-					},
-				},
-				Selector: map[string]string{
-					"app": "elasticsearch9",
-				},
-			},
-		}
-		common.RequireNoError(t, c.GetClient().Create(ctx, es9Service))
-
-		es9Deployment := &appsv1.Deployment{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      "elasticsearch9",
-				Namespace: ns,
-				Labels: map[string]string{
-					"app":     "elasticsearch9",
-					"version": "9.1.5",
-				},
-			},
-			Spec: appsv1.DeploymentSpec{
-				Replicas: new(int32(1)),
-				Selector: &metav1.LabelSelector{
-					MatchLabels: map[string]string{
-						"app": "elasticsearch9",
-					},
-				},
-				Template: corev1.PodTemplateSpec{
-					ObjectMeta: metav1.ObjectMeta{
-						Labels: map[string]string{
-							"app":     "elasticsearch9",
-							"version": "9.1.5",
-						},
-					},
-					Spec: corev1.PodSpec{
-						Containers: []corev1.Container{
-							{
-								Name:  "elasticsearch",
-								Image: "docker.elastic.co/elasticsearch/elasticsearch:9.1.5",
-								Ports: []corev1.ContainerPort{
-									{
-										Name:          "http",
-										ContainerPort: 9200,
-										Protocol:      corev1.ProtocolTCP,
-									},
-									{
-										Name:          "transport",
-										ContainerPort: 9300,
-										Protocol:      corev1.ProtocolTCP,
-									},
-								},
-								Env: []corev1.EnvVar{
-									{
-										Name:  "discovery.type",
-										Value: "single-node",
-									},
-									{
-										Name:  "ES_JAVA_OPTS",
-										Value: "-Xms512m -Xmx512m",
-									},
-									{
-										Name:  "xpack.security.enabled",
-										Value: "false",
-									},
-								},
-								Resources: corev1.ResourceRequirements{
-									Requests: corev1.ResourceList{
-										corev1.ResourceMemory: resource.MustParse("1Gi"),
-										corev1.ResourceCPU:    resource.MustParse("500m"),
-									},
-									Limits: corev1.ResourceList{
-										corev1.ResourceMemory: resource.MustParse("1536Mi"),
-										corev1.ResourceCPU:    resource.MustParse("1000m"),
-									},
-								},
-								// No liveness probe: readiness already gates the wait, and a
-								// 60s + 3x10s deadline killed the JVM mid-boot on a loaded runner.
-								ReadinessProbe: &corev1.Probe{
-									ProbeHandler: corev1.ProbeHandler{
-										HTTPGet: &corev1.HTTPGetAction{
-											Path: "/_cluster/health",
-											Port: intstr.FromInt(9200),
-										},
-									},
-									InitialDelaySeconds: 30,
-									PeriodSeconds:       10,
-								},
-							},
-						},
-					},
-				},
-			},
-		}
-		common.RequireNoError(t, c.GetClient().Create(ctx, es9Deployment))
-
-		deployments := []string{"elasticsearch7", "elasticsearch8", "elasticsearch9"}
-		for i, name := range deployments {
-			t.Logf("Waiting for %s deployment to be ready...", name)
-			require.Eventuallyf(t, func() bool {
-				if wait.DeploymentAvailable(t, c.GetClient(), ctx, ns, name)() {
-					return true
-				}
-				logContainerRestarts(t, c, ctx, ns, name)
-				return false
-			}, esReadyBudget(t, len(deployments)-i), 10*time.Second, "%s never became ready", name)
-		}
-
-		logging := v1beta1.Logging{
-			ObjectMeta: metav1.ObjectMeta{
-				Name: "all-to-es",
-			},
-			Spec: v1beta1.LoggingSpec{
-				ControlNamespace: ns,
-				FluentdSpec: &v1beta1.FluentdSpec{
-					Image:               image.Fluentd().Spec(),
-					ConfigReloaderImage: image.ConfigReloader().Spec(),
-					BufferVolumeImage:   image.NodeExporter().Spec(),
-					Resources: corev1.ResourceRequirements{
-						Limits: corev1.ResourceList{
-							corev1.ResourceCPU:    resource.MustParse("500m"),
-							corev1.ResourceMemory: resource.MustParse("200M"),
-						},
-						Requests: corev1.ResourceList{
-							corev1.ResourceCPU:    resource.MustParse("250m"),
-							corev1.ResourceMemory: resource.MustParse("50M"),
-						},
-					},
-					LogLevel: "debug",
-				},
-			},
-		}
-		common.RequireNoError(t, c.GetClient().Create(ctx, &logging))
-
-		agent := v1beta1.FluentbitAgent{
-			ObjectMeta: metav1.ObjectMeta{
-				Name: "all-to-es",
-			},
-			Spec: v1beta1.FluentbitSpec{},
-		}
-		common.RequireNoError(t, c.GetClient().Create(ctx, &agent))
-
-		es7Output := v1beta1.Output{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      "es7-output",
-				Namespace: ns,
-			},
-			Spec: v1beta1.OutputSpec{
-				ElasticsearchOutput: &output.ElasticsearchOutput{
-					Host:                        "elasticsearch7.logging.svc.cluster.local",
-					Port:                        9200,
-					Scheme:                      "http",
-					DefaultElasticsearchVersion: "7",
-					SuppressTypeName:            new(false),
-					TypeName:                    "_doc",
-					IndexName:                   "test-logs-es7",
-					LogstashFormat:              true,
-					LogstashPrefix:              "fluentd-es7",
-					LogstashDateformat:          "%Y.%m.%d",
-					IncludeTimestamp:            true,
-					ReconnectOnError:            true,
-					ReloadConnections:           new(false),
-					ReloadOnFailure:             true,
-					VerifyEsVersionAtStartup:    new(false),
-					Buffer: &output.Buffer{
-						Type:             "file",
-						Path:             "/buffers/es7",
-						ChunkLimitSize:   "4MB",
-						FlushAtShutdown:  true,
-						FlushInterval:    "15s",
-						FlushMode:        "interval",
-						FlushThreadCount: 2,
-						OverflowAction:   "block",
-						RetryMaxInterval: "30s",
-						RetryTimeout:     "72h",
-					},
-				},
-			},
-		}
-		common.RequireNoError(t, c.GetClient().Create(ctx, &es7Output))
-
-		es8Output := v1beta1.Output{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      "es8-output",
-				Namespace: ns,
-			},
-			Spec: v1beta1.OutputSpec{
-				ElasticsearchOutput: &output.ElasticsearchOutput{
-					Host:                        "elasticsearch8.logging.svc.cluster.local",
-					Port:                        9200,
-					Scheme:                      "http",
-					DefaultElasticsearchVersion: "8",
-					SuppressTypeName:            new(true),
-					DataStreamEnable:            new(true),
-					DataStreamName:              "logs-fluentd-es8",
-					DataStreamTemplateName:      "logs-fluentd-template",
-					IncludeTimestamp:            true,
-					ReconnectOnError:            true,
-					ReloadConnections:           new(false),
-					ReloadOnFailure:             true,
-					VerifyEsVersionAtStartup:    new(false),
-					Buffer: &output.Buffer{
-						Type:             "file",
-						Path:             "/buffers/es8",
-						ChunkLimitSize:   "4MB",
-						FlushAtShutdown:  true,
-						FlushInterval:    "15s",
-						FlushMode:        "interval",
-						FlushThreadCount: 2,
-						OverflowAction:   "block",
-						RetryMaxInterval: "30s",
-						RetryTimeout:     "72h",
-					},
-				},
-			},
-		}
-		common.RequireNoError(t, c.GetClient().Create(ctx, &es8Output))
-
-		es9Output := v1beta1.Output{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      "es9-output",
-				Namespace: ns,
-			},
-			Spec: v1beta1.OutputSpec{
-				ElasticsearchOutput: &output.ElasticsearchOutput{
-					Host:                        "elasticsearch9.logging.svc.cluster.local",
-					Port:                        9200,
-					Scheme:                      "http",
-					DefaultElasticsearchVersion: "9",
-					SuppressTypeName:            new(true),
-					DataStreamEnable:            new(true),
-					DataStreamName:              "logs-fluentd-es9",
-					DataStreamTemplateName:      "logs-fluentd-template",
-					IncludeTimestamp:            true,
-					ReconnectOnError:            true,
-					ReloadConnections:           new(false),
-					ReloadOnFailure:             true,
-					VerifyEsVersionAtStartup:    new(false),
-					Buffer: &output.Buffer{
-						Type:             "file",
-						Path:             "/buffers/es9",
-						ChunkLimitSize:   "4MB",
-						FlushAtShutdown:  true,
-						FlushInterval:    "15s",
-						FlushMode:        "interval",
-						FlushThreadCount: 2,
-						OverflowAction:   "block",
-						RetryMaxInterval: "30s",
-						RetryTimeout:     "72h",
-					},
-				},
-			},
-		}
-		common.RequireNoError(t, c.GetClient().Create(ctx, &es9Output))
-
-		producerLabels := map[string]string{
-			"my-unique-label": "log-producer",
-		}
-
-		flow := v1beta1.Flow{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      "all-logs-to-elasticsearch",
-				Namespace: ns,
-			},
-			Spec: v1beta1.FlowSpec{
-				Filters: []v1beta1.Filter{
-					{
-						TagNormaliser: &filter.TagNormaliser{},
-					},
-					{
-						RecordModifier: &filter.RecordModifier{
-							Records: []filter.Record{
-								{"cluster": "test-cluster"},
-								{"environment": "development"},
-							},
-						},
-					},
-					{
-						RecordTransformer: &filter.RecordTransformer{
-							EnableRuby: true,
-							Records: []filter.Record{
-								{"kubernetes_labels_flattened": `${record.dig("kubernetes", "labels").to_json rescue "{}"}`},
-							},
-							RemoveKeys: "kubernetes.labels",
-						},
-					},
-				},
-				Match: []v1beta1.Match{
-					{
-						Select: &v1beta1.Select{},
-					},
-				},
-				LocalOutputRefs: []string{"es7-output", "es8-output", "es9-output"},
-			},
-		}
-		common.RequireNoError(t, c.GetClient().Create(ctx, &flow))
-
-		aggregatorLabels := map[string]string{
-			types.NameLabel:      "fluentd",
-			types.ComponentLabel: "fluentd",
-		}
-		operatorLabels := map[string]string{
-			types.NameLabel: releaseNameOverride,
-		}
-
-		setup.LogProducer(t, c.GetClient(), setup.LogProducerOptionFunc(func(options *setup.LogProducerOptions) {
-			options.Namespace = ns
-			options.Labels = producerLabels
-		}))
-
-		t.Log("Waiting for components to be ready...")
-		require.Eventually(t, func() bool {
-			if operatorRunning := wait.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(operatorLabels))(); !operatorRunning {
-				t.Log("waiting for the operator")
-				return false
+	for _, v := range esVersions {
+		env.Create(esService(ns, v), esDeployment(ns, v))
+	}
+	for i, v := range esVersions {
+		t.Logf("Waiting for %s deployment to be ready...", v.name)
+		// Driving the Condition from the suite's own poll rather than
+		// env.WaitWithin: the budget WaitWithin would take, but the restart
+		// count logged on each failed poll a read-only Condition cannot
+		// produce, and it is what turns a stall into a reported number.
+		require.Eventuallyf(t, func() bool {
+			if met, _ := wait.Deployment(ns, v.name).Met(env.Ctx, env.Client); met {
+				return true
 			}
-			if producerRunning := wait.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(producerLabels))(); !producerRunning {
-				t.Log("waiting for the producer")
-				return false
-			}
-			if aggregatorRunning := wait.AnyPodShouldBeRunning(t, c.GetClient(), client.MatchingLabels(aggregatorLabels)); !aggregatorRunning() {
-				t.Log("waiting for the aggregator")
-				return false
-			}
-			return true
-		}, 5*time.Minute, 3*time.Second)
+			logContainerRestarts(t, env, ns, v.name)
+			return false
+		}, esReadyBudget(t, len(esVersions)-i), 10*time.Second, "%s never became ready", v.name)
+	}
 
-		const (
-			pollInterval = 5 * time.Second
-			pollTimeout  = 2 * time.Minute
-		)
-		curlPod, err := common.SetupCurlPod(ctx, c.GetClient(), ns, "es-tester", pollInterval, pollTimeout)
-		common.RequireNoError(t, err)
+	logging := v1beta1.Logging{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "all-to-es",
+		},
+		Spec: v1beta1.LoggingSpec{
+			ControlNamespace: ns,
+			FluentdSpec: &v1beta1.FluentdSpec{
+				Image:               image.Fluentd().Spec(),
+				ConfigReloaderImage: image.ConfigReloader().Spec(),
+				BufferVolumeImage:   image.NodeExporter().Spec(),
+				Resources: corev1.ResourceRequirements{
+					Limits: corev1.ResourceList{
+						corev1.ResourceCPU:    resource.MustParse("500m"),
+						corev1.ResourceMemory: resource.MustParse("200M"),
+					},
+					Requests: corev1.ResourceList{
+						corev1.ResourceCPU:    resource.MustParse("250m"),
+						corev1.ResourceMemory: resource.MustParse("50M"),
+					},
+				},
+				LogLevel: "debug",
+			},
+		},
+	}
+	env.Create(&logging)
 
-		require.Eventually(t, func() bool {
-			cmd := common.CmdEnv(exec.Command("kubectl", "exec", curlPod.Name, "-n", ns, "--",
-				"curl", "-s", "http://elasticsearch7.logging.svc:9200/_cat/count/fluentd-es7-*?h=count"), c)
-			rawOut, err := cmd.Output()
-			if err != nil {
-				t.Logf("Error checking ES7: %v", err)
-				return false
-			}
-			count := strings.TrimSpace(string(rawOut))
-			t.Logf("ES7 document count: %s", count)
-			return count != "" && count != "0"
-		}, 3*time.Minute, 10*time.Second)
+	agent := v1beta1.FluentbitAgent{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "all-to-es",
+		},
+		Spec: v1beta1.FluentbitSpec{},
+	}
+	env.Create(&agent)
 
-		require.Eventually(t, func() bool {
-			cmd := common.CmdEnv(exec.Command("kubectl", "exec", curlPod.Name, "-n", ns, "--",
-				"curl", "-s", "http://elasticsearch8.logging.svc:9200/_cat/count/.ds-logs-fluentd-es8-*?h=count"), c)
-			rawOut, err := cmd.Output()
-			if err != nil {
-				t.Logf("Error checking ES8: %v", err)
-				return false
-			}
-			count := strings.TrimSpace(string(rawOut))
-			t.Logf("ES8 document count: %s", count)
-			return count != "" && count != "0"
-		}, 3*time.Minute, 10*time.Second)
+	es7Output := v1beta1.Output{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "es7-output",
+			Namespace: ns,
+		},
+		Spec: v1beta1.OutputSpec{
+			ElasticsearchOutput: &output.ElasticsearchOutput{
+				Host:                        "elasticsearch7.logging.svc.cluster.local",
+				Port:                        9200,
+				Scheme:                      "http",
+				DefaultElasticsearchVersion: "7",
+				SuppressTypeName:            new(false),
+				TypeName:                    "_doc",
+				IndexName:                   "test-logs-es7",
+				LogstashFormat:              true,
+				LogstashPrefix:              "fluentd-es7",
+				LogstashDateformat:          "%Y.%m.%d",
+				IncludeTimestamp:            true,
+				ReconnectOnError:            true,
+				ReloadConnections:           new(false),
+				ReloadOnFailure:             true,
+				VerifyEsVersionAtStartup:    new(false),
+				Buffer: &output.Buffer{
+					Type:             "file",
+					Path:             "/buffers/es7",
+					ChunkLimitSize:   "4MB",
+					FlushAtShutdown:  true,
+					FlushInterval:    "15s",
+					FlushMode:        "interval",
+					FlushThreadCount: 2,
+					OverflowAction:   "block",
+					RetryMaxInterval: "30s",
+					RetryTimeout:     "72h",
+				},
+			},
+		},
+	}
+	env.Create(&es7Output)
 
-		require.Eventually(t, func() bool {
-			cmd := common.CmdEnv(exec.Command("kubectl", "exec", curlPod.Name, "-n", ns, "--",
-				"curl", "-s", "http://elasticsearch9.logging.svc:9200/_cat/count/.ds-logs-fluentd-es9-*?h=count"), c)
-			rawOut, err := cmd.Output()
-			if err != nil {
-				t.Logf("Error checking ES9: %v", err)
-				return false
-			}
-			count := strings.TrimSpace(string(rawOut))
-			t.Logf("ES9 document count: %s", count)
-			return count != "" && count != "0"
-		}, 3*time.Minute, 10*time.Second)
-	}, func(t *testing.T, c common.Cluster) error {
-		path := filepath.Join(TestTempDir, fmt.Sprintf("cluster-%s.log", t.Name()))
-		t.Logf("Printing cluster logs to %s", path)
-		err := c.PrintLogs(common.PrintLogConfig{
-			Namespaces: []string{ns, "default"},
-			FilePath:   path,
-			Limit:      100 * 1000,
-		})
-		if err != nil {
-			return err
-		}
+	es8Output := v1beta1.Output{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "es8-output",
+			Namespace: ns,
+		},
+		Spec: v1beta1.OutputSpec{
+			ElasticsearchOutput: &output.ElasticsearchOutput{
+				Host:                        "elasticsearch8.logging.svc.cluster.local",
+				Port:                        9200,
+				Scheme:                      "http",
+				DefaultElasticsearchVersion: "8",
+				SuppressTypeName:            new(true),
+				DataStreamEnable:            new(true),
+				DataStreamName:              "logs-fluentd-es8",
+				DataStreamTemplateName:      "logs-fluentd-template",
+				IncludeTimestamp:            true,
+				ReconnectOnError:            true,
+				ReloadConnections:           new(false),
+				ReloadOnFailure:             true,
+				VerifyEsVersionAtStartup:    new(false),
+				Buffer: &output.Buffer{
+					Type:             "file",
+					Path:             "/buffers/es8",
+					ChunkLimitSize:   "4MB",
+					FlushAtShutdown:  true,
+					FlushInterval:    "15s",
+					FlushMode:        "interval",
+					FlushThreadCount: 2,
+					OverflowAction:   "block",
+					RetryMaxInterval: "30s",
+					RetryTimeout:     "72h",
+				},
+			},
+		},
+	}
+	env.Create(&es8Output)
 
-		loggingOperatorName := "logging-operator-" + releaseNameOverride
-		t.Logf("Collecting coverage files from logging-operator: %s/%s", ns, loggingOperatorName)
-		err = c.CollectTestCoverageFiles(ns, loggingOperatorName)
-		if err != nil {
-			t.Logf("Failed collecting coverage files: %s", err)
-		}
+	es9Output := v1beta1.Output{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "es9-output",
+			Namespace: ns,
+		},
+		Spec: v1beta1.OutputSpec{
+			ElasticsearchOutput: &output.ElasticsearchOutput{
+				Host:                        "elasticsearch9.logging.svc.cluster.local",
+				Port:                        9200,
+				Scheme:                      "http",
+				DefaultElasticsearchVersion: "9",
+				SuppressTypeName:            new(true),
+				DataStreamEnable:            new(true),
+				DataStreamName:              "logs-fluentd-es9",
+				DataStreamTemplateName:      "logs-fluentd-template",
+				IncludeTimestamp:            true,
+				ReconnectOnError:            true,
+				ReloadConnections:           new(false),
+				ReloadOnFailure:             true,
+				VerifyEsVersionAtStartup:    new(false),
+				Buffer: &output.Buffer{
+					Type:             "file",
+					Path:             "/buffers/es9",
+					ChunkLimitSize:   "4MB",
+					FlushAtShutdown:  true,
+					FlushInterval:    "15s",
+					FlushMode:        "interval",
+					FlushThreadCount: 2,
+					OverflowAction:   "block",
+					RetryMaxInterval: "30s",
+					RetryTimeout:     "72h",
+				},
+			},
+		},
+	}
+	env.Create(&es9Output)
 
-		return nil
-	}, func(o *cluster.Options) {
-		if o.Scheme == nil {
-			o.Scheme = runtime.NewScheme()
-		}
-		common.RequireNoError(t, v1beta1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, apiextensionsv1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, appsv1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, batchv1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, corev1.AddToScheme(o.Scheme))
-		common.RequireNoError(t, rbacv1.AddToScheme(o.Scheme))
-	})
+	producerLabels := map[string]string{
+		"my-unique-label": "log-producer",
+	}
+
+	flow := v1beta1.Flow{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "all-logs-to-elasticsearch",
+			Namespace: ns,
+		},
+		Spec: v1beta1.FlowSpec{
+			Filters: []v1beta1.Filter{
+				{
+					TagNormaliser: &filter.TagNormaliser{},
+				},
+				{
+					RecordModifier: &filter.RecordModifier{
+						Records: []filter.Record{
+							{"cluster": "test-cluster"},
+							{"environment": "development"},
+						},
+					},
+				},
+				{
+					RecordTransformer: &filter.RecordTransformer{
+						EnableRuby: true,
+						Records: []filter.Record{
+							{"kubernetes_labels_flattened": `${record.dig("kubernetes", "labels").to_json rescue "{}"}`},
+						},
+						RemoveKeys: "kubernetes.labels",
+					},
+				},
+			},
+			Match: []v1beta1.Match{
+				{
+					Select: &v1beta1.Select{},
+				},
+			},
+			LocalOutputRefs: []string{"es7-output", "es8-output", "es9-output"},
+		},
+	}
+	env.Create(&flow)
+
+	setup.LogProducer(t, env.Client, setup.LogProducerOptionFunc(func(options *setup.LogProducerOptions) {
+		options.Namespace = ns
+		options.Labels = producerLabels
+	}))
+
+	t.Log("Waiting for components to be ready...")
+	env.WaitFor(
+		wait.Operator(release),
+		wait.Producer(producerLabels),
+		wait.FluentdAggregator(ns),
+	)
+
+	const (
+		pollInterval = 5 * time.Second
+		pollTimeout  = 2 * time.Minute
+	)
+	curlPod, err := common.SetupCurlPod(env.Ctx, env.Client, ns, "es-tester", pollInterval, pollTimeout)
+	common.RequireNoError(t, err)
+	es := esClient{pod: curlPod.Name, ns: ns, env: env}
+
+	require.Eventuallyf(t, func() bool {
+		return es.hasDocuments(t, "elasticsearch7", "fluentd-es7-*")
+	}, 3*time.Minute, 10*time.Second, "elasticsearch7 never indexed anything")
+
+	require.Eventuallyf(t, func() bool {
+		return es.hasDocuments(t, "elasticsearch8", ".ds-logs-fluentd-es8-*")
+	}, 3*time.Minute, 10*time.Second, "elasticsearch8 never indexed anything")
+
+	require.Eventuallyf(t, func() bool {
+		return es.hasDocuments(t, "elasticsearch9", ".ds-logs-fluentd-es9-*")
+	}, 3*time.Minute, 10*time.Second, "elasticsearch9 never indexed anything")
 }
