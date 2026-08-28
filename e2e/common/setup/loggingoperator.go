@@ -38,7 +38,7 @@ func LoggingOperator(t *testing.T, c common.Cluster, opts ...LoggingOperatorOpti
 		o.ApplyToLoggingOperatorOptions(opt)
 	}
 
-	restClientGetter, err := NewRESTClientGetter(c.KubeConfigFilePath(), opt.Namespace)
+	restClientGetter, err := newRESTClientGetter(c.KubeConfigFilePath(), opt.Namespace)
 	if err != nil {
 		t.Fatalf("helm rest client getter: %s", err)
 	}

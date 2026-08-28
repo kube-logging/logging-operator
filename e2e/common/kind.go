@@ -80,7 +80,7 @@ func removeIfExists(path string) error {
 	return nil
 }
 
-func KindClusterKubeconfig(name string) ([]byte, error) {
+func kindClusterKubeconfig(name string) ([]byte, error) {
 	kubeconfig, err := clusterKubeconfigPath(name)
 	if err != nil {
 		return nil, err
