@@ -30,7 +30,7 @@ type RESTClientGetter struct {
 	clientconfig clientcmd.ClientConfig
 }
 
-func NewRESTClientGetter(kubeconfigPath string, namespace string) (*RESTClientGetter, error) {
+func newRESTClientGetter(kubeconfigPath string, namespace string) (*RESTClientGetter, error) {
 	kubeconfigContent, err := os.ReadFile(kubeconfigPath)
 	if err != nil {
 		return nil, err

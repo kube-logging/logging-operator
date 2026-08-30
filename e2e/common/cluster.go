@@ -54,7 +54,7 @@ func GetTestCluster(clusterName string, opts ...cluster.Option) (Cluster, error)
 	var restCfg *rest.Config
 	var c cluster.Cluster
 
-	kubeconfig, err = KindClusterKubeconfig(clusterName)
+	kubeconfig, err = kindClusterKubeconfig(clusterName)
 	if err != nil {
 		return nil, errors.WrapIfWithDetails(err, "getting kubeconfig of kind cluster", "clusterName", clusterName)
 	}
@@ -86,12 +86,12 @@ func GetTestCluster(clusterName string, opts ...cluster.Option) (Cluster, error)
 // failing here would not remove the leftover the next run recreates anyway.
 func DeleteTestClusterOrLog(t *testing.T, clusterName string) {
 	t.Helper()
-	if err := DeleteTestCluster(clusterName); err != nil {
+	if err := deleteTestCluster(clusterName); err != nil {
 		t.Logf("deleting cluster %q: %v", clusterName, err)
 	}
 }
 
-func DeleteTestCluster(clusterName string) error {
+func deleteTestCluster(clusterName string) error {
 	kubeconfig, err := clusterKubeconfigPath(clusterName)
 	if err != nil {
 		return err

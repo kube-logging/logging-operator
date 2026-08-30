@@ -30,7 +30,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/kube-logging/logging-operator/e2e/common"
-	"github.com/kube-logging/logging-operator/e2e/common/setup"
 	"github.com/kube-logging/logging-operator/e2e/internal/harness"
 	"github.com/kube-logging/logging-operator/e2e/internal/image"
 	"github.com/kube-logging/logging-operator/e2e/internal/wait"
@@ -494,10 +493,7 @@ func TestElasticsearch_MultiVersion(t *testing.T) {
 	}
 	env.Create(&flow)
 
-	setup.LogProducer(t, env.Client, setup.LogProducerOptionFunc(func(options *setup.LogProducerOptions) {
-		options.Namespace = ns
-		options.Labels = producerLabels
-	}))
+	env.StartLogProducer(ns, producerLabels)
 
 	t.Log("Waiting for components to be ready...")
 	env.WaitFor(
