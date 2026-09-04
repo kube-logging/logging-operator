@@ -265,7 +265,7 @@ logging:
       # -- Repository of the EventTailer image
       repository: ghcr.io/kube-logging/eventrouter
       # -- Tag of the EventTailer image
-      tag: "1.0.0"
+      tag: "1.0.1"
       # -- Image pull policy for the EventTailer image
       pullPolicy: IfNotPresent
       # -- Image pull secrets for the EventTailer image
