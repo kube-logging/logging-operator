@@ -19,9 +19,9 @@ import (
 	"os"
 	"testing"
 
-	"helm.sh/helm/v3/pkg/action"
-	"helm.sh/helm/v3/pkg/chart/loader"
-	"helm.sh/helm/v3/pkg/cli"
+	"helm.sh/helm/v4/pkg/action"
+	"helm.sh/helm/v4/pkg/chart/loader"
+	"helm.sh/helm/v4/pkg/cli"
 	corev1 "k8s.io/api/core/v1"
 
 	"github.com/kube-logging/logging-operator/e2e/common"

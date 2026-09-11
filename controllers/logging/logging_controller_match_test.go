@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/MakeNowJust/heredoc"
+	"github.com/MakeNowJust/heredoc/v2"
 	"github.com/andreyvit/diff"
 	"github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/onsi/gomega"
