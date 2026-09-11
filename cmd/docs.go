@@ -19,7 +19,7 @@ import (
 	"path/filepath"
 
 	"emperror.dev/errors"
-	"github.com/MakeNowJust/heredoc"
+	"github.com/MakeNowJust/heredoc/v2"
 	"github.com/cisco-open/operator-tools/pkg/docgen"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 )
