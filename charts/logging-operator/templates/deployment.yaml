@@ -56,6 +56,16 @@ spec:
           ports:
             - name: http
               containerPort: {{ .Values.http.port }}
+            - name: health
+              containerPort: {{ .Values.healthProbe.port }}
+        {{- with .Values.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+        {{- end }}
+        {{- with .Values.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+        {{- end }}
         {{- with .Values.env }}
           env: {{ toYaml . | nindent 12 }}
         {{- end }}
