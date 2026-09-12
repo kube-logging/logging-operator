@@ -55,6 +55,9 @@ Use `createCustomResource=false` with Helm v3 to avoid trying to create CRDs fro
 | telemetry-controller.install | bool | `false` | Toggle to install and upgrade Telemetry Controller from a subchart. |
 | http.port | int | `8080` | HTTP listen port number. |
 | http.service | object | `{"annotations":{},"clusterIP":"None","labels":{},"type":"ClusterIP"}` | Service definition for query http service. |
+| healthProbe.port | int | `8081` | Health probe (healthz/readyz) listen port number. Must be kept in sync with the `-health-probe-bind-address` manager flag if overridden through `extraArgs`. |
+| livenessProbe | object | `{"httpGet":{"path":"/healthz","port":"health"},"initialDelaySeconds":15,"periodSeconds":20}` | Liveness probe configuration for the logging-operator manager pod. |
+| readinessProbe | object | `{"httpGet":{"path":"/readyz","port":"health"},"initialDelaySeconds":5,"periodSeconds":10}` | Readiness probe configuration for the logging-operator manager pod. |
 | rbac.enabled | bool | `true` | Create rbac service account and roles. |
 | rbac.retainOnDelete | bool | `false` | Keep the operators RBAC resources after the operator is deleted to allow removing pending finalizers. |
 | rbac.createAggregatedViewClusterRole | bool | `false` | Create ClusterRole that extend the existing view ClusterRole to interact with logging-operator CRDs # Ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/#aggregated-clusterroles |

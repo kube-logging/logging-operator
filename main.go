@@ -49,6 +49,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
+	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
@@ -84,6 +85,7 @@ func init() {
 
 func main() {
 	var metricsAddr string
+	var healthProbeAddr string
 	var enableLeaderElection bool
 	var verboseLogging bool
 	var loggingOutputFormat string
@@ -98,6 +100,7 @@ func main() {
 	var syncPeriod string
 
 	flag.StringVar(&metricsAddr, "metrics-addr", ":8080", "The address the metric endpoint binds to.")
+	flag.StringVar(&healthProbeAddr, "health-probe-bind-address", ":8081", "The address the health probe (healthz/readyz) endpoint binds to.")
 	flag.BoolVar(&enableLeaderElection, "enable-leader-election", false,
 		"Enable leader election for controller manager. Enabling this will ensure there is only one active controller manager.")
 	flag.BoolVar(&verboseLogging, "verbose", false, "Enable verbose logging")
@@ -151,10 +154,11 @@ func main() {
 	klog.SetLogger(zapLogger)
 
 	mgrOptions := ctrl.Options{
-		Scheme:           scheme,
-		Metrics:          metricsserver.Options{BindAddress: metricsAddr},
-		LeaderElection:   enableLeaderElection,
-		LeaderElectionID: "logging-operator." + loggingv1beta1.GroupVersion.Group,
+		Scheme:                 scheme,
+		Metrics:                metricsserver.Options{BindAddress: metricsAddr},
+		HealthProbeBindAddress: healthProbeAddr,
+		LeaderElection:         enableLeaderElection,
+		LeaderElectionID:       "logging-operator." + loggingv1beta1.GroupVersion.Group,
 	}
 
 	if os.Getenv("ENABLE_WEBHOOKS") == "true" {
@@ -202,6 +206,11 @@ func main() {
 
 	if err := detectContainerRuntime(ctx, mgr.GetAPIReader()); err != nil {
 		setupLog.Error(err, "failed to detect container runtime")
+		os.Exit(1)
+	}
+
+	if err := setupHealthChecks(mgr); err != nil {
+		setupLog.Error(err, "unable to set up health checks")
 		os.Exit(1)
 	}
 
@@ -341,6 +350,14 @@ func detectContainerRuntime(ctx context.Context, c client.Reader) error {
 	}
 
 	return nil
+}
+
+func setupHealthChecks(mgr ctrl.Manager) error {
+	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
+		return err
+	}
+
+	return mgr.AddReadyzCheck("readyz", healthz.Ping)
 }
 
 func setupCustomCache(mgrOptions *ctrl.Options, syncPeriod string, namespace string, loggingRef string, watchLabeledChildren bool) (*ctrl.Options, error) {

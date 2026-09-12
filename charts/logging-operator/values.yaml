@@ -68,6 +68,26 @@ http:
     # Labels to query http service
     labels: {}
 
+healthProbe:
+  # -- Health probe (healthz/readyz) listen port number. Must be kept in sync with the `-health-probe-bind-address` manager flag if overridden through `extraArgs`.
+  port: 8081
+
+# -- Liveness probe configuration for the logging-operator manager pod.
+livenessProbe:
+  httpGet:
+    path: /healthz
+    port: health
+  initialDelaySeconds: 15
+  periodSeconds: 20
+
+# -- Readiness probe configuration for the logging-operator manager pod.
+readinessProbe:
+  httpGet:
+    path: /readyz
+    port: health
+  initialDelaySeconds: 5
+  periodSeconds: 10
+
 rbac:
   # -- Create rbac service account and roles.
   enabled: true
