@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package setup
+package harness
 
 import (
 	"os"
@@ -26,11 +26,11 @@ import (
 	"k8s.io/client-go/tools/clientcmd/api"
 )
 
-type RESTClientGetter struct {
+type restClientGetter struct {
 	clientconfig clientcmd.ClientConfig
 }
 
-func newRESTClientGetter(kubeconfigPath string, namespace string) (*RESTClientGetter, error) {
+func newRESTClientGetter(kubeconfigPath string, namespace string) (*restClientGetter, error) {
 	kubeconfigContent, err := os.ReadFile(kubeconfigPath)
 	if err != nil {
 		return nil, err
@@ -51,14 +51,14 @@ func newRESTClientGetter(kubeconfigPath string, namespace string) (*RESTClientGe
 		},
 	})
 
-	return &RESTClientGetter{clientconfig}, nil
+	return &restClientGetter{clientconfig}, nil
 }
 
-func (r *RESTClientGetter) ToRESTConfig() (*rest.Config, error) {
+func (r *restClientGetter) ToRESTConfig() (*rest.Config, error) {
 	return r.clientconfig.ClientConfig()
 }
 
-func (r *RESTClientGetter) ToDiscoveryClient() (discovery.CachedDiscoveryInterface, error) {
+func (r *restClientGetter) ToDiscoveryClient() (discovery.CachedDiscoveryInterface, error) {
 	restconfig, err := r.clientconfig.ClientConfig()
 	if err != nil {
 		return nil, err
@@ -70,7 +70,7 @@ func (r *RESTClientGetter) ToDiscoveryClient() (discovery.CachedDiscoveryInterfa
 	return memory.NewMemCacheClient(dc), nil
 }
 
-func (r *RESTClientGetter) ToRESTMapper() (meta.RESTMapper, error) {
+func (r *restClientGetter) ToRESTMapper() (meta.RESTMapper, error) {
 	dc, err := r.ToDiscoveryClient()
 	if err != nil {
 		return nil, err
@@ -78,6 +78,6 @@ func (r *RESTClientGetter) ToRESTMapper() (meta.RESTMapper, error) {
 	return restmapper.NewDeferredDiscoveryRESTMapper(dc), nil
 }
 
-func (r *RESTClientGetter) ToRawKubeConfigLoader() clientcmd.ClientConfig {
+func (r *restClientGetter) ToRawKubeConfigLoader() clientcmd.ClientConfig {
 	return r.clientconfig
 }

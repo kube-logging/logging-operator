@@ -206,7 +206,7 @@ test: codegen fmt vet manifests ${ENVTEST_BINARY_ASSETS} ${KUBEBUILDER} ## Run t
 	cd pkg/sdk/logging/model/syslogng/config && go test ./...  -coverprofile ${TEST_COV_DIR}/cover_syslogng.out
 	ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} go test -v ./controllers/logging/... ./pkg/...  -coverprofile ${TEST_COV_DIR}/cover_controllers_logging.out
 	ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} go test -v ./controllers/extensions/... ./pkg/...  -coverprofile ${TEST_COV_DIR}/cover_controllers_extensions.out
-	cd e2e && go test -v ./common/... ./internal/...
+	cd e2e && go test -v ./internal/...
 
 .PHONY: generate-test-coverage
 generate-test-coverage: test
@@ -251,7 +251,7 @@ test-e2e-nodeps:
 		KIND_IMAGE="$(KIND_IMAGE)" \
 		PROJECT_DIR="$(PWD)" \
 		E2E_TEST_COV_DIR=${TEST_COV_DIR} \
-		go test -count=1 -v -p ${E2E_CLUSTERS} -parallel ${E2E_SUITE_PARALLEL} -timeout ${E2E_TEST_TIMEOUT} $$(go list ./${E2E_TEST}/... | grep -vE '/e2e/(common|internal)(/|$$)')
+		go test -count=1 -v -p ${E2E_CLUSTERS} -parallel ${E2E_SUITE_PARALLEL} -timeout ${E2E_TEST_TIMEOUT} $$(go list ./${E2E_TEST}/... | grep -vE '/e2e/internal(/|$$)')
 		go tool covdata textfmt -i=${TEST_COV_DIR}/covdatafiles -o ${TEST_COV_DIR}/coverage_e2e.out
 	@echo "--- E2E test coverage report"
 	go tool covdata percent -i=${TEST_COV_DIR}/covdatafiles

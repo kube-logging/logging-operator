@@ -9,7 +9,6 @@ require (
 	github.com/kube-logging/logging-operator v0.0.0-20260525191431-270b64e8120f
 	github.com/kube-logging/logging-operator/pkg/sdk v0.12.0
 	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.93.1
-	github.com/spf13/cast v1.10.0
 	github.com/stretchr/testify v1.11.1
 	helm.sh/helm/v3 v3.21.0
 	k8s.io/api v0.36.3
@@ -113,6 +112,7 @@ require (
 	github.com/santhosh-tekuri/jsonschema/v6 v6.0.2 // indirect
 	github.com/shopspring/decimal v1.4.0 // indirect
 	github.com/sirupsen/logrus v1.9.4 // indirect
+	github.com/spf13/cast v1.10.0 // indirect
 	github.com/spf13/cobra v1.10.2 // indirect
 	github.com/spf13/pflag v1.0.10 // indirect
 	github.com/vladimirvivien/gexe v0.5.0 // indirect

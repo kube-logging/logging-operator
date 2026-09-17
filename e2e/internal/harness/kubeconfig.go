@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package common
+package harness
 
 import (
 	"fmt"
@@ -26,10 +26,10 @@ import (
 	"github.com/kube-logging/logging-operator/e2e/internal/kind"
 )
 
-// KindClusterCreationTimeout is passed to `kind create cluster --wait`, which
+// kindClusterCreationTimeout is passed to `kind create cluster --wait`, which
 // bounds only the last of kind's actions, waiting for control plane readiness.
 // The whole invocation is bounded by Kind.CommandTimeout instead.
-const KindClusterCreationTimeout = "3m"
+const kindClusterCreationTimeout = "3m"
 
 var kindCLI = kind.New()
 
@@ -88,7 +88,7 @@ func kindClusterKubeconfig(name string) ([]byte, error) {
 
 	create := kind.CreateClusterOptions{
 		Name:       name,
-		Wait:       KindClusterCreationTimeout,
+		Wait:       kindClusterCreationTimeout,
 		Kubeconfig: kubeconfig,
 	}
 

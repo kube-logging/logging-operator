@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -25,6 +26,7 @@ import (
 	"testing"
 	"time"
 
+	"emperror.dev/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	appsv1 "k8s.io/api/apps/v1"
@@ -35,10 +37,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/cluster"
 
-	"github.com/kube-logging/logging-operator/e2e/common"
-	"github.com/kube-logging/logging-operator/e2e/common/setup"
 	"github.com/kube-logging/logging-operator/e2e/internal/wait"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
@@ -124,31 +123,32 @@ type Env struct {
 	T   *testing.T
 	Ctx context.Context
 
-	Client  client.Client
-	Cluster common.Cluster
+	Client     client.Client
+	Kubeconfig string
 
 	Release          string
 	ControlNamespace string
 	Receiver         Receiver
 
+	cluster        *kindCluster
 	dumpNamespaces []string
 }
 
 // Start marks the test parallel, so it has to be the first call in the test.
 func (b *Builder) Start() *Env {
 	t := b.t
-	common.Initialize(t)
+	t.Parallel()
 
 	scheme, err := buildScheme(b.cfg.schemeBuilders)
-	common.RequireNoError(t, err)
+	requireNoError(t, err)
 
-	c, err := common.GetTestCluster(b.cfg.cluster, func(o *cluster.Options) { o.Scheme = scheme })
+	c, err := newCluster(b.cfg.cluster, scheme)
 	if err != nil {
 		// The kind cluster is up before the client can fail, and teardown is
 		// not registered yet.
-		common.DeleteTestClusterOrLog(t, b.cfg.cluster)
+		deleteClusterOrLog(t, b.cfg.cluster)
 	}
-	common.RequireNoError(t, err)
+	requireNoError(t, err)
 
 	// Not t.Context(): that is canceled before the first Cleanup runs, which
 	// would stop the cache before the log dump reads through it.
@@ -160,25 +160,22 @@ func (b *Builder) Start() *Env {
 		T:                t,
 		Ctx:              ctx,
 		Client:           c.GetClient(),
-		Cluster:          c,
+		Kubeconfig:       c.kubeconfig,
 		Release:          b.cfg.release,
 		ControlNamespace: b.cfg.controlNamespace,
+		cluster:          c,
 		dumpNamespaces:   dumpNamespaces(b.cfg),
 	}
 	env.Receiver = Receiver{env: env}
 
 	teardown{
 		{"artifacts", env.collectArtifacts},
-		{"kubeconfig", func() { assert.NoError(t, c.Cleanup()) }},
+		{"kubeconfig", func() { assert.NoError(t, c.removeKubeconfig()) }},
 		{"stop", func() { stopCluster(t, cancel, startErr) }},
-		{"delete", func() { common.DeleteTestClusterOrLog(t, b.cfg.cluster) }},
+		{"delete", func() { deleteClusterOrLog(t, b.cfg.cluster) }},
 	}.register(t)
 
-	setup.LoggingOperator(t, c, setup.LoggingOperatorOptionFunc(func(o *setup.LoggingOperatorOptions) {
-		o.Namespace = b.cfg.controlNamespace
-		o.NameOverride = b.cfg.release
-		o.Args = b.cfg.operatorArgs
-	}))
+	installOperator(t, c, b.cfg)
 
 	for _, ns := range b.cfg.namespaces {
 		env.Create(&corev1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: ns}})
@@ -190,17 +187,18 @@ func (b *Builder) Start() *Env {
 func (e *Env) Create(objects ...client.Object) {
 	e.T.Helper()
 	for _, object := range objects {
-		common.RequireNoError(e.T, e.Client.Create(e.Ctx, object))
+		requireNoError(e.T, e.Client.Create(e.Ctx, object))
 	}
 }
 
-// StartLogProducer runs on the test goroutine, where FailNow is defined.
 func (e *Env) StartLogProducer(namespace string, labels map[string]string) {
 	e.T.Helper()
-	setup.LogProducer(e.T, e.Client, setup.LogProducerOptionFunc(func(o *setup.LogProducerOptions) {
-		o.Namespace = namespace
-		o.Labels = labels
-	}))
+	e.Create(logProducer(namespace, labels)...)
+}
+
+// Kubectl is the seam for what the client cannot do, which is exec into a pod.
+func (e *Env) Kubectl(args ...string) *exec.Cmd {
+	return kubectl(e.Kubeconfig, args...)
 }
 
 func (e *Env) WaitFor(conditions ...wait.Condition) {
@@ -313,16 +311,12 @@ func (e *Env) collectArtifacts() {
 		e.T.Logf("Skipping cluster logs: %s", err)
 	} else {
 		e.T.Logf("Printing cluster logs to %s", path)
-		assert.NoError(e.T, e.Cluster.PrintLogs(common.PrintLogConfig{
-			Namespaces: e.dumpNamespaces,
-			FilePath:   path,
-			Limit:      clusterLogLimit,
-		}))
+		assert.NoError(e.T, e.cluster.printLogs(e.dumpNamespaces, path, clusterLogLimit))
 	}
 
 	operator := "logging-operator-" + e.Release
 	e.T.Logf("Collecting coverage files from logging-operator: %s/%s", e.ControlNamespace, operator)
-	if err := e.Cluster.CollectTestCoverageFiles(e.ControlNamespace, operator); err != nil {
+	if err := e.cluster.collectCoverage(e.ControlNamespace, operator); err != nil {
 		// Logged, never fatal: coverage is not the suite's verdict.
 		e.T.Logf("Failed collecting coverage files: %s", err)
 	}
@@ -352,12 +346,25 @@ func dumpNamespaces(cfg config) []string {
 	return out
 }
 
-func artifactPath(name string) (string, error) {
-	root, ok := os.LookupEnv("PROJECT_DIR")
-	if !ok {
-		root = "../.."
+// requireNoError keeps errors.GetDetails, which require.NoError would drop.
+func requireNoError(t *testing.T, err error) {
+	t.Helper()
+	if err != nil {
+		assert.Fail(t, fmt.Sprintf("Received unexpected error:\n%#v %+v", err, errors.GetDetails(err)))
+		t.FailNow()
 	}
-	dir := filepath.Join(root, "build/_test")
+}
+
+// projectDir falls back to the repo root relative to a suite directory.
+func projectDir() string {
+	if dir := os.Getenv("PROJECT_DIR"); dir != "" {
+		return dir
+	}
+	return "../.."
+}
+
+func artifactPath(name string) (string, error) {
+	dir := filepath.Join(projectDir(), "build/_test")
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return "", err
 	}

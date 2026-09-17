@@ -123,7 +123,7 @@ func requireOwnedBy(t *testing.T, owner *v1beta1.Logging, ref *metav1.OwnerRefer
 }
 
 func installFluentdSts(env *harness.Env) error {
-	manager := helm.New(env.Cluster.KubeConfigFilePath())
+	manager := helm.New(env.Kubeconfig)
 
 	if err := manager.RunRepo(helm.WithArgs("add", "fluent", "https://fluent.github.io/helm-charts")); err != nil {
 		return fmt.Errorf("failed to add fluent repo: %v", err)

@@ -12,9 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package image is the only declaration of the images the Makefile builds. It
-// sits below the harness rather than on it because common/setup owns the loader
-// and the harness imports that, so only a package below both can serve both.
+// Package image is the only declaration of the images the Makefile builds.
 package image
 
 import (

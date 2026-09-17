@@ -17,18 +17,16 @@ package logging_metrics_monitoring_test
 import (
 	"errors"
 	"fmt"
-	"os/exec"
 	"strings"
 	"testing"
 	"time"
 
 	v1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"github.com/stretchr/testify/require"
-	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/e2e-framework/third_party/helm"
 
-	"github.com/kube-logging/logging-operator/e2e/common"
+	"github.com/kube-logging/logging-operator/e2e/internal/fixture"
 	"github.com/kube-logging/logging-operator/e2e/internal/harness"
 	"github.com/kube-logging/logging-operator/e2e/internal/image"
 	"github.com/kube-logging/logging-operator/e2e/internal/wait"
@@ -36,7 +34,7 @@ import (
 )
 
 type metricsTester struct {
-	testPod *corev1.Pod
+	pod string
 }
 
 type metricsEndpoint struct {
@@ -153,8 +151,10 @@ func TestLoggingMetrics_Monitoring(t *testing.T) {
 	serviceMonitorsSyslogNG := &v1.ServiceMonitorList{}
 	require.NoError(t, env.Client.List(env.Ctx, serviceMonitorsSyslogNG))
 
-	mt, err := setupMetricsTester(env)
-	require.NoError(t, err)
+	const curlPod = "metrics-tester"
+	env.Create(fixture.CurlPod(ns, curlPod))
+	env.WaitFor(wait.Pod(ns, curlPod))
+	mt := metricsTester{pod: curlPod}
 
 	mt.mustServe(env, fluentbit)
 	mt.mustServe(env, syslogNG)
@@ -177,7 +177,7 @@ func TestLoggingMetrics_Monitoring(t *testing.T) {
 // stack is what the ServiceMonitors are read by, and pinning our own copy of it
 // would be a second thing to keep current.
 func installPrometheusOperator(env *harness.Env) error {
-	manager := helm.New(env.Cluster.KubeConfigFilePath())
+	manager := helm.New(env.Kubeconfig)
 
 	if err := manager.RunRepo(helm.WithArgs("add", "prometheus-community", "https://prometheus-community.github.io/helm-charts")); err != nil {
 		return fmt.Errorf("failed to add prometheus-community repo: %v", err)
@@ -201,15 +201,6 @@ func installPrometheusOperator(env *harness.Env) error {
 	}
 
 	return nil
-}
-
-func setupMetricsTester(env *harness.Env) (metricsTester, error) {
-	pod, err := common.SetupCurlPod(env.Ctx, env.Client, ns, "metrics-tester", pollInterval, pollTimeout)
-	if err != nil {
-		return metricsTester{}, err
-	}
-
-	return metricsTester{testPod: pod}, nil
 }
 
 func checkServiceMonitorAvailability(serviceMonitors []v1.ServiceMonitor) error {
@@ -265,8 +256,7 @@ func (mt *metricsTester) getMetrics(endpoint metricsEndpoint, env *harness.Env) 
 		endpoint.port,
 		endpoint.path,
 	)
-	cmd := common.CmdEnv(exec.Command("kubectl", "exec", mt.testPod.Name, "-n", ns, "--", "curl", serviceURL), env.Cluster)
-	rawOut, err := cmd.Output()
+	rawOut, err := env.Kubectl("exec", mt.pod, "-n", ns, "--", "curl", serviceURL).Output()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get metrics: %w", err)
 	}

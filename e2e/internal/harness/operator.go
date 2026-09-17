@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package setup
+package harness
 
 import (
-	"fmt"
-	"os"
+	"path/filepath"
 	"testing"
 
 	"helm.sh/helm/v3/pkg/action"
@@ -24,27 +23,17 @@ import (
 	"helm.sh/helm/v3/pkg/cli"
 	corev1 "k8s.io/api/core/v1"
 
-	"github.com/kube-logging/logging-operator/e2e/common"
 	"github.com/kube-logging/logging-operator/e2e/internal/image"
 )
 
-func LoggingOperator(t *testing.T, c common.Cluster, opts ...LoggingOperatorOption) {
-	opt := &LoggingOperatorOptions{
-		Namespace:    "default",
-		NameOverride: "logging-operator",
-	}
-
-	for _, o := range opts {
-		o.ApplyToLoggingOperatorOptions(opt)
-	}
-
-	restClientGetter, err := newRESTClientGetter(c.KubeConfigFilePath(), opt.Namespace)
+func installOperator(t *testing.T, c *kindCluster, cfg config) {
+	restClientGetter, err := newRESTClientGetter(c.kubeconfig, cfg.controlNamespace)
 	if err != nil {
 		t.Fatalf("helm rest client getter: %s", err)
 	}
 	actionConfig := new(action.Configuration)
 
-	if err := actionConfig.Init(restClientGetter, opt.Namespace, "memory", func(format string, v ...any) {
+	if err := actionConfig.Init(restClientGetter, cfg.controlNamespace, "memory", func(format string, v ...any) {
 		t.Logf(format, v...)
 	}); err != nil {
 		t.Fatalf("helm action config init: %s", err)
@@ -52,16 +41,11 @@ func LoggingOperator(t *testing.T, c common.Cluster, opts ...LoggingOperatorOpti
 
 	installer := action.NewInstall(actionConfig)
 
-	installer.Namespace = opt.Namespace
+	installer.Namespace = cfg.controlNamespace
 	installer.CreateNamespace = true
 	installer.ReleaseName = "logging-operator"
 
-	projectDir := os.Getenv("PROJECT_DIR")
-	if projectDir == "" {
-		projectDir = "../.."
-	}
-
-	cp, err := installer.LocateChart(fmt.Sprintf("%s/charts/logging-operator", projectDir), cli.New())
+	cp, err := installer.LocateChart(filepath.Join(projectDir(), "charts/logging-operator"), cli.New())
 	if err != nil {
 		t.Fatalf("helm locate chart: %s", err)
 	}
@@ -79,12 +63,12 @@ func LoggingOperator(t *testing.T, c common.Cluster, opts ...LoggingOperatorOpti
 
 	// One invocation, so docker save writes shared layers once instead of once
 	// per image.
-	if err := c.LoadImages(images...); err != nil {
+	if err := c.loadImages(images...); err != nil {
 		t.Fatalf("kind load images: %s", err)
 	}
 
 	_, err = installer.Run(chartReq, map[string]any{
-		"nameOverride": opt.NameOverride,
+		"nameOverride": cfg.release,
 		"image": map[string]any{
 			"repository": loggingOperatorImage.Repository,
 			"tag":        loggingOperatorImage.Tag,
@@ -111,25 +95,9 @@ func LoggingOperator(t *testing.T, c common.Cluster, opts ...LoggingOperatorOpti
 				"value": "/covdatafiles",
 			},
 		},
-		"extraArgs": opt.Args,
+		"extraArgs": cfg.operatorArgs,
 	})
 	if err != nil {
 		t.Fatalf("helm chart install: %s", err)
 	}
-}
-
-type LoggingOperatorOption interface {
-	ApplyToLoggingOperatorOptions(options *LoggingOperatorOptions)
-}
-
-type LoggingOperatorOptionFunc func(*LoggingOperatorOptions)
-
-func (fn LoggingOperatorOptionFunc) ApplyToLoggingOperatorOptions(options *LoggingOperatorOptions) {
-	fn(options)
-}
-
-type LoggingOperatorOptions struct {
-	Namespace    string
-	NameOverride string
-	Args         []string
 }

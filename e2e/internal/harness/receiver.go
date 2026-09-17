@@ -16,15 +16,12 @@ package harness
 
 import (
 	"fmt"
-	"os/exec"
 	"strconv"
 	"strings"
 
 	"github.com/cisco-open/operator-tools/pkg/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	"github.com/kube-logging/logging-operator/e2e/common"
 )
 
 const (
@@ -43,8 +40,8 @@ type Receiver struct {
 
 func ReceiverName(release string) string { return release + "-test-receiver" }
 
-// These take a release rather than an Env so the unmigrated suites can use
-// them too. They go when the last one migrates, leaving the methods.
+// ReceiverURL and ReceiverURLIn take a release rather than an Env because
+// fixture builds its Outputs before there is one.
 func ReceiverURL(release, tag string) string {
 	return fmt.Sprintf("http://%s:%d/%s", ReceiverName(release), receiverPort, tag)
 }
@@ -93,17 +90,17 @@ func (r Receiver) MustNotReceive(tags ...string) {
 // makes the aggregator buffer instead of deliver.
 func (r Receiver) Scale(replicas int) {
 	r.env.T.Helper()
-	require.NoError(r.env.T, common.CmdEnv(exec.Command("kubectl",
+	require.NoError(r.env.T, r.env.Kubectl(
 		"scale", "deployment/"+ReceiverName(r.env.Release),
 		"-n", r.env.ControlNamespace,
-		"--replicas", strconv.Itoa(replicas)), r.env.Cluster).Run())
+		"--replicas", strconv.Itoa(replicas)).Run())
 }
 
 func (r Receiver) Logs() (string, error) {
-	out, err := common.CmdEnv(exec.Command("kubectl",
+	out, err := r.env.Kubectl(
 		"logs",
 		"-n", r.env.ControlNamespace,
 		"--tail", fmt.Sprint(receiverLogTail),
-		"-l", fmt.Sprintf("%s=%s", types.NameLabel, ReceiverName(r.env.Release))), r.env.Cluster).Output()
+		"-l", fmt.Sprintf("%s=%s", types.NameLabel, ReceiverName(r.env.Release))).Output()
 	return string(out), err
 }

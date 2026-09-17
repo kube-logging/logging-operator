@@ -5,8 +5,8 @@ provisions its own KIND cluster, installs the operator into it and tears it down
 afterwards. Suites do not share a cluster, so they can run concurrently and a
 failure in one leaves the others alone.
 
-`common/` and `internal/` are helpers rather than suites, and the Makefile
-filters them out of the selection.
+`internal/` is the harness rather than a suite, and the Makefile filters it out
+of the selection.
 
 ## Running them
 
@@ -86,8 +86,8 @@ func TestSomething(t *testing.T) {
 }
 ```
 
-`Start()` returns an `Env` carrying `T`, `Ctx`, `Client`, `Cluster`, `Release`,
-`ControlNamespace` and `Receiver`. Teardown is registered for you and runs in
+`Start()` returns an `Env` carrying `T`, `Ctx`, `Client`, `Kubeconfig`,
+`Release`, `ControlNamespace` and `Receiver`. Teardown is registered for you and runs in
 order: artifacts (the log dump and coverage), the temporary kubeconfig, stopping
 the cluster, deleting it. Each step is isolated, so one failing does not strand
 the cluster.
@@ -155,8 +155,11 @@ env.Receiver.MustNotReceive("tag") // point-in-time check that it did not
 env.Receiver.Scale(0)              // take it away, to make an aggregator buffer
 ```
 
-Prefer these to shelling out to `kubectl` — `#2325` tracks the calls that are
-left, and each one is a case where nothing better exists yet.
+Prefer these to shelling out. What they do not cover — running a command inside
+a pod — goes through `env.Kubectl(args...)`, which is `kubectl` against the
+suite's cluster. A suite that has to reach a Service creates
+`fixture.CurlPod(ns, name)`, waits on `wait.Pod(ns, name)`, and execs `curl`
+through it.
 
 ### Images
 
