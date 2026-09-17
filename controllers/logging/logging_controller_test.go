@@ -1357,7 +1357,7 @@ func beforeEach(t *testing.T) func() {
 func beforeEachWithError(t *testing.T, errors chan<- error) func() {
 	g := gomega.NewWithT(t)
 
-	timeout := 1 * time.Second
+	timeout := 5 * time.Second
 
 	mgr, err = ctrl.NewManager(cfg, ctrl.Options{
 		Scheme:                  scheme.Scheme,

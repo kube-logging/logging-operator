@@ -118,7 +118,12 @@ func duplicateRequest(t *testing.T, inner reconcile.Reconciler, stopped *bool, e
 				t.Logf("reconcile failure err: %+v req: %+v, result: %+v", err, req, result)
 			}
 			if errors != nil {
-				errors <- err
+				// Nobody reads the channel once the test has returned, and a send
+				// that blocks here keeps the worker, and so the manager, alive.
+				select {
+				case errors <- err:
+				case <-ctx.Done():
+				}
 			}
 		}
 		return result, err
