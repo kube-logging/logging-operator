@@ -118,25 +118,19 @@ func main() {
 
 	ctx := context.Background()
 
+	encoder, encoderErr := logEncoder(loggingOutputFormat)
 	zapLogger := zap.New(func(o *zap.Options) {
 		o.Development = verboseLogging
-
-		switch loggingOutputFormat {
-		case "json":
-			encoder := zap.JSONEncoder()
+		if encoder != nil {
 			encoder(o)
-		case "console":
-			encoder := zap.ConsoleEncoder()
-			encoder(o)
-		case "":
-			break
-		default:
-			fmt.Printf("invalid encoder value \"%s\"", loggingOutputFormat)
-			os.Exit(1)
 		}
 	})
 
 	ctrl.SetLogger(zapLogger)
+	if encoderErr != nil {
+		setupLog.Error(encoderErr, "invalid -output-format")
+		os.Exit(1)
+	}
 
 	klogFlags := flag.NewFlagSet("klog", flag.ExitOnError)
 	klog.InitFlags(klogFlags)
@@ -149,7 +143,7 @@ func main() {
 
 	err := klogFlags.Set("v", cast.ToString(klogLevel))
 	if err != nil {
-		fmt.Printf("%s - failed to set log level for klog, moving on.\n", err)
+		setupLog.Error(err, "failed to set log level for klog, moving on")
 	}
 	klog.SetLogger(zapLogger)
 
@@ -451,5 +445,20 @@ func cleanupFinalizers(ctx context.Context, client client.Client) {
 				}
 			}
 		}
+	}
+}
+
+// logEncoder leaves zap's default in place for a bad value, so the logger
+// exists to report it.
+func logEncoder(format string) (zap.Opts, error) {
+	switch format {
+	case "json":
+		return zap.JSONEncoder(), nil
+	case "console":
+		return zap.ConsoleEncoder(), nil
+	case "":
+		return nil, nil
+	default:
+		return nil, fmt.Errorf("unknown output format %q, want json or console", format)
 	}
 }
