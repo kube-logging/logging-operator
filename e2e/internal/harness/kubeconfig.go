@@ -80,10 +80,12 @@ func removeIfExists(path string) error {
 	return nil
 }
 
-func kindClusterKubeconfig(name string) ([]byte, error) {
+// createCluster returns the kubeconfig kind wrote, which is the one every
+// client uses: kind's lock only guards kind against kind.
+func createCluster(name string) (string, error) {
 	kubeconfig, err := clusterKubeconfigPath(name)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	create := kind.CreateClusterOptions{
@@ -100,17 +102,14 @@ func kindClusterKubeconfig(name string) ([]byte, error) {
 			Name:       name,
 			Kubeconfig: kubeconfig,
 		}); err != nil {
-			return nil, errors.WrapIfWithDetails(err, "deleting a leftover kind cluster", "clusterName", name)
+			return "", errors.WrapIfWithDetails(err, "deleting a leftover kind cluster", "clusterName", name)
 		}
 		err = kindCLI.CreateCluster(create)
 	}
 	if err != nil {
-		return nil, err
+		return "", err
 	}
-
-	return kindCLI.GetKubeconfig(kind.GetKubeconfigOptions{
-		Name: name,
-	})
+	return kubeconfig, nil
 }
 
 func isClusterAlreadyExistsError(err error) bool {

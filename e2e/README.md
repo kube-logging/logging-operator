@@ -87,8 +87,8 @@ func TestSomething(t *testing.T) {
 
 `Start()` returns an `Env` carrying `T`, `Ctx`, `Client`, `Kubeconfig`,
 `Release`, `ControlNamespace` and `Receiver`. Teardown is registered for you and runs in
-order: artifacts (the log dump and coverage), the temporary kubeconfig, stopping
-the cluster, deleting it. Each step is isolated, so one failing does not strand
+order: artifacts (the log dump and coverage), stopping the cluster, deleting
+it. Each step is isolated, so one failing does not strand
 the cluster.
 
 ### Builder options

@@ -170,7 +170,6 @@ func (b *Builder) Start() *Env {
 
 	teardown{
 		{"artifacts", env.collectArtifacts},
-		{"kubeconfig", func() { assert.NoError(t, c.removeKubeconfig()) }},
 		{"stop", func() { stopCluster(t, cancel, startErr) }},
 		{"delete", func() { deleteClusterOrLog(t, b.cfg.cluster) }},
 	}.register(t)

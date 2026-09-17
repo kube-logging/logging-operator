@@ -44,41 +44,20 @@ type kindCluster struct {
 	kubeconfig string
 }
 
-func newCluster(name string, scheme *runtime.Scheme) (_ *kindCluster, err error) {
-	kubeconfig, err := kindClusterKubeconfig(name)
+func newCluster(name string, scheme *runtime.Scheme) (*kindCluster, error) {
+	kubeconfig, err := createCluster(name)
 	if err != nil {
-		return nil, errors.WrapIfWithDetails(err, "getting kubeconfig of kind cluster", "clusterName", name)
+		return nil, errors.WrapIfWithDetails(err, "creating kind cluster", "clusterName", name)
 	}
-	kubeconfigFile, err := os.CreateTemp("", "kind-kind-kubeconfig")
+	restCfg, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 	if err != nil {
-		return nil, errors.WrapIfWithDetails(err, "unable to create temp file for kubeconfig", "clusterName", name)
-	}
-	path := kubeconfigFile.Name()
-	defer func() {
-		if err != nil {
-			_ = os.Remove(path)
-		}
-	}()
-	_, err = kubeconfigFile.Write(kubeconfig)
-	if closeErr := kubeconfigFile.Close(); err == nil {
-		err = closeErr
-	}
-	if err != nil {
-		return nil, errors.WrapIfWithDetails(err, "failed to write kubeconfig", "clusterName", name, "path", path)
-	}
-	clientCfg, err := clientcmd.NewClientConfigFromBytes(kubeconfig)
-	if err != nil {
-		return nil, errors.WrapIfWithDetails(err, "creating client config from kubeconfig bytes", "kubeconfig", kubeconfig)
-	}
-	restCfg, err := clientCfg.ClientConfig()
-	if err != nil {
-		return nil, errors.WrapIfWithDetails(err, "creating rest config from client config", "cfg", clientCfg)
+		return nil, errors.WrapIfWithDetails(err, "reading kubeconfig", "path", kubeconfig)
 	}
 	c, err := cluster.New(restCfg, func(o *cluster.Options) { o.Scheme = scheme })
 	if err != nil {
 		return nil, errors.WrapIfWithDetails(err, "creating cluster with rest config", "cfg", restCfg)
 	}
-	return &kindCluster{Cluster: c, name: name, kubeconfig: path}, nil
+	return &kindCluster{Cluster: c, name: name, kubeconfig: kubeconfig}, nil
 }
 
 // A delete that fails after the assertions have run is the runner's state, and
@@ -144,8 +123,4 @@ func (c *kindCluster) collectCoverage(namespace, operator string) error {
 		return errors.WrapIfWithDetails(err, "Error in extracting test coverage files", out)
 	}
 	return nil
-}
-
-func (c *kindCluster) removeKubeconfig() error {
-	return os.Remove(c.kubeconfig)
 }

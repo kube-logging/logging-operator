@@ -40,10 +40,10 @@ func TestTeardownRunsInDeclaredOrder(t *testing.T) {
 	record := func(name string) step { return step{name, func() { ran = append(ran, name) }} }
 
 	t.Run("teardown", func(t *testing.T) {
-		teardown{record("artifacts"), record("kubeconfig"), record("stop"), record("delete")}.register(t)
+		teardown{record("artifacts"), record("stop"), record("delete")}.register(t)
 	})
 
-	assert.Equal(t, []string{"artifacts", "kubeconfig", "stop", "delete"}, ran)
+	assert.Equal(t, []string{"artifacts", "stop", "delete"}, ran)
 }
 
 // A real subtest cannot be used here: register reports the panic, which would
@@ -73,11 +73,11 @@ func TestTeardownDeletesTheClusterAfterAnEarlierPanic(t *testing.T) {
 	recorder := &reportingT{}
 	teardown{
 		{"artifacts", func() { ran = append(ran, "artifacts"); panic("boom") }},
-		record("kubeconfig"), record("stop"), record("delete"),
+		record("stop"), record("delete"),
 	}.register(recorder)
 	recorder.runCleanups()
 
-	assert.Equal(t, []string{"artifacts", "kubeconfig", "stop", "delete"}, ran)
+	assert.Equal(t, []string{"artifacts", "stop", "delete"}, ran)
 	assert.Len(t, recorder.reported, 1, "the panic is reported, not swallowed")
 	assert.Contains(t, recorder.reported[0], `"artifacts" panicked`)
 }
