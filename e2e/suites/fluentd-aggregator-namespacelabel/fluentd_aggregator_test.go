@@ -19,7 +19,6 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/kube-logging/logging-operator/e2e/internal/harness"
 	"github.com/kube-logging/logging-operator/e2e/internal/image"
@@ -47,7 +46,7 @@ func TestFluentdAggregator_NamespaceLabel(t *testing.T) {
 		Start()
 
 	env.Create(&v1beta1.Logging{
-		ObjectMeta: metav1.ObjectMeta{Name: "fluentd-aggregator-nslabel-test"},
+		Name: "fluentd-aggregator-nslabel-test",
 		Spec: v1beta1.LoggingSpec{
 			EnableRecreateWorkloadOnImmutableFieldChange: true,
 			ControlNamespace: ns,
@@ -84,7 +83,7 @@ func TestFluentdAggregator_NamespaceLabel(t *testing.T) {
 
 	tags := "time"
 	out := &v1beta1.ClusterOutput{
-		ObjectMeta: metav1.ObjectMeta{Name: "test-output", Namespace: ns},
+		Name: "test-output", Namespace: ns,
 		Spec: v1beta1.ClusterOutputSpec{
 			OutputSpec: v1beta1.OutputSpec{
 				HTTPOutput: &output.HTTPOutputConfig{
@@ -103,7 +102,7 @@ func TestFluentdAggregator_NamespaceLabel(t *testing.T) {
 	env.Create(out)
 
 	env.Create(&v1beta1.ClusterFlow{
-		ObjectMeta: metav1.ObjectMeta{Name: "test-flow", Namespace: ns},
+		Name: "test-flow", Namespace: ns,
 		Spec: v1beta1.ClusterFlowSpec{
 			Match: []v1beta1.ClusterMatch{
 				{

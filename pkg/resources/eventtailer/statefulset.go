@@ -96,12 +96,8 @@ func (e *EventTailer) statefulSetSpec() *appsv1.StatefulSetSpec {
 		}
 		volumes = append(volumes, corev1.Volume{
 			Name: "config-volume",
-			VolumeSource: corev1.VolumeSource{
-				ConfigMap: &corev1.ConfigMapVolumeSource{
-					LocalObjectReference: corev1.LocalObjectReference{
-						Name: e.Name(),
-					},
-				},
+			ConfigMap: &corev1.ConfigMapVolumeSource{
+				Name: e.Name(),
 			},
 		})
 	}

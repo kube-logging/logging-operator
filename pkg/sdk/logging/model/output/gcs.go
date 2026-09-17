@@ -100,12 +100,10 @@ type GCSOutput struct {
 func (g *GCSOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	const pluginType = "gcs"
 	gcs := &types.OutputPlugin{
-		PluginMeta: types.PluginMeta{
-			Type:      pluginType,
-			Directive: "match",
-			Tag:       "**",
-			Id:        id,
-		},
+		Type:      pluginType,
+		Directive: "match",
+		Tag:       "**",
+		Id:        id,
 	}
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(g); err != nil {
 		return nil, err

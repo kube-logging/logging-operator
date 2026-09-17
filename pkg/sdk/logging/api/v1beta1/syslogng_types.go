@@ -210,11 +210,9 @@ func (s *SyslogNGSpec) SetDefaults() {
 		}
 		if s.BufferVolumeMetricsLivenessProbe == nil {
 			s.BufferVolumeMetricsLivenessProbe = &corev1.Probe{
-				ProbeHandler: corev1.ProbeHandler{
-					HTTPGet: &corev1.HTTPGetAction{
-						Port:   intstr.FromString("buffer-metrics"),
-						Scheme: corev1.URISchemeHTTP,
-					},
+				HTTPGet: &corev1.HTTPGetAction{
+					Port:   intstr.FromString("buffer-metrics"),
+					Scheme: corev1.URISchemeHTTP,
 				},
 				InitialDelaySeconds: 600,
 				TimeoutSeconds:      5,

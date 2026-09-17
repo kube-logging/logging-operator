@@ -20,7 +20,6 @@ import (
 	"github.com/cisco-open/operator-tools/pkg/typeoverride"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/kube-logging/logging-operator/e2e/internal/harness"
 	"github.com/kube-logging/logging-operator/e2e/internal/image"
@@ -47,7 +46,7 @@ var producerLabels = map[string]string{"my-unique-label": "log-producer"}
 // is the operator's decision rather than anything in the spec.
 func detachedSyslogNG(name string) *v1beta1.SyslogNGConfig {
 	return &v1beta1.SyslogNGConfig{
-		ObjectMeta: metav1.ObjectMeta{Name: name, Namespace: ns},
+		Name: name, Namespace: ns,
 		Spec: v1beta1.SyslogNGSpec{
 			ConfigReloadImage:        image.SyslogNGReloader().Basic(),
 			BufferVolumeMetricsImage: image.NodeExporter().Basic(),
@@ -75,8 +74,8 @@ func detachedSyslogNG(name string) *v1beta1.SyslogNGConfig {
 							},
 							Volumes: []corev1.Volume{
 								{
-									Name:         "buffers",
-									VolumeSource: corev1.VolumeSource{EmptyDir: &corev1.EmptyDirVolumeSource{}},
+									Name:     "buffers",
+									EmptyDir: &corev1.EmptyDirVolumeSource{},
 								},
 							},
 						},
@@ -84,7 +83,7 @@ func detachedSyslogNG(name string) *v1beta1.SyslogNGConfig {
 				},
 			},
 			BufferVolumeMetrics: &v1beta1.BufferMetrics{
-				Metrics:   v1beta1.Metrics{Interval: "1s"},
+				Interval:  "1s",
 				MountName: "buffers",
 			},
 		},
@@ -99,7 +98,7 @@ func TestSyslogNGDetachedIsRunningAndForwardingLogs(t *testing.T) {
 		Start()
 
 	env.Create(&v1beta1.Logging{
-		ObjectMeta: metav1.ObjectMeta{Name: loggingName, Namespace: ns},
+		Name: loggingName, Namespace: ns,
 		Spec: v1beta1.LoggingSpec{
 			EnableRecreateWorkloadOnImmutableFieldChange: true,
 			ControlNamespace: ns,
@@ -117,7 +116,7 @@ func TestSyslogNGDetachedIsRunningAndForwardingLogs(t *testing.T) {
 	env.Create(detachedSyslogNG(attachedConfig))
 
 	out := &v1beta1.SyslogNGOutput{
-		ObjectMeta: metav1.ObjectMeta{Name: "test-output", Namespace: ns},
+		Name: "test-output", Namespace: ns,
 		Spec: v1beta1.SyslogNGOutputSpec{
 			HTTP: &syslogngoutput.HTTPOutput{
 				URL:     env.Receiver.URL(testTag),
@@ -134,7 +133,7 @@ func TestSyslogNGDetachedIsRunningAndForwardingLogs(t *testing.T) {
 	env.Create(out)
 
 	env.Create(&v1beta1.SyslogNGFlow{
-		ObjectMeta: metav1.ObjectMeta{Name: "test-flow", Namespace: ns},
+		Name: "test-flow", Namespace: ns,
 		Spec: v1beta1.SyslogNGFlowSpec{
 			Match: &v1beta1.SyslogNGMatch{
 				Regexp: &filter.RegexpMatchExpr{

@@ -19,7 +19,6 @@ import (
 	"testing"
 
 	"github.com/go-logr/logr"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
@@ -39,8 +38,8 @@ func newRepoWithObjects(t *testing.T, objs ...client.Object) LoggingResourceRepo
 
 func loggingFor() v1beta1.Logging {
 	return v1beta1.Logging{
-		ObjectMeta: metav1.ObjectMeta{Name: "test-logging", Namespace: "test"},
-		Spec:       v1beta1.LoggingSpec{ControlNamespace: "test"},
+		Name: "test-logging", Namespace: "test",
+		Spec: v1beta1.LoggingSpec{ControlNamespace: "test"},
 	}
 }
 
@@ -51,10 +50,10 @@ func loggingFor() v1beta1.Logging {
 func TestSyslogNGConfigFor_PreservesPreviouslyAssociatedConfigOnExcess(t *testing.T) {
 	ns := "test"
 	primary := &v1beta1.SyslogNGConfig{
-		ObjectMeta: metav1.ObjectMeta{Name: "primary", Namespace: ns},
+		Name: "primary", Namespace: ns,
 	}
 	excess := &v1beta1.SyslogNGConfig{
-		ObjectMeta: metav1.ObjectMeta{Name: "excess", Namespace: ns},
+		Name: "excess", Namespace: ns,
 	}
 	repo := newRepoWithObjects(t, primary, excess)
 
@@ -75,8 +74,8 @@ func TestSyslogNGConfigFor_PreservesPreviouslyAssociatedConfigOnExcess(t *testin
 
 func TestSyslogNGConfigFor_NoPriorAssociationMarksAllExcess(t *testing.T) {
 	ns := "test"
-	a := &v1beta1.SyslogNGConfig{ObjectMeta: metav1.ObjectMeta{Name: "a", Namespace: ns}}
-	b := &v1beta1.SyslogNGConfig{ObjectMeta: metav1.ObjectMeta{Name: "b", Namespace: ns}}
+	a := &v1beta1.SyslogNGConfig{Name: "a", Namespace: ns}
+	b := &v1beta1.SyslogNGConfig{Name: "b", Namespace: ns}
 	repo := newRepoWithObjects(t, a, b)
 
 	cfg, excesses, err := repo.SyslogNGConfigFor(context.Background(), loggingFor())
@@ -93,8 +92,8 @@ func TestSyslogNGConfigFor_NoPriorAssociationMarksAllExcess(t *testing.T) {
 
 func TestSyslogNGConfigFor_StaleAssociationFallsBackToAllExcess(t *testing.T) {
 	ns := "test"
-	a := &v1beta1.SyslogNGConfig{ObjectMeta: metav1.ObjectMeta{Name: "a", Namespace: ns}}
-	b := &v1beta1.SyslogNGConfig{ObjectMeta: metav1.ObjectMeta{Name: "b", Namespace: ns}}
+	a := &v1beta1.SyslogNGConfig{Name: "a", Namespace: ns}
+	b := &v1beta1.SyslogNGConfig{Name: "b", Namespace: ns}
 	repo := newRepoWithObjects(t, a, b)
 
 	logging := loggingFor()
@@ -116,10 +115,10 @@ func TestSyslogNGConfigFor_StaleAssociationFallsBackToAllExcess(t *testing.T) {
 func TestFluentdConfigFor_PreservesPreviouslyAssociatedConfigOnExcess(t *testing.T) {
 	ns := "test"
 	primary := &v1beta1.FluentdConfig{
-		ObjectMeta: metav1.ObjectMeta{Name: "primary", Namespace: ns},
+		Name: "primary", Namespace: ns,
 	}
 	excess := &v1beta1.FluentdConfig{
-		ObjectMeta: metav1.ObjectMeta{Name: "excess", Namespace: ns},
+		Name: "excess", Namespace: ns,
 	}
 	repo := newRepoWithObjects(t, primary, excess)
 

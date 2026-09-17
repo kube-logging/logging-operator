@@ -142,12 +142,10 @@ func (o *KinesisFirehoseAssumeRoleCredentials) ToDirective(secretLoader secret.S
 func (e *KinesisFirehoseOutputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	const pluginType = "kinesis_firehose"
 	kinesis := &types.OutputPlugin{
-		PluginMeta: types.PluginMeta{
-			Type:      pluginType,
-			Directive: "match",
-			Tag:       "**",
-			Id:        id,
-		},
+		Type:      pluginType,
+		Directive: "match",
+		Tag:       "**",
+		Id:        id,
 	}
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(e); err != nil {
 		return nil, err

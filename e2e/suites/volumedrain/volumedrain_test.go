@@ -23,7 +23,6 @@ import (
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/kube-logging/logging-operator/e2e/internal/harness"
@@ -50,7 +49,7 @@ var producerLabels = map[string]string{"my-unique-label": "log-producer"}
 // kept and labeled, or removed with the replica.
 func drainingLogging(ns string, deleteVolume bool) *v1beta1.Logging {
 	return &v1beta1.Logging{
-		ObjectMeta: metav1.ObjectMeta{Name: loggingName, Namespace: ns},
+		Name: loggingName, Namespace: ns,
 		Spec: v1beta1.LoggingSpec{
 			EnableRecreateWorkloadOnImmutableFieldChange: true,
 			ControlNamespace: ns,
@@ -94,7 +93,7 @@ func drainingLogging(ns string, deleteVolume bool) *v1beta1.Logging {
 func httpOutput(env *harness.Env, ns, timekey string) *v1beta1.Output {
 	tags := "time"
 	return &v1beta1.Output{
-		ObjectMeta: metav1.ObjectMeta{Name: "test-output", Namespace: ns},
+		Name: "test-output", Namespace: ns,
 		Spec: v1beta1.OutputSpec{
 			HTTPOutput: &output.HTTPOutputConfig{
 				Endpoint:    env.Receiver.URL(testTag),
@@ -112,7 +111,7 @@ func httpOutput(env *harness.Env, ns, timekey string) *v1beta1.Output {
 
 func flowToOutput(ns, outputName string) *v1beta1.Flow {
 	return &v1beta1.Flow{
-		ObjectMeta: metav1.ObjectMeta{Name: "test-flow", Namespace: ns},
+		Name: "test-flow", Namespace: ns,
 		Spec: v1beta1.FlowSpec{
 			Match: []v1beta1.Match{
 				{Select: &v1beta1.Select{Labels: producerLabels}},

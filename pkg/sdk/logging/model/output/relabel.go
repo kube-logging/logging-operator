@@ -104,13 +104,11 @@ type RelabelOutputConfig struct {
 func (c *RelabelOutputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	const pluginType = "relabel"
 	relabel := &types.OutputPlugin{
-		PluginMeta: types.PluginMeta{
-			Type:      pluginType,
-			Directive: "match",
-			Tag:       "**",
-			Id:        id,
-			Label:     c.Label,
-		},
+		Type:      pluginType,
+		Directive: "match",
+		Tag:       "**",
+		Id:        id,
+		Label:     c.Label,
 	}
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(c); err != nil {
 		return nil, err

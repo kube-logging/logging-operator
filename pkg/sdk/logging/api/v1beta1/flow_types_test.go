@@ -19,7 +19,6 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
@@ -53,10 +52,8 @@ var _ = Describe("Flow", func() {
 				Namespace: "default",
 			}
 			created = &v1beta1.Flow{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "foo",
-					Namespace: "default",
-				},
+				Name:      "foo",
+				Namespace: "default",
 				Spec: v1beta1.FlowSpec{
 					Selectors: nil,
 				},

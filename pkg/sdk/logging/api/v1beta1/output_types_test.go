@@ -53,11 +53,9 @@ var _ = Describe("Output", func() {
 				Namespace: "default",
 			}
 			created = &v1beta1.Output{
-				TypeMeta: metav1.TypeMeta{},
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "foo",
-					Namespace: "default",
-				},
+				TypeMeta:  metav1.TypeMeta{},
+				Name:      "foo",
+				Namespace: "default",
 				Spec: v1beta1.OutputSpec{
 					S3OutputConfig:   nil,
 					NullOutputConfig: nil,

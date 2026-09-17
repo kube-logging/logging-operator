@@ -186,9 +186,7 @@ func doParseRawConfig(sectionName string, topLevel bool, depth int, nextLine fun
 	}
 
 	directive := &types.GenericDirective{
-		PluginMeta: types.PluginMeta{
-			Directive: sectionName,
-		},
+		Directive:     sectionName,
 		Params:        types.Params{},
 		SubDirectives: []types.Directive{},
 	}

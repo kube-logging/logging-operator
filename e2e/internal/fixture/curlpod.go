@@ -16,14 +16,13 @@ package fixture
 
 import (
 	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // CurlPod is how a suite reaches a Service: the test binary has no route into
 // the cluster network.
 func CurlPod(namespace, name string) *corev1.Pod {
 	return &corev1.Pod{
-		ObjectMeta: metav1.ObjectMeta{Name: name, Namespace: namespace},
+		Name: name, Namespace: namespace,
 		Spec: corev1.PodSpec{
 			Containers: []corev1.Container{{
 				Name:    "curl",

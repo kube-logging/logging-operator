@@ -126,11 +126,9 @@ func (f *FlowRoute) GetSections() []Directive {
 
 func (r *Router) AddRoute(flow *Flow) *Router {
 	route := &FlowRoute{
-		PluginMeta: PluginMeta{
-			Directive: "route",
-			Label:     flow.FlowLabel,
-		},
-		Params: Params{},
+		Directive: "route",
+		Label:     flow.FlowLabel,
+		Params:    Params{},
 	}
 	if flow.FlowID != "" {
 		metricsLabels, _ := json.Marshal(map[string]string{"id": flow.FlowID})
@@ -145,12 +143,10 @@ func (r *Router) AddRoute(flow *Flow) *Router {
 
 func NewRouter(id string, params Params) *Router {
 	return &Router{
-		PluginMeta: PluginMeta{
-			Type:      "label_router",
-			Directive: "match",
-			Tag:       "**",
-			Id:        id,
-		},
-		Params: params,
+		Type:      "label_router",
+		Directive: "match",
+		Tag:       "**",
+		Id:        id,
+		Params:    params,
 	}
 }

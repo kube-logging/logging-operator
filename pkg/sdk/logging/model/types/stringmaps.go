@@ -108,7 +108,7 @@ func (s *StructToStringMapper) processField(field reflect.StructField, value ref
 	}
 
 	if s.SecretLoader != nil {
-		if secretItem, _ := value.Interface().(*secret.Secret); secretItem != nil {
+		if secretItem, _ := reflect.TypeAssert[*secret.Secret](value); secretItem != nil {
 			loadedSecret, err := s.SecretLoader.Load(secretItem)
 			if err != nil {
 				return errors.WrapIff(err, "failed to load secret for field %q", name)
@@ -169,7 +169,7 @@ func (s *StructToStringMapper) processField(field reflect.StructField, value ref
 			}
 		}
 	case reflect.Map:
-		if mapStringString, ok := value.Interface().(map[string]string); ok { //nolint:nestif
+		if mapStringString, ok := reflect.TypeAssert[map[string]string](value); ok { //nolint:nestif
 			if len(mapStringString) > 0 {
 				b, err := json.Marshal(mapStringString)
 				if err != nil {

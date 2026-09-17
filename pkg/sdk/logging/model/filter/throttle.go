@@ -85,12 +85,10 @@ type _expThrottle any //nolint:deadcode,unused
 func (t *Throttle) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	const pluginType = "throttle"
 	throttle := &types.GenericDirective{
-		PluginMeta: types.PluginMeta{
-			Type:      pluginType,
-			Directive: "filter",
-			Tag:       "**",
-			Id:        id,
-		},
+		Type:      pluginType,
+		Directive: "filter",
+		Tag:       "**",
+		Id:        id,
 	}
 	throttleConfig := t.DeepCopy()
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(throttleConfig); err != nil {

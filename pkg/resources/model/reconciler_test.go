@@ -20,7 +20,6 @@ import (
 
 	"github.com/cisco-open/operator-tools/pkg/secret"
 	"github.com/go-logr/logr"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
@@ -70,8 +69,8 @@ func TestValidationReconciler_DefaultFlowRef(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			clusterOutput := v1beta1.ClusterOutput{
-				ObjectMeta: metav1.ObjectMeta{Name: "general", Namespace: "test"},
-				Spec:       v1beta1.ClusterOutputSpec{OutputSpec: tt.outputSpec},
+				Name: "general", Namespace: "test",
+				Spec: v1beta1.ClusterOutputSpec{OutputSpec: tt.outputSpec},
 			}
 			logging := loggingFor()
 			logging.Spec.DefaultFlowSpec = &v1beta1.DefaultFlowSpec{GlobalOutputRefs: tt.refs}

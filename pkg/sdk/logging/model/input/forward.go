@@ -50,11 +50,9 @@ func (f *ForwardInputConfig) ToDirective(secretLoader secret.SecretLoader, id st
 	const pluginType = "forward"
 	pluginID := id + "_" + pluginType
 	forward := &types.GenericDirective{
-		PluginMeta: types.PluginMeta{
-			Type:      pluginType,
-			Directive: "source",
-			Id:        pluginID,
-		},
+		Type:      pluginType,
+		Directive: "source",
+		Id:        pluginID,
 	}
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(f); err != nil {
 		return nil, err

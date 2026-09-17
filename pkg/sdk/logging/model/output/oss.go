@@ -103,12 +103,10 @@ type OSSOutput struct {
 func (o *OSSOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	const pluginType = "oss"
 	oss := &types.OutputPlugin{
-		PluginMeta: types.PluginMeta{
-			Type:      pluginType,
-			Directive: "match",
-			Tag:       "**",
-			Id:        id,
-		},
+		Type:      pluginType,
+		Directive: "match",
+		Tag:       "**",
+		Id:        id,
 	}
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(o); err != nil {
 		return nil, err

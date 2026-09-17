@@ -124,10 +124,8 @@ func NewFlow(matches []FlowMatch, id, name, namespace, flowLabel string, include
 		}
 	}
 	return &Flow{
-		PluginMeta: PluginMeta{
-			Directive: "label",
-			Tag:       flowLabel,
-		},
+		Directive: "label",
+		Tag:       flowLabel,
 		FlowID:    id,
 		FlowLabel: flowLabel,
 		Matches:   matches,

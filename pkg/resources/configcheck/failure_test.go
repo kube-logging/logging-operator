@@ -23,7 +23,6 @@ import (
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
@@ -33,7 +32,7 @@ import (
 
 func failedPod(reason string) *corev1.Pod {
 	return &corev1.Pod{
-		ObjectMeta: metav1.ObjectMeta{Name: "fluentd-configcheck-deadbeef", Namespace: "logging"},
+		Name: "fluentd-configcheck-deadbeef", Namespace: "logging",
 		Status: corev1.PodStatus{
 			Phase:  corev1.PodFailed,
 			Reason: reason,

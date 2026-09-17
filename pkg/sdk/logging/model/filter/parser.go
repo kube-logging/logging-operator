@@ -260,10 +260,8 @@ type _expParser any //nolint:deadcode,unused
 
 func (p *SingleParseSection) ToPatternDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	parseSection := &types.GenericDirective{
-		PluginMeta: types.PluginMeta{
-			Type:      p.Type,
-			Directive: "pattern",
-		},
+		Type:      p.Type,
+		Directive: "pattern",
 	}
 	section := p.DeepCopy()
 	section.Type = ""
@@ -292,10 +290,8 @@ func (p *GrokSection) ToGrokDirective(secretLoader secret.SecretLoader, id strin
 
 func (p *ParseSection) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	parseSection := &types.GenericDirective{
-		PluginMeta: types.PluginMeta{
-			Type:      p.Type,
-			Directive: "parse",
-		},
+		Type:      p.Type,
+		Directive: "parse",
 	}
 	section := p.DeepCopy()
 	section.Type = ""
@@ -338,12 +334,10 @@ func (p *ParseSection) ToDirective(secretLoader secret.SecretLoader, id string) 
 func (p *ParserConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	const pluginType = "parser"
 	parser := &types.GenericDirective{
-		PluginMeta: types.PluginMeta{
-			Type:      pluginType,
-			Directive: "filter",
-			Tag:       "**",
-			Id:        id,
-		},
+		Type:      pluginType,
+		Directive: "filter",
+		Tag:       "**",
+		Id:        id,
 	}
 	parserConfig := p.DeepCopy()
 

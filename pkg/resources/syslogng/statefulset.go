@@ -138,10 +138,8 @@ func syslogNGContainer(spec *v1beta1.SyslogNGSpec) corev1.Container {
 		},
 		Env: []corev1.EnvVar{{Name: "BUFFER_PATH", Value: BufferPath}},
 		LivenessProbe: &corev1.Probe{
-			ProbeHandler: corev1.ProbeHandler{
-				Exec: &corev1.ExecAction{
-					Command: []string{"/usr/sbin/syslog-ng-ctl", "--control=/tmp/syslog-ng/syslog-ng.ctl", "query", "get", "global.sdata_updates.processed"},
-				},
+			Exec: &corev1.ExecAction{
+				Command: []string{"/usr/sbin/syslog-ng-ctl", "--control=/tmp/syslog-ng/syslog-ng.ctl", "query", "get", "global.sdata_updates.processed"},
 			},
 			InitialDelaySeconds: 30,
 			TimeoutSeconds:      0,
@@ -198,40 +196,32 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 	v = []corev1.Volume{
 		{
 			Name: configVolumeName,
-			VolumeSource: corev1.VolumeSource{
-				Secret: &corev1.SecretVolumeSource{
-					SecretName: r.Logging.QualifiedName(configSecretName),
-				},
+			Secret: &corev1.SecretVolumeSource{
+				SecretName: r.Logging.QualifiedName(configSecretName),
 			},
 		},
 	}
 	if r.syslogNGSpec.TLS.Enabled {
 		tlsRelatedVolume := corev1.Volume{
 			Name: tlsVolumeName,
-			VolumeSource: corev1.VolumeSource{
-				Secret: &corev1.SecretVolumeSource{
-					SecretName: r.syslogNGSpec.TLS.SecretName,
-				},
+			Secret: &corev1.SecretVolumeSource{
+				SecretName: r.syslogNGSpec.TLS.SecretName,
 			},
 		}
 		v = append(v, tlsRelatedVolume)
 	}
 	socketVolume := corev1.Volume{
 		Name: socketVolumeName,
-		VolumeSource: corev1.VolumeSource{
-			EmptyDir: &corev1.EmptyDirVolumeSource{
-				Medium:    corev1.StorageMediumDefault,
-				SizeLimit: nil,
-			},
+		EmptyDir: &corev1.EmptyDirVolumeSource{
+			Medium:    corev1.StorageMediumDefault,
+			SizeLimit: nil,
 		},
 	}
 	v = append(v, socketVolume)
 	outputSecretVolume := corev1.Volume{
 		Name: outputSecretName,
-		VolumeSource: corev1.VolumeSource{
-			Secret: &corev1.SecretVolumeSource{
-				SecretName: r.Logging.QualifiedName(outputSecretName),
-			},
+		Secret: &corev1.SecretVolumeSource{
+			SecretName: r.Logging.QualifiedName(outputSecretName),
 		},
 	}
 	v = append(v, outputSecretVolume)
@@ -363,10 +353,8 @@ func generateReadinessCheck(spec *v1beta1.SyslogNGSpec) *corev1.Probe {
 		}
 
 		return &corev1.Probe{
-			ProbeHandler: corev1.ProbeHandler{
-				Exec: &corev1.ExecAction{
-					Command: append(check, strings.Join(bash, "\n")),
-				},
+			Exec: &corev1.ExecAction{
+				Command: append(check, strings.Join(bash, "\n")),
 			},
 			InitialDelaySeconds: spec.ReadinessDefaultCheck.InitialDelaySeconds,
 			TimeoutSeconds:      spec.ReadinessDefaultCheck.TimeoutSeconds,
@@ -395,11 +383,9 @@ func configReloadContainer(spec *v1beta1.SyslogNGSpec) corev1.Container {
 		// A watch that fails to register leaves this container Running while it
 		// silently never reloads again. readyz is 503 in that state.
 		ReadinessProbe: &corev1.Probe{
-			ProbeHandler: corev1.ProbeHandler{
-				HTTPGet: &corev1.HTTPGetAction{
-					Path: "/readyz",
-					Port: intstr.FromString(model.ConfigReloaderMetricsPortName),
-				},
+			HTTPGet: &corev1.HTTPGetAction{
+				Path: "/readyz",
+				Port: intstr.FromString(model.ConfigReloaderMetricsPortName),
 			},
 			PeriodSeconds:    10,
 			FailureThreshold: 3,

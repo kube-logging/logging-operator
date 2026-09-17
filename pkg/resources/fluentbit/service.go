@@ -95,11 +95,7 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 				RelabelConfigs:       r.fluentbitSpec.Metrics.ServiceMonitorConfig.Relabelings,
 				MetricRelabelConfigs: r.fluentbitSpec.Metrics.ServiceMonitorConfig.MetricsRelabelings,
 				Scheme:               new(monitoringv1.Scheme(r.fluentbitSpec.Metrics.ServiceMonitorConfig.Scheme)),
-				HTTPConfigWithProxyAndTLSFiles: monitoringv1.HTTPConfigWithProxyAndTLSFiles{
-					HTTPConfigWithTLSFiles: monitoringv1.HTTPConfigWithTLSFiles{
-						TLSConfig: r.fluentbitSpec.Metrics.ServiceMonitorConfig.TLSConfig,
-					},
-				},
+				TLSConfig:            r.fluentbitSpec.Metrics.ServiceMonitorConfig.TLSConfig,
 			},
 		}
 		// Add config-reloader metrics endpoint if hotreload is configured
@@ -113,11 +109,7 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 				RelabelConfigs:       r.fluentbitSpec.Metrics.ServiceMonitorConfig.Relabelings,
 				MetricRelabelConfigs: r.fluentbitSpec.Metrics.ServiceMonitorConfig.MetricsRelabelings,
 				Scheme:               new(monitoringv1.Scheme(r.fluentbitSpec.Metrics.ServiceMonitorConfig.Scheme)),
-				HTTPConfigWithProxyAndTLSFiles: monitoringv1.HTTPConfigWithProxyAndTLSFiles{
-					HTTPConfigWithTLSFiles: monitoringv1.HTTPConfigWithTLSFiles{
-						TLSConfig: r.fluentbitSpec.Metrics.ServiceMonitorConfig.TLSConfig,
-					},
-				},
+				TLSConfig:            r.fluentbitSpec.Metrics.ServiceMonitorConfig.TLSConfig,
 			})
 		}
 		return &monitoringv1.ServiceMonitor{
@@ -205,11 +197,7 @@ func (r *Reconciler) monitorBufferServiceMetrics() (runtime.Object, reconciler.D
 					RelabelConfigs:       r.fluentbitSpec.BufferVolumeMetrics.ServiceMonitorConfig.Relabelings,
 					MetricRelabelConfigs: r.fluentbitSpec.BufferVolumeMetrics.ServiceMonitorConfig.MetricsRelabelings,
 					Scheme:               new(monitoringv1.Scheme(r.fluentbitSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme)),
-					HTTPConfigWithProxyAndTLSFiles: monitoringv1.HTTPConfigWithProxyAndTLSFiles{
-						HTTPConfigWithTLSFiles: monitoringv1.HTTPConfigWithTLSFiles{
-							TLSConfig: r.fluentbitSpec.BufferVolumeMetrics.ServiceMonitorConfig.TLSConfig,
-						},
-					},
+					TLSConfig:            r.fluentbitSpec.BufferVolumeMetrics.ServiceMonitorConfig.TLSConfig,
 				}},
 				Selector:          metav1.LabelSelector{MatchLabels: r.getFluentBitLabels()},
 				NamespaceSelector: monitoringv1.NamespaceSelector{MatchNames: []string{r.Logging.Spec.FluentbitAgentNamespace}},

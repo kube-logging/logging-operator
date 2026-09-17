@@ -33,7 +33,6 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -176,7 +175,7 @@ func (b *Builder) Start() *Env {
 	installOperator(t, c, b.cfg)
 
 	for _, ns := range b.cfg.namespaces {
-		env.Create(&corev1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: ns}})
+		env.Create(&corev1.Namespace{Name: ns})
 	}
 
 	return env

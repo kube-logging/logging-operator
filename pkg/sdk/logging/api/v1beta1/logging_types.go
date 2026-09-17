@@ -398,11 +398,9 @@ func FluentBitDefaults(fluentbitSpec *FluentbitSpec) error { //nolint: gocyclo
 		}
 		if fluentbitSpec.BufferVolumeLivenessProbe == nil {
 			fluentbitSpec.BufferVolumeLivenessProbe = &corev1.Probe{
-				ProbeHandler: corev1.ProbeHandler{
-					HTTPGet: &corev1.HTTPGetAction{
-						Port:   intstr.FromString("buffer-metrics"),
-						Scheme: corev1.URISchemeHTTP,
-					},
+				HTTPGet: &corev1.HTTPGetAction{
+					Port:   intstr.FromString("buffer-metrics"),
+					Scheme: corev1.URISchemeHTTP,
 				},
 				InitialDelaySeconds: 600,
 				TimeoutSeconds:      5,
@@ -444,12 +442,10 @@ func FluentBitDefaults(fluentbitSpec *FluentbitSpec) error { //nolint: gocyclo
 		if fluentbitSpec.LivenessProbe == nil {
 			if fluentbitSpec.LivenessDefaultCheck {
 				fluentbitSpec.LivenessProbe = &corev1.Probe{
-					ProbeHandler: corev1.ProbeHandler{
-						HTTPGet: &corev1.HTTPGetAction{
-							Path: fluentbitSpec.Metrics.Path,
-							Port: intstr.IntOrString{
-								IntVal: fluentbitSpec.Metrics.Port,
-							},
+					HTTPGet: &corev1.HTTPGetAction{
+						Path: fluentbitSpec.Metrics.Path,
+						Port: intstr.IntOrString{
+							IntVal: fluentbitSpec.Metrics.Port,
 						},
 					},
 					InitialDelaySeconds: 10,

@@ -23,7 +23,6 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
@@ -177,8 +176,8 @@ func requireIPFamiliesMatchClusterIPs(t *testing.T, service *corev1.Service) {
 
 func ipv6Reconciler() *Reconciler {
 	logging := &v1beta1.Logging{
-		ObjectMeta: metav1.ObjectMeta{Name: "test"},
-		Spec:       v1beta1.LoggingSpec{ControlNamespace: "default"},
+		Name: "test",
+		Spec: v1beta1.LoggingSpec{ControlNamespace: "default"},
 	}
 	return &Reconciler{
 		Logging:                   logging,

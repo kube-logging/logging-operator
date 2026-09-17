@@ -19,7 +19,6 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
@@ -53,12 +52,10 @@ var _ = Describe("ClusterFlow", func() {
 				Name:      "foo",
 			}
 			created = &v1beta1.ClusterFlow{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "foo",
-					Namespace: "default",
-				},
-				Spec:   v1beta1.ClusterFlowSpec{},
-				Status: v1beta1.FlowStatus{},
+				Name:      "foo",
+				Namespace: "default",
+				Spec:      v1beta1.ClusterFlowSpec{},
+				Status:    v1beta1.FlowStatus{},
 			}
 
 			By("creating an API obj")

@@ -277,10 +277,8 @@ func TestSecretValueFrom(t *testing.T) {
 		Field: &secret.Secret{
 			ValueFrom: &secret.ValueFrom{
 				SecretKeyRef: &corev1.SecretKeySelector{
-					LocalObjectReference: corev1.LocalObjectReference{
-						Name: "a",
-					},
-					Key: "b",
+					Name: "a",
+					Key:  "b",
 				},
 			},
 		},

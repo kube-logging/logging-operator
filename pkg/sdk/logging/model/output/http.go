@@ -108,12 +108,10 @@ type HTTPOutputConfig struct {
 func (c *HTTPOutputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	const pluginType = "http"
 	http := &types.OutputPlugin{
-		PluginMeta: types.PluginMeta{
-			Type:      pluginType,
-			Directive: "match",
-			Tag:       "**",
-			Id:        id,
-		},
+		Type:      pluginType,
+		Directive: "match",
+		Tag:       "**",
+		Id:        id,
 	}
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(c); err != nil {
 		return nil, err

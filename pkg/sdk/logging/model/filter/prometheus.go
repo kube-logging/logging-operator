@@ -132,9 +132,7 @@ func (r Label) ToDirective(secretLoader secret.SecretLoader, id string) (types.D
 
 func (m *MetricSection) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	metricSection := &types.GenericDirective{
-		PluginMeta: types.PluginMeta{
-			Directive: "metric",
-		},
+		Directive: "metric",
 	}
 	metric := m.DeepCopy()
 	// Render Labels as subdirective
@@ -158,12 +156,10 @@ func (m *MetricSection) ToDirective(secretLoader secret.SecretLoader, id string)
 func (p *PrometheusConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	const pluginType = "prometheus"
 	prometheus := &types.GenericDirective{
-		PluginMeta: types.PluginMeta{
-			Type:      pluginType,
-			Directive: "filter",
-			Tag:       "**",
-			Id:        id,
-		},
+		Type:      pluginType,
+		Directive: "filter",
+		Tag:       "**",
+		Id:        id,
 	}
 
 	prometheusConfig := p.DeepCopy()

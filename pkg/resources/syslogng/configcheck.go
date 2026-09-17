@@ -240,18 +240,14 @@ func (r *Reconciler) newCheckPod(hashKey string) (*corev1.Pod, error) {
 			Volumes: []corev1.Volume{
 				{
 					Name: "config",
-					VolumeSource: corev1.VolumeSource{
-						Secret: &corev1.SecretVolumeSource{
-							SecretName: r.Logging.QualifiedName(configCheckResourceName(hashKey)),
-						},
+					Secret: &corev1.SecretVolumeSource{
+						SecretName: r.Logging.QualifiedName(configCheckResourceName(hashKey)),
 					},
 				},
 				{
 					Name: "output-secret",
-					VolumeSource: corev1.VolumeSource{
-						Secret: &corev1.SecretVolumeSource{
-							SecretName: r.Logging.QualifiedName(fmt.Sprintf("syslog-ng-configcheck-output-%s", hashKey)),
-						},
+					Secret: &corev1.SecretVolumeSource{
+						SecretName: r.Logging.QualifiedName(fmt.Sprintf("syslog-ng-configcheck-output-%s", hashKey)),
 					},
 				},
 			},
@@ -289,10 +285,8 @@ func (r *Reconciler) newCheckPod(hashKey string) (*corev1.Pod, error) {
 	if r.syslogNGSpec.TLS.Enabled {
 		tlsVolume := corev1.Volume{
 			Name: "syslog-ng-tls",
-			VolumeSource: corev1.VolumeSource{
-				Secret: &corev1.SecretVolumeSource{
-					SecretName: r.syslogNGSpec.TLS.SecretName,
-				},
+			Secret: &corev1.SecretVolumeSource{
+				SecretName: r.syslogNGSpec.TLS.SecretName,
 			},
 		}
 		pod.Spec.Volumes = append(pod.Spec.Volumes, tlsVolume)

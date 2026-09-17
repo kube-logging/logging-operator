@@ -160,12 +160,10 @@ type VMwareLogInsightOutput struct {
 
 func (in *VMwareLogInsightOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	vmwLi := types.OutputPlugin{
-		PluginMeta: types.PluginMeta{
-			Type:      "vmware_loginsight",
-			Id:        id,
-			Directive: "match",
-			Tag:       "**",
-		},
+		Type:      "vmware_loginsight",
+		Id:        id,
+		Directive: "match",
+		Tag:       "**",
 	}
 
 	if in.Buffer != nil {

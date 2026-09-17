@@ -97,8 +97,8 @@ func (r Receiver) Scale(replicas int32) {
 	name := ReceiverName(r.env.Release)
 	_, err := r.env.cluster.clientset.AppsV1().Deployments(r.env.ControlNamespace).UpdateScale(r.env.Ctx, name,
 		&autoscalingv1.Scale{
-			ObjectMeta: metav1.ObjectMeta{Name: name, Namespace: r.env.ControlNamespace},
-			Spec:       autoscalingv1.ScaleSpec{Replicas: replicas},
+			Name: name, Namespace: r.env.ControlNamespace,
+			Spec: autoscalingv1.ScaleSpec{Replicas: replicas},
 		}, metav1.UpdateOptions{})
 	require.NoError(r.env.T, err)
 }
