@@ -28,9 +28,10 @@ import (
 const (
 	receiverPort = 8080
 
-	// Generous on purpose: more lines makes a tag easier to find and its
-	// absence harder to claim.
+	// Generous on purpose: more lines makes a tag easier to find.
 	receiverLogTail = 100
+
+	wholeLog = -1
 )
 
 // Receiver is the test receiver the chart installs, where a suite looks to see
@@ -76,11 +77,13 @@ func (r Receiver) MustReceive(tags ...string) {
 }
 
 // MustNotReceive is a point-in-time check, since an absence cannot be waited
-// for. It belongs after whatever wait establishes that the pipeline is running.
+// for. It belongs after whatever wait establishes that the pipeline is running,
+// and it reads the whole log rather than the tail MustReceive polls: a tag
+// that arrived early would otherwise have scrolled out of view.
 func (r Receiver) MustNotReceive(tags ...string) {
 	r.env.T.Helper()
 
-	logs, err := r.Logs()
+	logs, err := r.logs(wholeLog)
 	require.NoError(r.env.T, err)
 	for _, tag := range tags {
 		assert.NotContains(r.env.T, logs, tag)

@@ -150,7 +150,7 @@ The chart installs a receiver that suites send logs to. `env.Receiver` owns it:
 ```go
 env.Receiver.URL("tag")            // address to point an Output at
 env.Receiver.MustReceive("tag")    // wait until the tag shows up
-env.Receiver.MustNotReceive("tag") // point-in-time check that it did not
+env.Receiver.MustNotReceive("tag") // point-in-time check over the whole log
 env.Receiver.Scale(0)              // take it away, to make an aggregator buffer
 ```
 
