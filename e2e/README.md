@@ -23,9 +23,9 @@ reuses them. Rebuild only when you change operator code, not test code.
 
 ### What has to be installed
 
-`docker`, and `kubectl` and `helm` on `PATH`. `make test-e2e` fetches `kind` and
-`stern` into `bin/` for you; `make test-e2e-nodeps` assumes they are already
-there.
+`docker`, and `helm` on `PATH` for the one suite that installs a chart.
+`make test-e2e` fetches `kind` into `bin/` for you; `make test-e2e-nodeps`
+assumes it is already there.
 
 On Linux, KIND needs more inotify instances than the default 128:
 
@@ -54,8 +54,9 @@ in an unrelated suite run at the same time is the cheapest way to confirm that.
 
 ### Artifacts
 
-Each suite writes `build/_test/cluster-<TestName>.log` — a `stern` dump of every
-watched namespace — and coverage into `build/_test_coverage`. Both survive the
+Each suite writes `build/_test/cluster-<TestName>.log` — the log of every
+container in the watched namespaces, one `namespace/pod container` prefix per
+line — and coverage into `build/_test_coverage`. Both survive the
 cluster being deleted, and the dump is the first place to look when a wait times
 out.
 
@@ -154,11 +155,11 @@ env.Receiver.MustNotReceive("tag") // point-in-time check that it did not
 env.Receiver.Scale(0)              // take it away, to make an aggregator buffer
 ```
 
-Prefer these to shelling out. What they do not cover — running a command inside
-a pod — goes through `env.Kubectl(args...)`, which is `kubectl` against the
-suite's cluster. A suite that has to reach a Service creates
+What they do not cover — running a command inside a pod — is
+`env.Exec(ns, pod, container, command...)`; an empty container means the pod's
+only one. A suite that has to reach a Service creates
 `fixture.CurlPod(ns, name)`, waits on `wait.Pod(ns, name)`, and execs `curl`
-through it.
+through it. Nothing shells out to `kubectl`.
 
 ### Images
 

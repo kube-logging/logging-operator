@@ -16,12 +16,13 @@ package harness
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/cisco-open/operator-tools/pkg/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	autoscalingv1 "k8s.io/api/autoscaling/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 const (
@@ -88,19 +89,33 @@ func (r Receiver) MustNotReceive(tags ...string) {
 
 // Scale takes the receiver away and brings it back, which is how a drain test
 // makes the aggregator buffer instead of deliver.
-func (r Receiver) Scale(replicas int) {
+func (r Receiver) Scale(replicas int32) {
 	r.env.T.Helper()
-	require.NoError(r.env.T, r.env.Kubectl(
-		"scale", "deployment/"+ReceiverName(r.env.Release),
-		"-n", r.env.ControlNamespace,
-		"--replicas", strconv.Itoa(replicas)).Run())
+	name := ReceiverName(r.env.Release)
+	_, err := r.env.cluster.clientset.AppsV1().Deployments(r.env.ControlNamespace).UpdateScale(r.env.Ctx, name,
+		&autoscalingv1.Scale{
+			ObjectMeta: metav1.ObjectMeta{Name: name, Namespace: r.env.ControlNamespace},
+			Spec:       autoscalingv1.ScaleSpec{Replicas: replicas},
+		}, metav1.UpdateOptions{})
+	require.NoError(r.env.T, err)
 }
 
 func (r Receiver) Logs() (string, error) {
-	out, err := r.env.Kubectl(
-		"logs",
-		"-n", r.env.ControlNamespace,
-		"--tail", fmt.Sprint(receiverLogTail),
-		"-l", fmt.Sprintf("%s=%s", types.NameLabel, ReceiverName(r.env.Release))).Output()
-	return string(out), err
+	return r.logs(receiverLogTail)
+}
+
+func (r Receiver) logs(tail int64) (string, error) {
+	pods, err := r.env.cluster.pods(r.env.Ctx, r.env.ControlNamespace, map[string]string{types.NameLabel: ReceiverName(r.env.Release)})
+	if err != nil {
+		return "", err
+	}
+	var out strings.Builder
+	for _, pod := range pods {
+		logs, err := r.env.cluster.podLogs(r.env.Ctx, pod.Namespace, pod.Name, "", tail)
+		if err != nil {
+			return "", err
+		}
+		out.WriteString(logs)
+	}
+	return out.String(), nil
 }

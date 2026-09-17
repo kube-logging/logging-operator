@@ -18,7 +18,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -195,9 +194,11 @@ func (e *Env) StartLogProducer(namespace string, labels map[string]string) {
 	e.Create(logProducer(namespace, labels)...)
 }
 
-// Kubectl is the seam for what the client cannot do, which is exec into a pod.
-func (e *Env) Kubectl(args ...string) *exec.Cmd {
-	return kubectl(e.Kubeconfig, args...)
+// Exec runs a command in a pod and returns its stdout. An empty container
+// means the pod's only one.
+func (e *Env) Exec(namespace, pod, container string, command ...string) (string, error) {
+	out, err := e.cluster.exec(e.Ctx, namespace, pod, container, command...)
+	return string(out), err
 }
 
 func (e *Env) WaitFor(conditions ...wait.Condition) {
@@ -310,12 +311,11 @@ func (e *Env) collectArtifacts() {
 		e.T.Logf("Skipping cluster logs: %s", err)
 	} else {
 		e.T.Logf("Printing cluster logs to %s", path)
-		assert.NoError(e.T, e.cluster.printLogs(e.dumpNamespaces, path, clusterLogLimit))
+		assert.NoError(e.T, e.cluster.dumpLogs(e.Ctx, e.dumpNamespaces, path, clusterLogLimit))
 	}
 
-	operator := "logging-operator-" + e.Release
-	e.T.Logf("Collecting coverage files from logging-operator: %s/%s", e.ControlNamespace, operator)
-	if err := e.cluster.collectCoverage(e.ControlNamespace, operator); err != nil {
+	e.T.Logf("Collecting coverage files from the operator in %s", e.ControlNamespace)
+	if err := e.cluster.collectCoverage(e.Ctx, e.ControlNamespace, e.Release); err != nil {
 		// Logged, never fatal: coverage is not the suite's verdict.
 		e.T.Logf("Failed collecting coverage files: %s", err)
 	}

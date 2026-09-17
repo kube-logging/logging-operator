@@ -16,16 +16,20 @@ package harness
 
 import (
 	"bytes"
-	"os"
-	"os/exec"
-	"strconv"
-	"strings"
+	"context"
 	"testing"
 
 	"emperror.dev/errors"
 	"github.com/go-logr/logr"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/kubernetes"
+	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
+	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
+	"k8s.io/client-go/tools/remotecommand"
 	"sigs.k8s.io/controller-runtime/pkg/cluster"
 	ctrllog "sigs.k8s.io/controller-runtime/pkg/log"
 
@@ -42,6 +46,8 @@ type kindCluster struct {
 	cluster.Cluster
 	name       string
 	kubeconfig string
+	restConfig *rest.Config
+	clientset  kubernetes.Interface
 }
 
 func newCluster(name string, scheme *runtime.Scheme) (*kindCluster, error) {
@@ -53,11 +59,15 @@ func newCluster(name string, scheme *runtime.Scheme) (*kindCluster, error) {
 	if err != nil {
 		return nil, errors.WrapIfWithDetails(err, "reading kubeconfig", "path", kubeconfig)
 	}
+	clientset, err := kubernetes.NewForConfig(restCfg)
+	if err != nil {
+		return nil, errors.WrapIf(err, "creating clientset")
+	}
 	c, err := cluster.New(restCfg, func(o *cluster.Options) { o.Scheme = scheme })
 	if err != nil {
 		return nil, errors.WrapIfWithDetails(err, "creating cluster with rest config", "cfg", restCfg)
 	}
-	return &kindCluster{Cluster: c, name: name, kubeconfig: kubeconfig}, nil
+	return &kindCluster{Cluster: c, name: name, kubeconfig: kubeconfig, restConfig: restCfg, clientset: clientset}, nil
 }
 
 // A delete that fails after the assertions have run is the runner's state, and
@@ -83,44 +93,49 @@ func deleteCluster(name string) error {
 	return removeClusterKubeconfig(name)
 }
 
-func kubectl(kubeconfig string, args ...string) *exec.Cmd {
-	cmd := exec.Command("kubectl", args...)
-	cmd.Env = append(os.Environ(), "KUBECONFIG="+kubeconfig)
-	cmd.Stderr = os.Stderr
-	return cmd
-}
-
 func (c *kindCluster) loadImages(images ...string) error {
 	return kindCLI.LoadDockerImage(images, kind.LoadDockerImageOptions{Name: c.name})
 }
 
-func (c *kindCluster) printLogs(namespaces []string, path string, limit int) error {
-	f, err := os.Create(path)
+func (c *kindCluster) pods(ctx context.Context, namespace string, selector map[string]string) ([]corev1.Pod, error) {
+	list, err := c.clientset.CoreV1().Pods(namespace).List(ctx, metav1.ListOptions{
+		LabelSelector: labels.SelectorFromSet(selector).String(),
+	})
 	if err != nil {
-		return err
+		return nil, err
 	}
-	defer func() { _ = f.Close() }()
-
-	cmd := exec.Command("stern", "-n", strings.Join(namespaces, ","), ".*", "--no-follow", "--tail", strconv.Itoa(limit), "--kubeconfig", c.kubeconfig)
-	cmd.Stdout = f
-	cmd.Stderr = os.Stderr
-	return cmd.Run()
+	return list.Items, nil
 }
 
-func (c *kindCluster) collectCoverage(namespace, operator string) error {
-	deployment := "deployment/" + operator
-	if out, err := kubectl(c.kubeconfig, "-n", namespace, "exec", deployment, "--", "kill", "-USR1", "1").Output(); err != nil {
-		return errors.WrapIfWithDetails(err, "Error in sending signal to logging-operator", out)
+// podLogs returns the last tail lines of one container, or all of them when
+// tail is negative.
+func (c *kindCluster) podLogs(ctx context.Context, namespace, pod, container string, tail int64) (string, error) {
+	opts := &corev1.PodLogOptions{Container: container}
+	if tail >= 0 {
+		opts.TailLines = &tail
 	}
-	tarball, err := kubectl(c.kubeconfig, "-n", namespace, "exec", deployment, "--", "tar", "-cf", "-", "-C", "/", "covdatafiles").Output()
-	if err != nil {
-		return errors.WrapIfWithDetails(err, "Error in reading test coverage files", tarball)
-	}
+	out, err := c.clientset.CoreV1().Pods(namespace).GetLogs(pod, opts).DoRaw(ctx)
+	return string(out), err
+}
 
-	extract := exec.Command("tar", "-xf", "-", "-C", os.Getenv("E2E_TEST_COV_DIR"))
-	extract.Stdin = bytes.NewReader(tarball)
-	if out, err := extract.CombinedOutput(); err != nil {
-		return errors.WrapIfWithDetails(err, "Error in extracting test coverage files", out)
+// exec runs command in a container and returns its stdout; an empty container
+// means the pod's only one.
+func (c *kindCluster) exec(ctx context.Context, namespace, pod, container string, command ...string) ([]byte, error) {
+	req := c.clientset.CoreV1().RESTClient().Post().
+		Resource("pods").Namespace(namespace).Name(pod).SubResource("exec").
+		VersionedParams(&corev1.PodExecOptions{
+			Container: container,
+			Command:   command,
+			Stdout:    true,
+			Stderr:    true,
+		}, clientgoscheme.ParameterCodec)
+	executor, err := remotecommand.NewSPDYExecutor(c.restConfig, "POST", req.URL())
+	if err != nil {
+		return nil, errors.WrapIf(err, "creating the exec request")
 	}
-	return nil
+	var stdout, stderr bytes.Buffer
+	if err := executor.StreamWithContext(ctx, remotecommand.StreamOptions{Stdout: &stdout, Stderr: &stderr}); err != nil {
+		return stdout.Bytes(), errors.WrapIfWithDetails(err, "exec", "pod", namespace+"/"+pod, "command", command, "stderr", stderr.String())
+	}
+	return stdout.Bytes(), nil
 }

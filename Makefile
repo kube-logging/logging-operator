@@ -230,15 +230,13 @@ test-e2e-coverage-report-no-deps:
 	${GO_TEST_COVERAGE} --profile=${TEST_COV_DIR}/coverage_e2e.out
 
 .PHONY: test-e2e
-test-e2e: ${KIND} codegen manifests docker-build-e2e-test stern ## Run E2E tests
+test-e2e: ${KIND} codegen manifests docker-build-e2e-test ## Run E2E tests
 	$(MAKE) test-e2e-nodeps E2E_TEST=${E2E_TEST}
 
 .PHONY: test-e2e-ci
 test-e2e-ci: ${BIN}
 	curl -Lo ./bin/kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64
 	chmod +x ./bin/kind
-	curl -L https://github.com/stern/stern/releases/download/v${STERN_VERSION}/stern_${STERN_VERSION}_linux_amd64.tar.gz | tar xz -C bin stern
-	chmod +x ./bin/stern
 	$(MAKE) test-e2e-nodeps E2E_TEST=${E2E_TEST}
 
 .PHONY: test-e2e-nodeps

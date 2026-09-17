@@ -123,11 +123,11 @@ func flowToOutput(ns, outputName string) *v1beta1.Flow {
 }
 
 func bufferFiles(env *harness.Env, ns string) (int, error) {
-	out, err := env.Kubectl("-n", ns, "exec", drainedReplica, "-c", "fluentd", "--", "ls", "-1", "/buffers").Output()
+	out, err := env.Exec(ns, drainedReplica, "fluentd", "ls", "-1", "/buffers")
 	if err != nil {
 		return 0, err
 	}
-	return strings.Count(string(out), "\n"), nil
+	return strings.Count(out, "\n"), nil
 }
 
 // How long each step of the arc is allowed. They are the suite's own numbers:

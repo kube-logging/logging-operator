@@ -141,13 +141,13 @@ func (c esClient) hasDocuments(t *testing.T, host, index string) bool {
 	t.Helper()
 
 	url := fmt.Sprintf("http://%s.%s.svc:9200/_cat/count/%s?h=count", host, c.ns, index)
-	rawOut, err := c.env.Kubectl("exec", c.pod, "-n", c.ns, "--", "curl", "-s", url).Output()
+	rawOut, err := c.env.Exec(c.ns, c.pod, "", "curl", "-s", url)
 	if err != nil {
 		t.Logf("Error checking %s: %v", host, err)
 		return false
 	}
 
-	count := strings.TrimSpace(string(rawOut))
+	count := strings.TrimSpace(rawOut)
 	t.Logf("%s document count: %s", host, count)
 	return count != "" && count != "0"
 }

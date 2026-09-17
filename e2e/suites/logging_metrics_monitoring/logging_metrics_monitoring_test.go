@@ -256,12 +256,12 @@ func (mt *metricsTester) getMetrics(endpoint metricsEndpoint, env *harness.Env) 
 		endpoint.port,
 		endpoint.path,
 	)
-	rawOut, err := env.Kubectl("exec", mt.pod, "-n", ns, "--", "curl", serviceURL).Output()
+	rawOut, err := env.Exec(ns, mt.pod, "", "curl", serviceURL)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get metrics: %w", err)
 	}
 
-	return rawOut, nil
+	return []byte(rawOut), nil
 }
 
 func (mt *metricsTester) validateMetrics(rawOut []byte, subject loggingResourceName) error {
