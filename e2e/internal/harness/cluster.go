@@ -23,12 +23,20 @@ import (
 	"testing"
 
 	"emperror.dev/errors"
+	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/tools/clientcmd"
 	"sigs.k8s.io/controller-runtime/pkg/cluster"
+	ctrllog "sigs.k8s.io/controller-runtime/pkg/log"
 
 	"github.com/kube-logging/logging-operator/e2e/internal/kind"
 )
+
+// controller-runtime prints a stack trace on first use when no logger is set,
+// and its cache logs are not the suite's.
+func init() {
+	ctrllog.SetLogger(logr.Discard())
+}
 
 type kindCluster struct {
 	cluster.Cluster
@@ -125,7 +133,7 @@ func (c *kindCluster) collectCoverage(namespace, operator string) error {
 	if out, err := kubectl(c.kubeconfig, "-n", namespace, "exec", deployment, "--", "kill", "-USR1", "1").Output(); err != nil {
 		return errors.WrapIfWithDetails(err, "Error in sending signal to logging-operator", out)
 	}
-	tarball, err := kubectl(c.kubeconfig, "-n", namespace, "exec", deployment, "--", "tar", "-cf", "-", "/covdatafiles").Output()
+	tarball, err := kubectl(c.kubeconfig, "-n", namespace, "exec", deployment, "--", "tar", "-cf", "-", "-C", "/", "covdatafiles").Output()
 	if err != nil {
 		return errors.WrapIfWithDetails(err, "Error in reading test coverage files", tarball)
 	}

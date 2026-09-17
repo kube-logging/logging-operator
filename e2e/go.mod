@@ -6,6 +6,7 @@ require (
 	emperror.dev/errors v0.8.1
 	github.com/MakeNowJust/heredoc v1.0.0
 	github.com/cisco-open/operator-tools v0.38.0
+	github.com/go-logr/logr v1.4.4
 	github.com/kube-logging/logging-operator v0.0.0-20260525191431-270b64e8120f
 	github.com/kube-logging/logging-operator/pkg/sdk v0.12.0
 	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.93.1
@@ -53,7 +54,6 @@ require (
 	github.com/fxamacker/cbor/v2 v2.9.2 // indirect
 	github.com/go-errors/errors v1.5.1 // indirect
 	github.com/go-gorp/gorp/v3 v3.1.0 // indirect
-	github.com/go-logr/logr v1.4.4 // indirect
 	github.com/go-openapi/jsonpointer v0.23.1 // indirect
 	github.com/go-openapi/jsonreference v0.21.6 // indirect
 	github.com/go-openapi/swag v0.26.1 // indirect

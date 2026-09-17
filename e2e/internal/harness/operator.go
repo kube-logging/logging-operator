@@ -15,7 +15,9 @@
 package harness
 
 import (
+	"fmt"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"helm.sh/helm/v3/pkg/action"
@@ -33,8 +35,11 @@ func installOperator(t *testing.T, c *kindCluster, cfg config) {
 	}
 	actionConfig := new(action.Configuration)
 
+	// Held back rather than logged: helm narrates every resource it creates,
+	// and the lines only say anything when the install fails.
+	var helmLog strings.Builder
 	if err := actionConfig.Init(restClientGetter, cfg.controlNamespace, "memory", func(format string, v ...any) {
-		t.Logf(format, v...)
+		fmt.Fprintf(&helmLog, format+"\n", v...)
 	}); err != nil {
 		t.Fatalf("helm action config init: %s", err)
 	}
@@ -98,6 +103,6 @@ func installOperator(t *testing.T, c *kindCluster, cfg config) {
 		"extraArgs": cfg.operatorArgs,
 	})
 	if err != nil {
-		t.Fatalf("helm chart install: %s", err)
+		t.Fatalf("helm chart install: %s\n%s", err, helmLog.String())
 	}
 }
