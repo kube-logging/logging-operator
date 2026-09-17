@@ -57,6 +57,9 @@ E2E_TEST_TIMEOUT ?= 20m
 # Clusters one suite binary builds at once. Caps peak concurrency, which
 # otherwise follows the core count and starves the aggregators.
 E2E_SUITE_PARALLEL ?= 2
+# A test's buffered log is discarded when the binary dies
+# at -timeout, and the timeout is where the diagnostics are needed.
+E2E_GO_TEST_FLAGS ?= -v
 
 # Suite binaries running at once. Pinned, peak clusters holds at 5; left to -p
 # it follows the core count, so eight cores would reach 10 and sixteen 15.
@@ -251,7 +254,7 @@ test-e2e-nodeps:
 		KIND_IMAGE="$(KIND_IMAGE)" \
 		PROJECT_DIR="$(PWD)" \
 		E2E_TEST_COV_DIR=${TEST_COV_DIR} \
-		go test -count=1 -v -p ${E2E_CLUSTERS} -parallel ${E2E_SUITE_PARALLEL} -timeout ${E2E_TEST_TIMEOUT} ./suites/${E2E_TEST}/...
+		go test -count=1 ${E2E_GO_TEST_FLAGS} -p ${E2E_CLUSTERS} -parallel ${E2E_SUITE_PARALLEL} -timeout ${E2E_TEST_TIMEOUT} ./suites/${E2E_TEST}/...
 		go tool covdata textfmt -i=${TEST_COV_DIR}/covdatafiles -o ${TEST_COV_DIR}/coverage_e2e.out
 	@echo "--- E2E test coverage report"
 	go tool covdata percent -i=${TEST_COV_DIR}/covdatafiles

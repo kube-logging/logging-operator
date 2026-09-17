@@ -45,6 +45,7 @@ It resets on reboot.
 | `E2E_CLUSTERS` | `4` | suite binaries at once (`go test -p`) |
 | `E2E_SUITE_PARALLEL` | `2` | clusters one binary builds at once |
 | `KIND_COMMAND_TIMEOUT` | derived | per `kind` invocation |
+| `E2E_GO_TEST_FLAGS` | `-v` | passed to `go test`; `-v` stays because a `-timeout` panic discards a test's buffered log without it |
 
 The two parallelism knobs multiply. Raising them starves the aggregators on a
 small runner: a suite whose fluentd never finishes its config check usually
