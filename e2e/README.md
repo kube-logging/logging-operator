@@ -1,12 +1,10 @@
 # End-to-end tests
 
-One directory per suite. Each is its own Go package and test binary, and each
-provisions its own KIND cluster, installs the operator into it and tears it down
-afterwards. Suites do not share a cluster, so they can run concurrently and a
-failure in one leaves the others alone.
-
-`common/` and `internal/` are helpers rather than suites, and the Makefile
-filters them out of the selection.
+One directory per suite under `suites/`. Each is its own Go package and test
+binary, and each provisions its own KIND cluster, installs the operator into it
+and tears it down afterwards. Suites do not share a cluster, so they can run
+concurrently and a failure in one leaves the others alone. `internal/` is the
+harness.
 
 ## Running them
 
@@ -25,9 +23,8 @@ reuses them. Rebuild only when you change operator code, not test code.
 
 ### What has to be installed
 
-`docker`, and `kubectl` and `helm` on `PATH`. `make test-e2e` fetches `kind` and
-`stern` into `bin/` for you; `make test-e2e-nodeps` assumes they are already
-there.
+`docker`. `make test-e2e` fetches `kind` into `bin/` for you; `make test-e2e-nodeps`
+assumes it is already there.
 
 On Linux, KIND needs more inotify instances than the default 128:
 
@@ -42,11 +39,12 @@ It resets on reboot.
 
 | variable | default | what it does |
 | --- | --- | --- |
-| `E2E_TEST` | all | suite directory to run |
+| `E2E_TEST` | all | suite directory under `suites/` to run |
 | `E2E_TEST_TIMEOUT` | `20m` | per suite binary |
 | `E2E_CLUSTERS` | `4` | suite binaries at once (`go test -p`) |
 | `E2E_SUITE_PARALLEL` | `2` | clusters one binary builds at once |
 | `KIND_COMMAND_TIMEOUT` | derived | per `kind` invocation |
+| `E2E_GO_TEST_FLAGS` | `-v` | passed to `go test`; `-v` stays because a `-timeout` panic discards a test's buffered log without it |
 
 The two parallelism knobs multiply. Raising them starves the aggregators on a
 small runner: a suite whose fluentd never finishes its config check usually
@@ -55,8 +53,9 @@ in an unrelated suite run at the same time is the cheapest way to confirm that.
 
 ### Artifacts
 
-Each suite writes `build/_test/cluster-<TestName>.log` — a `stern` dump of every
-watched namespace — and coverage into `build/_test_coverage`. Both survive the
+Each suite writes `build/_test/cluster-<TestName>.log` — the log of every
+container in the watched namespaces, one `namespace/pod container` prefix per
+line — and coverage into `build/_test_coverage`. Both survive the
 cluster being deleted, and the dump is the first place to look when a wait times
 out.
 
@@ -86,10 +85,10 @@ func TestSomething(t *testing.T) {
 }
 ```
 
-`Start()` returns an `Env` carrying `T`, `Ctx`, `Client`, `Cluster`, `Release`,
+`Start()` returns an `Env` carrying `T`, `Ctx`, `Client`, `Release`,
 `ControlNamespace` and `Receiver`. Teardown is registered for you and runs in
-order: artifacts (the log dump and coverage), the temporary kubeconfig, stopping
-the cluster, deleting it. Each step is isolated, so one failing does not strand
+order: artifacts (the log dump and coverage), stopping the cluster, deleting
+it. Each step is isolated, so one failing does not strand
 the cluster.
 
 ### Builder options
@@ -151,12 +150,15 @@ The chart installs a receiver that suites send logs to. `env.Receiver` owns it:
 ```go
 env.Receiver.URL("tag")            // address to point an Output at
 env.Receiver.MustReceive("tag")    // wait until the tag shows up
-env.Receiver.MustNotReceive("tag") // point-in-time check that it did not
+env.Receiver.MustNotReceive("tag") // point-in-time check over the whole log
 env.Receiver.Scale(0)              // take it away, to make an aggregator buffer
 ```
 
-Prefer these to shelling out to `kubectl` — `#2325` tracks the calls that are
-left, and each one is a case where nothing better exists yet.
+What they do not cover — running a command inside a pod — is
+`env.Exec(ns, pod, container, command...)`; an empty container means the pod's
+only one. A suite that has to reach a Service creates
+`fixture.CurlPod(ns, name)`, waits on `wait.Pod(ns, name)`, and execs `curl`
+through it. Nothing shells out to `kubectl`.
 
 ### Images
 

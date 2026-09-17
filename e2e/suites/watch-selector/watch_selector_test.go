@@ -15,15 +15,14 @@
 package watch_selector
 
 import (
-	"fmt"
 	"testing"
 
+	"github.com/cisco-open/operator-tools/pkg/types"
 	"github.com/stretchr/testify/require"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/e2e-framework/third_party/helm"
 
 	"github.com/kube-logging/logging-operator/e2e/internal/harness"
 	"github.com/kube-logging/logging-operator/e2e/internal/image"
@@ -35,7 +34,6 @@ const (
 	ns      = "test"
 	release = "e2e"
 
-	// unmanagedNS is created by the fluent chart, not by the harness.
 	unmanagedNS = "fluentd"
 )
 
@@ -45,6 +43,7 @@ func TestWatchSelectors(t *testing.T) {
 		WithRelease(release).
 		WithControlNamespace(ns).
 		WithOperatorArgs("-enable-leader-election=true", "-watch-labeled-children=true", "-watch-labeled-secrets=true").
+		WithNamespaces(unmanagedNS).
 		Start()
 
 	logging := &v1beta1.Logging{
@@ -69,7 +68,7 @@ func TestWatchSelectors(t *testing.T) {
 	}
 	env.Create(logging)
 
-	require.NoError(t, installFluentdSts(env))
+	env.Create(unmanagedFluentd())
 
 	unmanagedSecret := &corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
@@ -122,23 +121,22 @@ func requireOwnedBy(t *testing.T, owner *v1beta1.Logging, ref *metav1.OwnerRefer
 	require.True(t, *ref.Controller)
 }
 
-func installFluentdSts(env *harness.Env) error {
-	manager := helm.New(env.Cluster.KubeConfigFilePath())
-
-	if err := manager.RunRepo(helm.WithArgs("add", "fluent", "https://fluent.github.io/helm-charts")); err != nil {
-		return fmt.Errorf("failed to add fluent repo: %v", err)
+// unmanagedFluentd carries the name label -watch-labeled-children selects on,
+// so it is inside the operator's watch and still has to be left alone.
+func unmanagedFluentd() *appsv1.StatefulSet {
+	labels := map[string]string{types.NameLabel: "fluentd"}
+	return &appsv1.StatefulSet{
+		ObjectMeta: metav1.ObjectMeta{Name: "fluentd", Namespace: unmanagedNS, Labels: labels},
+		Spec: appsv1.StatefulSetSpec{
+			ServiceName: "fluentd",
+			Replicas:    new(int32(1)),
+			Selector:    &metav1.LabelSelector{MatchLabels: labels},
+			Template: corev1.PodTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{Labels: labels},
+				Spec: corev1.PodSpec{
+					Containers: []corev1.Container{{Name: "fluentd", Image: image.Fluentd().Ref()}},
+				},
+			},
+		},
 	}
-
-	if err := manager.RunInstall(
-		helm.WithName("fluentd"),
-		helm.WithChart("fluent/fluentd"),
-		helm.WithArgs("--create-namespace"),
-		helm.WithNamespace(unmanagedNS),
-		helm.WithArgs("--set", "kind=StatefulSet"),
-		helm.WithWait(),
-	); err != nil {
-		return fmt.Errorf("failed to install fluentd: %v", err)
-	}
-
-	return nil
 }

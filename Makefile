@@ -57,6 +57,9 @@ E2E_TEST_TIMEOUT ?= 20m
 # Clusters one suite binary builds at once. Caps peak concurrency, which
 # otherwise follows the core count and starves the aggregators.
 E2E_SUITE_PARALLEL ?= 2
+# A test's buffered log is discarded when the binary dies
+# at -timeout, and the timeout is where the diagnostics are needed.
+E2E_GO_TEST_FLAGS ?= -v
 
 # Suite binaries running at once. Pinned, peak clusters holds at 5; left to -p
 # it follows the core count, so eight cores would reach 10 and sixteen 15.
@@ -206,7 +209,7 @@ test: codegen fmt vet manifests ${ENVTEST_BINARY_ASSETS} ${KUBEBUILDER} ## Run t
 	cd pkg/sdk/logging/model/syslogng/config && go test ./...  -coverprofile ${TEST_COV_DIR}/cover_syslogng.out
 	ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} go test -v ./controllers/logging/... ./pkg/...  -coverprofile ${TEST_COV_DIR}/cover_controllers_logging.out
 	ENVTEST_BINARY_ASSETS=${ENVTEST_BINARY_ASSETS} go test -v ./controllers/extensions/... ./pkg/...  -coverprofile ${TEST_COV_DIR}/cover_controllers_extensions.out
-	cd e2e && go test -v ./common/... ./internal/...
+	cd e2e && go test -v ./internal/...
 
 .PHONY: generate-test-coverage
 generate-test-coverage: test
@@ -227,15 +230,13 @@ test-e2e-coverage-report-no-deps:
 	${GO_TEST_COVERAGE} --profile=${TEST_COV_DIR}/coverage_e2e.out
 
 .PHONY: test-e2e
-test-e2e: ${KIND} codegen manifests docker-build-e2e-test stern ## Run E2E tests
+test-e2e: ${KIND} codegen manifests docker-build-e2e-test ## Run E2E tests
 	$(MAKE) test-e2e-nodeps E2E_TEST=${E2E_TEST}
 
 .PHONY: test-e2e-ci
 test-e2e-ci: ${BIN}
 	curl -Lo ./bin/kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64
 	chmod +x ./bin/kind
-	curl -L https://github.com/stern/stern/releases/download/v${STERN_VERSION}/stern_${STERN_VERSION}_linux_amd64.tar.gz | tar xz -C bin stern
-	chmod +x ./bin/stern
 	$(MAKE) test-e2e-nodeps E2E_TEST=${E2E_TEST}
 
 .PHONY: test-e2e-nodeps
@@ -251,7 +252,7 @@ test-e2e-nodeps:
 		KIND_IMAGE="$(KIND_IMAGE)" \
 		PROJECT_DIR="$(PWD)" \
 		E2E_TEST_COV_DIR=${TEST_COV_DIR} \
-		go test -count=1 -v -p ${E2E_CLUSTERS} -parallel ${E2E_SUITE_PARALLEL} -timeout ${E2E_TEST_TIMEOUT} $$(go list ./${E2E_TEST}/... | grep -vE '/e2e/(common|internal)(/|$$)')
+		go test -count=1 ${E2E_GO_TEST_FLAGS} -p ${E2E_CLUSTERS} -parallel ${E2E_SUITE_PARALLEL} -timeout ${E2E_TEST_TIMEOUT} ./suites/${E2E_TEST}/...
 		go tool covdata textfmt -i=${TEST_COV_DIR}/covdatafiles -o ${TEST_COV_DIR}/coverage_e2e.out
 	@echo "--- E2E test coverage report"
 	go tool covdata percent -i=${TEST_COV_DIR}/covdatafiles

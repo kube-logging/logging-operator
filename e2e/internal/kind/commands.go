@@ -37,7 +37,7 @@ const (
 	imageEnv          = "KIND_IMAGE"
 	commandTimeoutEnv = "KIND_COMMAND_TIMEOUT"
 
-	defaultPath = "../../bin/kind"
+	defaultPath = "../../../bin/kind"
 
 	// timeoutFraction is the share of the enclosing -timeout that one invocation
 	// may consume. The cap is derived from the surrounding budget rather than
@@ -177,17 +177,6 @@ func (k *Kind) deleteCluster(timeout time.Duration, options DeleteClusterOptions
 		return fmt.Errorf("%w: %s", err, strings.TrimSpace(cmderr.String()))
 	}
 	return err
-}
-
-func (k *Kind) GetKubeconfig(options GetKubeconfigOptions) ([]byte, error) {
-	args := options.AppendToArgs([]string{"get", "kubeconfig"})
-
-	stdout := &bytes.Buffer{}
-	err := k.run(k.commandTimeout(), args, func(cmd *exec.Cmd) {
-		cmd.Stdout = stdout
-		cmd.Stderr = os.Stderr
-	})
-	return stdout.Bytes(), err
 }
 
 func (k *Kind) LoadDockerImage(images []string, options LoadDockerImageOptions) error {
@@ -344,23 +333,6 @@ func (options DeleteClusterOptions) AppendToArgs(args []string) []string {
 	args = options.GlobalOptions.AppendToArgs(args)
 	if options.Kubeconfig != "" {
 		args = append(args, "--kubeconfig", options.Kubeconfig)
-	}
-	if options.Name != "" {
-		args = append(args, "--name", options.Name)
-	}
-	return args
-}
-
-type GetKubeconfigOptions struct {
-	GlobalOptions
-	Internal bool
-	Name     string
-}
-
-func (options GetKubeconfigOptions) AppendToArgs(args []string) []string {
-	args = options.GlobalOptions.AppendToArgs(args)
-	if options.Internal {
-		args = append(args, "--internal")
 	}
 	if options.Name != "" {
 		args = append(args, "--name", options.Name)

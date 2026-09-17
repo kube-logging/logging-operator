@@ -17,18 +17,15 @@ package logging_metrics_monitoring_test
 import (
 	"errors"
 	"fmt"
-	"os/exec"
 	"strings"
 	"testing"
 	"time"
 
 	v1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"github.com/stretchr/testify/require"
-	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"sigs.k8s.io/e2e-framework/third_party/helm"
 
-	"github.com/kube-logging/logging-operator/e2e/common"
+	"github.com/kube-logging/logging-operator/e2e/internal/fixture"
 	"github.com/kube-logging/logging-operator/e2e/internal/harness"
 	"github.com/kube-logging/logging-operator/e2e/internal/image"
 	"github.com/kube-logging/logging-operator/e2e/internal/wait"
@@ -36,7 +33,7 @@ import (
 )
 
 type metricsTester struct {
-	testPod *corev1.Pod
+	pod string
 }
 
 type metricsEndpoint struct {
@@ -144,7 +141,13 @@ func TestLoggingMetrics_Monitoring(t *testing.T) {
 		WithScheme(v1.AddToScheme).
 		Start()
 
-	require.NoError(t, installPrometheusOperator(env))
+	// The CRDs alone: the ServiceMonitors are read here, not by a Prometheus.
+	env.InstallChart(harness.Chart{
+		Release:   "prometheus-operator-crds",
+		Namespace: ns,
+		Repo:      "https://prometheus-community.github.io/helm-charts",
+		Name:      "prometheus-operator-crds",
+	})
 
 	logging := syslogNGLogging()
 	env.Create(logging)
@@ -153,8 +156,10 @@ func TestLoggingMetrics_Monitoring(t *testing.T) {
 	serviceMonitorsSyslogNG := &v1.ServiceMonitorList{}
 	require.NoError(t, env.Client.List(env.Ctx, serviceMonitorsSyslogNG))
 
-	mt, err := setupMetricsTester(env)
-	require.NoError(t, err)
+	const curlPod = "metrics-tester"
+	env.Create(fixture.CurlPod(ns, curlPod))
+	env.WaitFor(wait.Pod(ns, curlPod))
+	mt := metricsTester{pod: curlPod}
 
 	mt.mustServe(env, fluentbit)
 	mt.mustServe(env, syslogNG)
@@ -171,45 +176,6 @@ func TestLoggingMetrics_Monitoring(t *testing.T) {
 
 	serviceMonitors := append(serviceMonitorsFluentd.Items, serviceMonitorsSyslogNG.Items...)
 	require.NoError(t, checkServiceMonitorAvailability(serviceMonitors))
-}
-
-// installPrometheusOperator keeps the chart install rather than a manifest: the
-// stack is what the ServiceMonitors are read by, and pinning our own copy of it
-// would be a second thing to keep current.
-func installPrometheusOperator(env *harness.Env) error {
-	manager := helm.New(env.Cluster.KubeConfigFilePath())
-
-	if err := manager.RunRepo(helm.WithArgs("add", "prometheus-community", "https://prometheus-community.github.io/helm-charts")); err != nil {
-		return fmt.Errorf("failed to add prometheus-community repo: %v", err)
-	}
-
-	if err := manager.RunRepo(helm.WithArgs("update")); err != nil {
-		return fmt.Errorf("failed to update helm repos: %v", err)
-	}
-
-	if err := manager.RunInstall(
-		helm.WithName("prometheus"),
-		helm.WithChart("prometheus-community/kube-prometheus-stack"),
-		helm.WithArgs("--create-namespace"),
-		helm.WithNamespace("monitoring"),
-		helm.WithArgs("--set", "prometheus.prometheusSpec.serviceMonitorSelectorNilUsesHelmValues=false"),
-		helm.WithArgs("--set", "prometheus.prometheusSpec.podMonitorSelectorNilUsesHelmValues=false"),
-		helm.WithArgs("--set", "prometheus.prometheusSpec.maximumStartupDurationSeconds=900"),
-		helm.WithWait(),
-	); err != nil {
-		return fmt.Errorf("failed to install prometheus: %v", err)
-	}
-
-	return nil
-}
-
-func setupMetricsTester(env *harness.Env) (metricsTester, error) {
-	pod, err := common.SetupCurlPod(env.Ctx, env.Client, ns, "metrics-tester", pollInterval, pollTimeout)
-	if err != nil {
-		return metricsTester{}, err
-	}
-
-	return metricsTester{testPod: pod}, nil
 }
 
 func checkServiceMonitorAvailability(serviceMonitors []v1.ServiceMonitor) error {
@@ -265,13 +231,12 @@ func (mt *metricsTester) getMetrics(endpoint metricsEndpoint, env *harness.Env) 
 		endpoint.port,
 		endpoint.path,
 	)
-	cmd := common.CmdEnv(exec.Command("kubectl", "exec", mt.testPod.Name, "-n", ns, "--", "curl", serviceURL), env.Cluster)
-	rawOut, err := cmd.Output()
+	rawOut, err := env.Exec(ns, mt.pod, "", "curl", serviceURL)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get metrics: %w", err)
 	}
 
-	return rawOut, nil
+	return []byte(rawOut), nil
 }
 
 func (mt *metricsTester) validateMetrics(rawOut []byte, subject loggingResourceName) error {

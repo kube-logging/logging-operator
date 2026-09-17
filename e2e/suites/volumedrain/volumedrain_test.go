@@ -15,7 +15,6 @@
 package volumedrain
 
 import (
-	"os/exec"
 	"strings"
 	"testing"
 	"time"
@@ -27,7 +26,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/kube-logging/logging-operator/e2e/common"
 	"github.com/kube-logging/logging-operator/e2e/internal/harness"
 	"github.com/kube-logging/logging-operator/e2e/internal/image"
 	"github.com/kube-logging/logging-operator/e2e/internal/wait"
@@ -124,16 +122,12 @@ func flowToOutput(ns, outputName string) *v1beta1.Flow {
 	}
 }
 
-// bufferFiles counts what the aggregator has queued. This is still a shell-out:
-// reading a path inside a container is the kubectl exec seam tracked in #2325,
-// which the receiver helpers do not cover.
 func bufferFiles(env *harness.Env, ns string) (int, error) {
-	out, err := common.CmdEnv(exec.Command("kubectl",
-		"-n", ns, "exec", drainedReplica, "-c", "fluentd", "--", "ls", "-1", "/buffers"), env.Cluster).Output()
+	out, err := env.Exec(ns, drainedReplica, "fluentd", "ls", "-1", "/buffers")
 	if err != nil {
 		return 0, err
 	}
-	return strings.Count(string(out), "\n"), nil
+	return strings.Count(out, "\n"), nil
 }
 
 // How long each step of the arc is allowed. They are the suite's own numbers:

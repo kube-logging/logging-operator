@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package common
+package harness
 
 import (
 	"fmt"
@@ -26,10 +26,10 @@ import (
 	"github.com/kube-logging/logging-operator/e2e/internal/kind"
 )
 
-// KindClusterCreationTimeout is passed to `kind create cluster --wait`, which
+// kindClusterCreationTimeout is passed to `kind create cluster --wait`, which
 // bounds only the last of kind's actions, waiting for control plane readiness.
 // The whole invocation is bounded by Kind.CommandTimeout instead.
-const KindClusterCreationTimeout = "3m"
+const kindClusterCreationTimeout = "3m"
 
 var kindCLI = kind.New()
 
@@ -80,15 +80,17 @@ func removeIfExists(path string) error {
 	return nil
 }
 
-func kindClusterKubeconfig(name string) ([]byte, error) {
+// createCluster returns the kubeconfig kind wrote, which is the one every
+// client uses: kind's lock only guards kind against kind.
+func createCluster(name string) (string, error) {
 	kubeconfig, err := clusterKubeconfigPath(name)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	create := kind.CreateClusterOptions{
 		Name:       name,
-		Wait:       KindClusterCreationTimeout,
+		Wait:       kindClusterCreationTimeout,
 		Kubeconfig: kubeconfig,
 	}
 
@@ -100,17 +102,14 @@ func kindClusterKubeconfig(name string) ([]byte, error) {
 			Name:       name,
 			Kubeconfig: kubeconfig,
 		}); err != nil {
-			return nil, errors.WrapIfWithDetails(err, "deleting a leftover kind cluster", "clusterName", name)
+			return "", errors.WrapIfWithDetails(err, "deleting a leftover kind cluster", "clusterName", name)
 		}
 		err = kindCLI.CreateCluster(create)
 	}
 	if err != nil {
-		return nil, err
+		return "", err
 	}
-
-	return kindCLI.GetKubeconfig(kind.GetKubeconfigOptions{
-		Name: name,
-	})
+	return kubeconfig, nil
 }
 
 func isClusterAlreadyExistsError(err error) bool {

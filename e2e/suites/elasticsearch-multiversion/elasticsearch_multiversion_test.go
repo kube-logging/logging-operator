@@ -16,7 +16,6 @@ package elasticsearch_multiversion
 
 import (
 	"fmt"
-	"os/exec"
 	"strings"
 	"testing"
 	"time"
@@ -29,7 +28,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/kube-logging/logging-operator/e2e/common"
+	"github.com/kube-logging/logging-operator/e2e/internal/fixture"
 	"github.com/kube-logging/logging-operator/e2e/internal/harness"
 	"github.com/kube-logging/logging-operator/e2e/internal/image"
 	"github.com/kube-logging/logging-operator/e2e/internal/wait"
@@ -127,9 +126,8 @@ func TestBudgetLeavesRoomForTheRemainingWaits(t *testing.T) {
 	require.LessOrEqual(t, 3*first, remaining-esReadyMargin)
 }
 
-// esClient reads Elasticsearch through the curl pod, which is the only way in
-// from the test binary. It stays suite-local: no other suite has a curl pod, so
-// on the harness it would be a helper with one caller.
+// esClient reads Elasticsearch through the curl pod. It stays suite-local: what
+// it parses out of the response is this suite's.
 type esClient struct {
 	pod string
 	ns  string
@@ -143,14 +141,13 @@ func (c esClient) hasDocuments(t *testing.T, host, index string) bool {
 	t.Helper()
 
 	url := fmt.Sprintf("http://%s.%s.svc:9200/_cat/count/%s?h=count", host, c.ns, index)
-	rawOut, err := common.CmdEnv(exec.Command("kubectl", "exec", c.pod, "-n", c.ns, "--",
-		"curl", "-s", url), c.env.Cluster).Output()
+	rawOut, err := c.env.Exec(c.ns, c.pod, "", "curl", "-s", url)
 	if err != nil {
 		t.Logf("Error checking %s: %v", host, err)
 		return false
 	}
 
-	count := strings.TrimSpace(string(rawOut))
+	count := strings.TrimSpace(rawOut)
 	t.Logf("%s document count: %s", host, count)
 	return count != "" && count != "0"
 }
@@ -502,13 +499,10 @@ func TestElasticsearch_MultiVersion(t *testing.T) {
 		wait.FluentdAggregator(ns),
 	)
 
-	const (
-		pollInterval = 5 * time.Second
-		pollTimeout  = 2 * time.Minute
-	)
-	curlPod, err := common.SetupCurlPod(env.Ctx, env.Client, ns, "es-tester", pollInterval, pollTimeout)
-	common.RequireNoError(t, err)
-	es := esClient{pod: curlPod.Name, ns: ns, env: env}
+	const curlPod = "es-tester"
+	env.Create(fixture.CurlPod(ns, curlPod))
+	env.WaitFor(wait.Pod(ns, curlPod))
+	es := esClient{pod: curlPod, ns: ns, env: env}
 
 	require.Eventuallyf(t, func() bool {
 		return es.hasDocuments(t, "elasticsearch7", "fluentd-es7-*")
