@@ -102,18 +102,6 @@
       ]
     },
     {
-      "matchManagers": [
-        "github-actions"
-      ],
-      "matchDepNames": [
-        "helm"
-      ],
-      "allowedVersions": "<4",
-      "description": [
-        "The helm CLI on the chart package/push path stays on 3.x until Helm 4 is verified against the release workflow."
-      ]
-    },
-    {
       "matchPackageNames": [
         "k8s.io/client-go"
       ],
