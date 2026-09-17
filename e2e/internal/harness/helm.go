@@ -19,9 +19,9 @@ import (
 	"strings"
 
 	"emperror.dev/errors"
-	"helm.sh/helm/v3/pkg/action"
-	"helm.sh/helm/v3/pkg/chart/loader"
-	"helm.sh/helm/v3/pkg/cli"
+	"helm.sh/helm/v4/pkg/action"
+	"helm.sh/helm/v4/pkg/chart/loader"
+	"helm.sh/helm/v4/pkg/cli"
 )
 
 // Chart is a helm chart to install: Name is a path when Repo is empty, and a

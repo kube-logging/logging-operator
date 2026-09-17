@@ -15,7 +15,7 @@
 package harness
 
 import (
-	"github.com/MakeNowJust/heredoc"
+	"github.com/MakeNowJust/heredoc/v2"
 	"github.com/cisco-open/operator-tools/pkg/types"
 	"github.com/cisco-open/operator-tools/pkg/utils"
 	appsv1 "k8s.io/api/apps/v1"
