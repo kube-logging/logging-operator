@@ -24,7 +24,7 @@ import (
 	"time"
 
 	"emperror.dev/errors"
-	"github.com/MakeNowJust/heredoc"
+	"github.com/MakeNowJust/heredoc/v2"
 	"github.com/andreyvit/diff"
 	"github.com/cisco-open/operator-tools/pkg/secret"
 	"github.com/cisco-open/operator-tools/pkg/utils"
@@ -64,9 +64,7 @@ func TestFluentdResourcesCreatedAndRemoved(t *testing.T) {
 	defer beforeEach(t)()
 
 	logging := &v1beta1.Logging{
-		ObjectMeta: v1.ObjectMeta{
-			Name: "test-" + uuid.New()[:8],
-		},
+		Name: "test-" + uuid.New()[:8],
 		Spec: v1beta1.LoggingSpec{
 			WatchNamespaces:         []string{testNamespace},
 			FluentdSpec:             &v1beta1.FluentdSpec{},
@@ -97,9 +95,7 @@ func TestSingleFlowWithoutOutputRefs(t *testing.T) {
 	defer beforeEach(t)()
 
 	logging := &v1beta1.Logging{
-		ObjectMeta: v1.ObjectMeta{
-			Name: "test-" + uuid.New()[:8],
-		},
+		Name: "test-" + uuid.New()[:8],
 		Spec: v1beta1.LoggingSpec{
 			WatchNamespaces:         []string{testNamespace},
 			FluentdSpec:             &v1beta1.FluentdSpec{},
@@ -109,10 +105,8 @@ func TestSingleFlowWithoutOutputRefs(t *testing.T) {
 	}
 
 	flow := &v1beta1.Flow{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "test-flow",
-			Namespace: testNamespace,
-		},
+		Name:      "test-flow",
+		Namespace: testNamespace,
 		Spec: v1beta1.FlowSpec{
 			Selectors: map[string]string{
 				"a": "b",
@@ -135,9 +129,7 @@ func TestSingleFlowWithoutExistingLoggingRef(t *testing.T) {
 	defer beforeEach(t)()
 
 	logging := &v1beta1.Logging{
-		ObjectMeta: v1.ObjectMeta{
-			Name: "test-" + uuid.New()[:8],
-		},
+		Name: "test-" + uuid.New()[:8],
 		Spec: v1beta1.LoggingSpec{
 			WatchNamespaces:         []string{testNamespace},
 			FluentdSpec:             &v1beta1.FluentdSpec{},
@@ -147,10 +139,8 @@ func TestSingleFlowWithoutExistingLoggingRef(t *testing.T) {
 	}
 
 	flow := &v1beta1.Flow{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "test-flow",
-			Namespace: testNamespace,
-		},
+		Name:      "test-flow",
+		Namespace: testNamespace,
 		Spec: v1beta1.FlowSpec{
 			LoggingRef: "nonexistent",
 			Selectors: map[string]string{
@@ -174,9 +164,7 @@ func TestSingleFlowWithOutputRefDefaultLoggingRef(t *testing.T) {
 	defer beforeEach(t)()
 
 	logging := &v1beta1.Logging{
-		ObjectMeta: v1.ObjectMeta{
-			Name: "test-" + uuid.New()[:8],
-		},
+		Name: "test-" + uuid.New()[:8],
 		Spec: v1beta1.LoggingSpec{
 			WatchNamespaces:         []string{testNamespace},
 			FluentdSpec:             &v1beta1.FluentdSpec{},
@@ -186,20 +174,16 @@ func TestSingleFlowWithOutputRefDefaultLoggingRef(t *testing.T) {
 	}
 
 	output := &v1beta1.Output{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "test-output",
-			Namespace: testNamespace,
-		},
+		Name:      "test-output",
+		Namespace: testNamespace,
 		Spec: v1beta1.OutputSpec{
 			NullOutputConfig: output.NewNullOutputConfig(),
 		},
 	}
 
 	flow := &v1beta1.Flow{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "test-flow",
-			Namespace: testNamespace,
-		},
+		Name:      "test-flow",
+		Namespace: testNamespace,
 		Spec: v1beta1.FlowSpec{
 			Selectors: map[string]string{
 				"a": "b",
@@ -223,9 +207,7 @@ func TestSingleFlowWithClusterOutput(t *testing.T) {
 	defer beforeEach(t)()
 
 	logging := &v1beta1.Logging{
-		ObjectMeta: v1.ObjectMeta{
-			Name: "test-" + uuid.New()[:8],
-		},
+		Name: "test-" + uuid.New()[:8],
 		Spec: v1beta1.LoggingSpec{
 			WatchNamespaces:         []string{testNamespace},
 			FluentdSpec:             &v1beta1.FluentdSpec{},
@@ -235,10 +217,8 @@ func TestSingleFlowWithClusterOutput(t *testing.T) {
 	}
 
 	output := &v1beta1.ClusterOutput{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "test-cluster-output",
-			Namespace: controlNamespace,
-		},
+		Name:      "test-cluster-output",
+		Namespace: controlNamespace,
 		Spec: v1beta1.ClusterOutputSpec{
 			OutputSpec: v1beta1.OutputSpec{
 				NullOutputConfig: output.NewNullOutputConfig(),
@@ -247,10 +227,8 @@ func TestSingleFlowWithClusterOutput(t *testing.T) {
 	}
 
 	flow := &v1beta1.Flow{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "test-flow",
-			Namespace: testNamespace,
-		},
+		Name:      "test-flow",
+		Namespace: testNamespace,
 		Spec: v1beta1.FlowSpec{
 			Selectors: map[string]string{
 				"a": "b",
@@ -274,9 +252,7 @@ func TestSingleFlowWithProtectedClusterOutput(t *testing.T) {
 	defer beforeEachWithError(t, errors)()
 
 	logging := &v1beta1.Logging{
-		ObjectMeta: v1.ObjectMeta{
-			Name: "test-" + uuid.New()[:8],
-		},
+		Name: "test-" + uuid.New()[:8],
 		Spec: v1beta1.LoggingSpec{
 			WatchNamespaces:         []string{testNamespace},
 			FluentdSpec:             &v1beta1.FluentdSpec{},
@@ -286,10 +262,8 @@ func TestSingleFlowWithProtectedClusterOutput(t *testing.T) {
 	}
 
 	output := &v1beta1.ClusterOutput{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "test-cluster-output",
-			Namespace: controlNamespace,
-		},
+		Name:      "test-cluster-output",
+		Namespace: controlNamespace,
 		Spec: v1beta1.ClusterOutputSpec{
 			Protected: true,
 			OutputSpec: v1beta1.OutputSpec{
@@ -299,10 +273,8 @@ func TestSingleFlowWithProtectedClusterOutput(t *testing.T) {
 	}
 
 	flow := &v1beta1.Flow{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "test-flow",
-			Namespace: testNamespace,
-		},
+		Name:      "test-flow",
+		Namespace: testNamespace,
 		Spec: v1beta1.FlowSpec{
 			GlobalOutputRefs: []string{"test-cluster-output"},
 		},
@@ -320,9 +292,7 @@ func TestSingleSyslogNGFlowWithProtectedSyslogNGClusterOutput(t *testing.T) {
 	defer beforeEachWithError(t, errors)()
 
 	logging := &v1beta1.Logging{
-		ObjectMeta: v1.ObjectMeta{
-			Name: "test-" + uuid.New()[:8],
-		},
+		Name: "test-" + uuid.New()[:8],
 		Spec: v1beta1.LoggingSpec{
 			WatchNamespaces:         []string{testNamespace},
 			SyslogNGSpec:            &v1beta1.SyslogNGSpec{},
@@ -332,10 +302,8 @@ func TestSingleSyslogNGFlowWithProtectedSyslogNGClusterOutput(t *testing.T) {
 	}
 
 	output := &v1beta1.SyslogNGClusterOutput{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "test-cluster-output",
-			Namespace: controlNamespace,
-		},
+		Name:      "test-cluster-output",
+		Namespace: controlNamespace,
 		Spec: v1beta1.SyslogNGClusterOutputSpec{
 			Protected: true,
 			SyslogNGOutputSpec: v1beta1.SyslogNGOutputSpec{
@@ -347,10 +315,8 @@ func TestSingleSyslogNGFlowWithProtectedSyslogNGClusterOutput(t *testing.T) {
 	}
 
 	flow := &v1beta1.SyslogNGFlow{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "test-flow",
-			Namespace: testNamespace,
-		},
+		Name:      "test-flow",
+		Namespace: testNamespace,
 		Spec: v1beta1.SyslogNGFlowSpec{
 			Match:            &v1beta1.SyslogNGMatch{},
 			GlobalOutputRefs: []string{"test-cluster-output"},
@@ -369,27 +335,21 @@ func TestLogginResourcesWithNonUniqueLoggingRefs(t *testing.T) {
 	defer beforeEach(t)()
 
 	logging1 := &v1beta1.Logging{
-		ObjectMeta: v1.ObjectMeta{
-			Name: "test-1",
-		},
+		Name: "test-1",
 		Spec: v1beta1.LoggingSpec{
 			ControlNamespace: controlNamespace,
 			WatchNamespaces:  []string{"a", "b"},
 		},
 	}
 	logging2 := &v1beta1.Logging{
-		ObjectMeta: v1.ObjectMeta{
-			Name: "test-2",
-		},
+		Name: "test-2",
 		Spec: v1beta1.LoggingSpec{
 			ControlNamespace: controlNamespace,
 			WatchNamespaces:  []string{"b", "c"},
 		},
 	}
 	logging3 := &v1beta1.Logging{
-		ObjectMeta: v1.ObjectMeta{
-			Name: "test-3",
-		},
+		Name: "test-3",
 		Spec: v1beta1.LoggingSpec{
 			LoggingRef:       "test",
 			ControlNamespace: controlNamespace,
@@ -429,9 +389,7 @@ func TestSingleClusterFlowWithClusterOutputFromExternalNamespace(t *testing.T) {
 	defer beforeEach(t)()
 
 	logging := &v1beta1.Logging{
-		ObjectMeta: v1.ObjectMeta{
-			Name: "test-" + uuid.New()[:8],
-		},
+		Name: "test-" + uuid.New()[:8],
 		Spec: v1beta1.LoggingSpec{
 			WatchNamespaces:                        []string{testNamespace},
 			FluentdSpec:                            &v1beta1.FluentdSpec{},
@@ -442,10 +400,8 @@ func TestSingleClusterFlowWithClusterOutputFromExternalNamespace(t *testing.T) {
 	}
 
 	output := &v1beta1.ClusterOutput{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "test-cluster-output",
-			Namespace: testNamespace,
-		},
+		Name:      "test-cluster-output",
+		Namespace: testNamespace,
 		Spec: v1beta1.ClusterOutputSpec{
 			OutputSpec: v1beta1.OutputSpec{
 				NullOutputConfig: output.NewNullOutputConfig(),
@@ -454,10 +410,8 @@ func TestSingleClusterFlowWithClusterOutputFromExternalNamespace(t *testing.T) {
 	}
 
 	flow := &v1beta1.ClusterFlow{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "test-flow",
-			Namespace: testNamespace,
-		},
+		Name:      "test-flow",
+		Namespace: testNamespace,
 		Spec: v1beta1.ClusterFlowSpec{
 			Selectors: map[string]string{
 				"a": "b",
@@ -481,9 +435,7 @@ func TestClusterFlowWithNamespacedOutput(t *testing.T) {
 	defer beforeEachWithError(t, errors)()
 
 	logging := &v1beta1.Logging{
-		ObjectMeta: v1.ObjectMeta{
-			Name: "test-" + uuid.New()[:8],
-		},
+		Name: "test-" + uuid.New()[:8],
 		Spec: v1beta1.LoggingSpec{
 			WatchNamespaces:         []string{testNamespace},
 			FluentdSpec:             &v1beta1.FluentdSpec{},
@@ -493,20 +445,16 @@ func TestClusterFlowWithNamespacedOutput(t *testing.T) {
 	}
 
 	output := &v1beta1.Output{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "test-output",
-			Namespace: testNamespace,
-		},
+		Name:      "test-output",
+		Namespace: testNamespace,
 		Spec: v1beta1.OutputSpec{
 			NullOutputConfig: output.NewNullOutputConfig(),
 		},
 	}
 
 	flow := &v1beta1.ClusterFlow{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "test-flow",
-			Namespace: controlNamespace,
-		},
+		Name:      "test-flow",
+		Namespace: controlNamespace,
 		Spec: v1beta1.ClusterFlowSpec{
 			Selectors: map[string]string{
 				"a": "b",
@@ -527,9 +475,7 @@ func TestSingleFlowWithOutputRef(t *testing.T) {
 	defer beforeEach(t)()
 
 	logging := &v1beta1.Logging{
-		ObjectMeta: v1.ObjectMeta{
-			Name: "test-" + uuid.New()[:8],
-		},
+		Name: "test-" + uuid.New()[:8],
 		Spec: v1beta1.LoggingSpec{
 			LoggingRef:              "someloggingref",
 			WatchNamespaces:         []string{testNamespace},
@@ -540,10 +486,8 @@ func TestSingleFlowWithOutputRef(t *testing.T) {
 	}
 
 	output := &v1beta1.Output{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "test-output",
-			Namespace: testNamespace,
-		},
+		Name:      "test-output",
+		Namespace: testNamespace,
 		Spec: v1beta1.OutputSpec{
 			LoggingRef:       "someloggingref",
 			NullOutputConfig: output.NewNullOutputConfig(),
@@ -551,10 +495,8 @@ func TestSingleFlowWithOutputRef(t *testing.T) {
 	}
 
 	flow := &v1beta1.Flow{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "test-flow",
-			Namespace: testNamespace,
-		},
+		Name:      "test-flow",
+		Namespace: testNamespace,
 		Spec: v1beta1.FlowSpec{
 			LoggingRef: "someloggingref",
 			Selectors: map[string]string{
@@ -579,9 +521,7 @@ func TestSingleFlowDefaultLoggingRefInvalidOutputRef(t *testing.T) {
 	defer beforeEachWithError(t, errors)()
 
 	logging := &v1beta1.Logging{
-		ObjectMeta: v1.ObjectMeta{
-			Name: "test-" + uuid.New()[:8],
-		},
+		Name: "test-" + uuid.New()[:8],
 		Spec: v1beta1.LoggingSpec{
 			WatchNamespaces:         []string{testNamespace},
 			FluentdSpec:             &v1beta1.FluentdSpec{},
@@ -591,10 +531,8 @@ func TestSingleFlowDefaultLoggingRefInvalidOutputRef(t *testing.T) {
 	}
 
 	flow := &v1beta1.Flow{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "test-flow",
-			Namespace: testNamespace,
-		},
+		Name:      "test-flow",
+		Namespace: testNamespace,
 		Spec: v1beta1.FlowSpec{
 			Selectors: map[string]string{
 				"a": "b",
@@ -615,9 +553,7 @@ func TestSingleFlowWithSecretInOutput(t *testing.T) {
 	defer beforeEach(t)()
 
 	logging := &v1beta1.Logging{
-		ObjectMeta: v1.ObjectMeta{
-			Name: "test-" + uuid.New()[:8],
-		},
+		Name: "test-" + uuid.New()[:8],
 		Spec: v1beta1.LoggingSpec{
 			FluentdSpec:             &v1beta1.FluentdSpec{},
 			FlowConfigCheckDisabled: true,
@@ -627,29 +563,23 @@ func TestSingleFlowWithSecretInOutput(t *testing.T) {
 	}
 
 	output := &v1beta1.Output{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "test-output",
-			Namespace: testNamespace,
-		},
+		Name:      "test-output",
+		Namespace: testNamespace,
 		Spec: v1beta1.OutputSpec{
 			S3OutputConfig: &output.S3OutputConfig{
 				AwsAccessKey: &secret.Secret{
 					ValueFrom: &secret.ValueFrom{
 						SecretKeyRef: &corev1.SecretKeySelector{
-							LocalObjectReference: corev1.LocalObjectReference{
-								Name: "topsecret",
-							},
-							Key: "key",
+							Name: "topsecret",
+							Key:  "key",
 						},
 					},
 				},
 				AwsSecretKey: &secret.Secret{
 					MountFrom: &secret.ValueFrom{
 						SecretKeyRef: &corev1.SecretKeySelector{
-							LocalObjectReference: corev1.LocalObjectReference{
-								Name: "topsecret",
-							},
-							Key: "key",
+							Name: "topsecret",
+							Key:  "key",
 						},
 					},
 				},
@@ -658,10 +588,8 @@ func TestSingleFlowWithSecretInOutput(t *testing.T) {
 		},
 	}
 	flow := &v1beta1.Flow{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "test-flow",
-			Namespace: testNamespace,
-		},
+		Name:      "test-flow",
+		Namespace: testNamespace,
 		Spec: v1beta1.FlowSpec{
 			Selectors: map[string]string{
 				"a": "b",
@@ -672,10 +600,8 @@ func TestSingleFlowWithSecretInOutput(t *testing.T) {
 		},
 	}
 	topsecret := &corev1.Secret{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "topsecret",
-			Namespace: testNamespace,
-		},
+		Name:      "topsecret",
+		Namespace: testNamespace,
 		StringData: map[string]string{
 			"key": "topsecretdata",
 		},
@@ -703,9 +629,7 @@ func TestMultiProcessWorker(t *testing.T) {
 	defer beforeEach(t)()
 
 	logging := &v1beta1.Logging{
-		ObjectMeta: v1.ObjectMeta{
-			Name: "test-" + uuid.New()[:8],
-		},
+		Name: "test-" + uuid.New()[:8],
 		Spec: v1beta1.LoggingSpec{
 			FluentdSpec: &v1beta1.FluentdSpec{
 				Workers: 2,
@@ -717,10 +641,8 @@ func TestMultiProcessWorker(t *testing.T) {
 		},
 	}
 	output := &v1beta1.Output{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "test-output",
-			Namespace: testNamespace,
-		},
+		Name:      "test-output",
+		Namespace: testNamespace,
 		Spec: v1beta1.OutputSpec{
 			FileOutput: &output.FileOutputConfig{
 				Path:   "/tmp/logs/${tag}/%Y/%m/%d.%H.%M",
@@ -735,10 +657,8 @@ func TestMultiProcessWorker(t *testing.T) {
 		},
 	}
 	flow := &v1beta1.Flow{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "test-flow",
-			Namespace: testNamespace,
-		},
+		Name:      "test-flow",
+		Namespace: testNamespace,
 		Spec: v1beta1.FlowSpec{
 			Selectors: map[string]string{
 				"a": "b",
@@ -794,9 +714,7 @@ func TestClusterOutputWithoutPlugin(t *testing.T) {
 	defer beforeEach(t)()
 
 	logging := &v1beta1.Logging{
-		ObjectMeta: v1.ObjectMeta{
-			Name: "test-" + uuid.New()[:8],
-		},
+		Name: "test-" + uuid.New()[:8],
 		Spec: v1beta1.LoggingSpec{
 			FluentdSpec:             &v1beta1.FluentdSpec{},
 			FlowConfigCheckDisabled: true,
@@ -806,11 +724,9 @@ func TestClusterOutputWithoutPlugin(t *testing.T) {
 	}
 
 	output := &v1beta1.ClusterOutput{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "test-output",
-			Namespace: logging.Spec.ControlNamespace,
-		},
-		Spec: v1beta1.ClusterOutputSpec{},
+		Name:      "test-output",
+		Namespace: logging.Spec.ControlNamespace,
+		Spec:      v1beta1.ClusterOutputSpec{},
 	}
 
 	defer ensureCreated(t, logging)()
@@ -832,9 +748,7 @@ func TestOutputWithoutPlugin(t *testing.T) {
 	defer beforeEach(t)()
 
 	logging := &v1beta1.Logging{
-		ObjectMeta: v1.ObjectMeta{
-			Name: "test-" + uuid.New()[:8],
-		},
+		Name: "test-" + uuid.New()[:8],
 		Spec: v1beta1.LoggingSpec{
 			FluentdSpec:             &v1beta1.FluentdSpec{},
 			FlowConfigCheckDisabled: true,
@@ -844,11 +758,9 @@ func TestOutputWithoutPlugin(t *testing.T) {
 	}
 
 	output := &v1beta1.Output{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "test-output",
-			Namespace: testNamespace,
-		},
-		Spec: v1beta1.OutputSpec{},
+		Name:      "test-output",
+		Namespace: testNamespace,
+		Spec:      v1beta1.OutputSpec{},
 	}
 
 	defer ensureCreated(t, logging)()
@@ -870,9 +782,7 @@ func TestClusterOutputWithMultiplePlugins(t *testing.T) {
 	defer beforeEach(t)()
 
 	logging := &v1beta1.Logging{
-		ObjectMeta: v1.ObjectMeta{
-			Name: "test-" + uuid.New()[:8],
-		},
+		Name: "test-" + uuid.New()[:8],
 		Spec: v1beta1.LoggingSpec{
 			FluentdSpec:             &v1beta1.FluentdSpec{},
 			FlowConfigCheckDisabled: true,
@@ -882,10 +792,8 @@ func TestClusterOutputWithMultiplePlugins(t *testing.T) {
 	}
 
 	output := &v1beta1.ClusterOutput{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "test-output",
-			Namespace: logging.Spec.ControlNamespace,
-		},
+		Name:      "test-output",
+		Namespace: logging.Spec.ControlNamespace,
 		Spec: v1beta1.ClusterOutputSpec{
 			OutputSpec: v1beta1.OutputSpec{
 				FileOutput: &output.FileOutputConfig{
@@ -915,9 +823,7 @@ func TestOutputWithMultiplePlugins(t *testing.T) {
 	defer beforeEach(t)()
 
 	logging := &v1beta1.Logging{
-		ObjectMeta: v1.ObjectMeta{
-			Name: "test-" + uuid.New()[:8],
-		},
+		Name: "test-" + uuid.New()[:8],
 		Spec: v1beta1.LoggingSpec{
 			FluentdSpec:             &v1beta1.FluentdSpec{},
 			FlowConfigCheckDisabled: true,
@@ -927,10 +833,8 @@ func TestOutputWithMultiplePlugins(t *testing.T) {
 	}
 
 	output := &v1beta1.Output{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "test-output",
-			Namespace: testNamespace,
-		},
+		Name:      "test-output",
+		Namespace: testNamespace,
 		Spec: v1beta1.OutputSpec{
 			FileOutput: &output.FileOutputConfig{
 				Path: "/dev/null",
@@ -958,9 +862,7 @@ func TestClusterOutputWithMissingSecret(t *testing.T) {
 	defer beforeEach(t)()
 
 	logging := &v1beta1.Logging{
-		ObjectMeta: v1.ObjectMeta{
-			Name: "test-" + uuid.New()[:8],
-		},
+		Name: "test-" + uuid.New()[:8],
 		Spec: v1beta1.LoggingSpec{
 			FluentdSpec:             &v1beta1.FluentdSpec{},
 			FlowConfigCheckDisabled: true,
@@ -970,10 +872,8 @@ func TestClusterOutputWithMissingSecret(t *testing.T) {
 	}
 
 	output := &v1beta1.ClusterOutput{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "test-output",
-			Namespace: logging.Spec.ControlNamespace,
-		},
+		Name:      "test-output",
+		Namespace: logging.Spec.ControlNamespace,
 		Spec: v1beta1.ClusterOutputSpec{
 			OutputSpec: v1beta1.OutputSpec{
 				SyslogOutputConfig: &output.SyslogOutputConfig{
@@ -981,10 +881,8 @@ func TestClusterOutputWithMissingSecret(t *testing.T) {
 					TrustedCaPath: &secret.Secret{
 						ValueFrom: &secret.ValueFrom{
 							SecretKeyRef: &corev1.SecretKeySelector{
-								LocalObjectReference: corev1.LocalObjectReference{
-									Name: "no-such-secret",
-								},
-								Key: "the-value",
+								Name: "no-such-secret",
+								Key:  "the-value",
 							},
 						},
 					},
@@ -1012,9 +910,7 @@ func TestOutputWithMissingSecret(t *testing.T) {
 	defer beforeEach(t)()
 
 	logging := &v1beta1.Logging{
-		ObjectMeta: v1.ObjectMeta{
-			Name: "test-" + uuid.New()[:8],
-		},
+		Name: "test-" + uuid.New()[:8],
 		Spec: v1beta1.LoggingSpec{
 			FluentdSpec:             &v1beta1.FluentdSpec{},
 			FlowConfigCheckDisabled: true,
@@ -1024,20 +920,16 @@ func TestOutputWithMissingSecret(t *testing.T) {
 	}
 
 	output := &v1beta1.Output{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "test-output",
-			Namespace: testNamespace,
-		},
+		Name:      "test-output",
+		Namespace: testNamespace,
 		Spec: v1beta1.OutputSpec{
 			SyslogOutputConfig: &output.SyslogOutputConfig{
 				Host: "localhost",
 				TrustedCaPath: &secret.Secret{
 					ValueFrom: &secret.ValueFrom{
 						SecretKeyRef: &corev1.SecretKeySelector{
-							LocalObjectReference: corev1.LocalObjectReference{
-								Name: "no-such-secret",
-							},
-							Key: "the-value",
+							Name: "no-such-secret",
+							Key:  "the-value",
 						},
 					},
 				},
@@ -1064,9 +956,7 @@ func TestClusterFlowWithLegacyOutputRef(t *testing.T) {
 	defer beforeEach(t)()
 
 	logging := &v1beta1.Logging{
-		ObjectMeta: v1.ObjectMeta{
-			Name: "test-" + uuid.New()[:8],
-		},
+		Name: "test-" + uuid.New()[:8],
 		Spec: v1beta1.LoggingSpec{
 			FluentdSpec:             &v1beta1.FluentdSpec{},
 			FlowConfigCheckDisabled: true,
@@ -1076,10 +966,8 @@ func TestClusterFlowWithLegacyOutputRef(t *testing.T) {
 	}
 
 	output := &v1beta1.ClusterOutput{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "test-output",
-			Namespace: logging.Spec.ControlNamespace,
-		},
+		Name:      "test-output",
+		Namespace: logging.Spec.ControlNamespace,
 		Spec: v1beta1.ClusterOutputSpec{
 			OutputSpec: v1beta1.OutputSpec{
 				NullOutputConfig: &output.NullOutputConfig{},
@@ -1088,10 +976,8 @@ func TestClusterFlowWithLegacyOutputRef(t *testing.T) {
 	}
 
 	flow := &v1beta1.ClusterFlow{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "test-flow",
-			Namespace: logging.Spec.ControlNamespace,
-		},
+		Name:      "test-flow",
+		Namespace: logging.Spec.ControlNamespace,
 		Spec: v1beta1.ClusterFlowSpec{
 			Match: []v1beta1.ClusterMatch{
 				{
@@ -1124,9 +1010,7 @@ func TestFlowWithLegacyOutputRef(t *testing.T) {
 	defer beforeEach(t)()
 
 	logging := &v1beta1.Logging{
-		ObjectMeta: v1.ObjectMeta{
-			Name: "test-" + uuid.New()[:8],
-		},
+		Name: "test-" + uuid.New()[:8],
 		Spec: v1beta1.LoggingSpec{
 			FluentdSpec:             &v1beta1.FluentdSpec{},
 			FlowConfigCheckDisabled: true,
@@ -1136,10 +1020,8 @@ func TestFlowWithLegacyOutputRef(t *testing.T) {
 	}
 
 	clusterOutput := &v1beta1.ClusterOutput{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "test-clusteroutput",
-			Namespace: logging.Spec.ControlNamespace,
-		},
+		Name:      "test-clusteroutput",
+		Namespace: logging.Spec.ControlNamespace,
 		Spec: v1beta1.ClusterOutputSpec{
 			OutputSpec: v1beta1.OutputSpec{
 				NullOutputConfig: &output.NullOutputConfig{},
@@ -1148,20 +1030,16 @@ func TestFlowWithLegacyOutputRef(t *testing.T) {
 	}
 
 	output := &v1beta1.Output{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "test-output",
-			Namespace: testNamespace,
-		},
+		Name:      "test-output",
+		Namespace: testNamespace,
 		Spec: v1beta1.OutputSpec{
 			NullOutputConfig: &output.NullOutputConfig{},
 		},
 	}
 
 	flow := &v1beta1.Flow{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "test-flow",
-			Namespace: testNamespace,
-		},
+		Name:      "test-flow",
+		Namespace: testNamespace,
 		Spec: v1beta1.FlowSpec{
 			Match: []v1beta1.Match{
 				{
@@ -1196,9 +1074,7 @@ func TestClusterFlowWithDanglingGlobalOutputRefs(t *testing.T) {
 	defer beforeEach(t)()
 
 	logging := &v1beta1.Logging{
-		ObjectMeta: v1.ObjectMeta{
-			Name: "test-" + uuid.New()[:8],
-		},
+		Name: "test-" + uuid.New()[:8],
 		Spec: v1beta1.LoggingSpec{
 			FluentdSpec:             &v1beta1.FluentdSpec{},
 			FlowConfigCheckDisabled: true,
@@ -1208,10 +1084,8 @@ func TestClusterFlowWithDanglingGlobalOutputRefs(t *testing.T) {
 	}
 
 	output := &v1beta1.ClusterOutput{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "test-output",
-			Namespace: logging.Spec.ControlNamespace,
-		},
+		Name:      "test-output",
+		Namespace: logging.Spec.ControlNamespace,
 		Spec: v1beta1.ClusterOutputSpec{
 			OutputSpec: v1beta1.OutputSpec{
 				NullOutputConfig: &output.NullOutputConfig{},
@@ -1220,10 +1094,8 @@ func TestClusterFlowWithDanglingGlobalOutputRefs(t *testing.T) {
 	}
 
 	flow := &v1beta1.ClusterFlow{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "test-flow",
-			Namespace: logging.Spec.ControlNamespace,
-		},
+		Name:      "test-flow",
+		Namespace: logging.Spec.ControlNamespace,
 		Spec: v1beta1.ClusterFlowSpec{
 			Match: []v1beta1.ClusterMatch{
 				{
@@ -1254,9 +1126,7 @@ func TestFlowWithDanglingLocalAndGlobalOutputRefs(t *testing.T) {
 	defer beforeEach(t)()
 
 	logging := &v1beta1.Logging{
-		ObjectMeta: v1.ObjectMeta{
-			Name: "test-" + uuid.New()[:8],
-		},
+		Name: "test-" + uuid.New()[:8],
 		Spec: v1beta1.LoggingSpec{
 			FluentdSpec:             &v1beta1.FluentdSpec{},
 			FlowConfigCheckDisabled: true,
@@ -1266,10 +1136,8 @@ func TestFlowWithDanglingLocalAndGlobalOutputRefs(t *testing.T) {
 	}
 
 	clusterOutput := &v1beta1.ClusterOutput{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "test-clusteroutput",
-			Namespace: logging.Spec.ControlNamespace,
-		},
+		Name:      "test-clusteroutput",
+		Namespace: logging.Spec.ControlNamespace,
 		Spec: v1beta1.ClusterOutputSpec{
 			OutputSpec: v1beta1.OutputSpec{
 				NullOutputConfig: &output.NullOutputConfig{},
@@ -1278,20 +1146,16 @@ func TestFlowWithDanglingLocalAndGlobalOutputRefs(t *testing.T) {
 	}
 
 	output := &v1beta1.Output{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "test-output",
-			Namespace: testNamespace,
-		},
+		Name:      "test-output",
+		Namespace: testNamespace,
 		Spec: v1beta1.OutputSpec{
 			NullOutputConfig: &output.NullOutputConfig{},
 		},
 	}
 
 	flow := &v1beta1.Flow{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "test-flow",
-			Namespace: testNamespace,
-		},
+		Name:      "test-flow",
+		Namespace: testNamespace,
 		Spec: v1beta1.FlowSpec{
 			Match: []v1beta1.Match{
 				{
@@ -1329,19 +1193,15 @@ func TestWatchNamespaces(t *testing.T) {
 	defer beforeEach(t)()
 
 	defer ensureCreated(t, &corev1.Namespace{
-		ObjectMeta: v1.ObjectMeta{
-			Name: "test-bylabel-1",
-			Labels: map[string]string{
-				"bylabel": "test1",
-			},
+		Name: "test-bylabel-1",
+		Labels: map[string]string{
+			"bylabel": "test1",
 		},
 	})()
 	defer ensureCreated(t, &corev1.Namespace{
-		ObjectMeta: v1.ObjectMeta{
-			Name: "test-bylabel-2",
-			Labels: map[string]string{
-				"bylabel": "test2",
-			},
+		Name: "test-bylabel-2",
+		Labels: map[string]string{
+			"bylabel": "test2",
 		},
 	})()
 
@@ -1359,9 +1219,7 @@ func TestWatchNamespaces(t *testing.T) {
 		{
 			name: "full list",
 			logging: &v1beta1.Logging{
-				ObjectMeta: v1.ObjectMeta{
-					Name: "test-" + uuid.New()[:8],
-				},
+				Name: "test-" + uuid.New()[:8],
 				Spec: v1beta1.LoggingSpec{
 					WatchNamespaces:        []string{},
 					WatchNamespaceSelector: nil,
@@ -1386,9 +1244,7 @@ func TestWatchNamespaces(t *testing.T) {
 		{
 			name: "explicit list",
 			logging: &v1beta1.Logging{
-				ObjectMeta: v1.ObjectMeta{
-					Name: "test-" + uuid.New()[:8],
-				},
+				Name: "test-" + uuid.New()[:8],
 				Spec: v1beta1.LoggingSpec{
 					WatchNamespaces:        []string{"test-explicit-1", "test-explicit-2"},
 					WatchNamespaceSelector: nil,
@@ -1403,9 +1259,7 @@ func TestWatchNamespaces(t *testing.T) {
 		{
 			name: "bylabel list",
 			logging: &v1beta1.Logging{
-				ObjectMeta: v1.ObjectMeta{
-					Name: "test-" + uuid.New()[:8],
-				},
+				Name: "test-" + uuid.New()[:8],
 				Spec: v1beta1.LoggingSpec{
 					WatchNamespaces: []string{},
 					WatchNamespaceSelector: &v1.LabelSelector{
@@ -1424,9 +1278,7 @@ func TestWatchNamespaces(t *testing.T) {
 		{
 			name: "bylabel negative list (label exists but value should be different)",
 			logging: &v1beta1.Logging{
-				ObjectMeta: v1.ObjectMeta{
-					Name: "test-" + uuid.New()[:8],
-				},
+				Name: "test-" + uuid.New()[:8],
 				Spec: v1beta1.LoggingSpec{
 					WatchNamespaces: []string{},
 					WatchNamespaceSelector: &v1.LabelSelector{
@@ -1453,9 +1305,7 @@ func TestWatchNamespaces(t *testing.T) {
 		{
 			name: "merge two sets uniquely",
 			logging: &v1beta1.Logging{
-				ObjectMeta: v1.ObjectMeta{
-					Name: "test-" + uuid.New()[:8],
-				},
+				Name: "test-" + uuid.New()[:8],
 				Spec: v1beta1.LoggingSpec{
 					WatchNamespaces: []string{"a", "b", "c", "test-bylabel-1"},
 					WatchNamespaceSelector: &v1.LabelSelector{
@@ -1507,7 +1357,7 @@ func beforeEach(t *testing.T) func() {
 func beforeEachWithError(t *testing.T, errors chan<- error) func() {
 	g := gomega.NewWithT(t)
 
-	timeout := 1 * time.Second
+	timeout := 5 * time.Second
 
 	mgr, err = ctrl.NewManager(cfg, ctrl.Options{
 		Scheme:                  scheme.Scheme,
@@ -1614,10 +1464,8 @@ func expectError(t *testing.T, expected string, reconcilerErrors <-chan error) {
 
 func testOutput() *v1beta1.Output {
 	return &v1beta1.Output{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "test-output",
-			Namespace: testNamespace,
-		},
+		Name:      "test-output",
+		Namespace: testNamespace,
 		Spec: v1beta1.OutputSpec{
 			NullOutputConfig: output.NewNullOutputConfig(),
 		},
@@ -1626,10 +1474,8 @@ func testOutput() *v1beta1.Output {
 
 func testClusterOutput() *v1beta1.ClusterOutput {
 	return &v1beta1.ClusterOutput{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "test-output",
-			Namespace: controlNamespace,
-		},
+		Name:      "test-output",
+		Namespace: controlNamespace,
 		Spec: v1beta1.ClusterOutputSpec{
 			OutputSpec: v1beta1.OutputSpec{
 				NullOutputConfig: output.NewNullOutputConfig(),
@@ -1640,9 +1486,7 @@ func testClusterOutput() *v1beta1.ClusterOutput {
 
 func testLogging() *v1beta1.Logging {
 	return &v1beta1.Logging{
-		ObjectMeta: v1.ObjectMeta{
-			Name: "test-" + uuid.New()[:8],
-		},
+		Name: "test-" + uuid.New()[:8],
 		Spec: v1beta1.LoggingSpec{
 			WatchNamespaces:         []string{testNamespace},
 			FluentdSpec:             &v1beta1.FluentdSpec{},

@@ -23,7 +23,6 @@ import (
 	"github.com/cisco-open/operator-tools/pkg/secret"
 	"github.com/cisco-open/operator-tools/pkg/utils"
 	corev1 "k8s.io/api/core/v1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 )
@@ -64,10 +63,8 @@ func (r *Reconciler) markSecrets(secrets *secret.MountSecrets) ([]runtime.Object
 func (r *Reconciler) outputSecret(secrets *secret.MountSecrets) (runtime.Object, reconciler.DesiredState, error) { //nolint: unparam
 	// Initialize output secret
 	fluentOutputSecret := &corev1.Secret{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      r.Logging.QualifiedName(OutputSecretName),
-			Namespace: r.Logging.Spec.ControlNamespace,
-		},
+		Name:      r.Logging.QualifiedName(OutputSecretName),
+		Namespace: r.Logging.Spec.ControlNamespace,
 	}
 	if fluentOutputSecret.Data == nil {
 		fluentOutputSecret.Data = make(map[string][]byte)

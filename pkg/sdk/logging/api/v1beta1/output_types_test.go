@@ -17,7 +17,7 @@ package v1beta1_test
 import (
 	"context"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -53,11 +53,9 @@ var _ = Describe("Output", func() {
 				Namespace: "default",
 			}
 			created = &v1beta1.Output{
-				TypeMeta: metav1.TypeMeta{},
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "foo",
-					Namespace: "default",
-				},
+				TypeMeta:  metav1.TypeMeta{},
+				Name:      "foo",
+				Namespace: "default",
 				Spec: v1beta1.OutputSpec{
 					S3OutputConfig:   nil,
 					NullOutputConfig: nil,

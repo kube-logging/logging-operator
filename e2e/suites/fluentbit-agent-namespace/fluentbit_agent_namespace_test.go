@@ -19,7 +19,6 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/kube-logging/logging-operator/e2e/internal/harness"
 	"github.com/kube-logging/logging-operator/e2e/internal/image"
@@ -55,7 +54,7 @@ func TestFluentbitAgentDedicatedNamespace(t *testing.T) {
 		Start()
 
 	out := &v1beta1.ClusterOutput{
-		ObjectMeta: metav1.ObjectMeta{Name: "http", Namespace: nsControl},
+		Name: "http", Namespace: nsControl,
 		Spec: v1beta1.ClusterOutputSpec{
 			OutputSpec: v1beta1.OutputSpec{
 				LoggingRef: "infra",
@@ -70,7 +69,7 @@ func TestFluentbitAgentDedicatedNamespace(t *testing.T) {
 	env.Create(out)
 
 	env.Create(&v1beta1.ClusterFlow{
-		ObjectMeta: metav1.ObjectMeta{Name: "flow", Namespace: nsControl},
+		Name: "flow", Namespace: nsControl,
 		Spec: v1beta1.ClusterFlowSpec{
 			LoggingRef: "infra",
 			Match: []v1beta1.ClusterMatch{
@@ -81,7 +80,7 @@ func TestFluentbitAgentDedicatedNamespace(t *testing.T) {
 	})
 
 	env.Create(&v1beta1.FluentbitAgent{
-		ObjectMeta: metav1.ObjectMeta{Name: "infra"},
+		Name: "infra",
 		Spec: v1beta1.FluentbitSpec{
 			LoggingRef: "infra",
 			ConfigHotReload: &v1beta1.HotReload{
@@ -92,7 +91,7 @@ func TestFluentbitAgentDedicatedNamespace(t *testing.T) {
 	})
 
 	env.Create(&v1beta1.Logging{
-		ObjectMeta: metav1.ObjectMeta{Name: "infra"},
+		Name: "infra",
 		Spec: v1beta1.LoggingSpec{
 			LoggingRef:              "infra",
 			ControlNamespace:        nsControl,

@@ -23,7 +23,6 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
@@ -42,8 +41,8 @@ func scheme(t *testing.T) *runtime.Scheme {
 
 func pod(name string, phase corev1.PodPhase, labels map[string]string) *corev1.Pod {
 	return &corev1.Pod{
-		ObjectMeta: metav1.ObjectMeta{Name: name, Namespace: "ns", Labels: labels},
-		Status:     corev1.PodStatus{Phase: phase},
+		Name: name, Namespace: "ns", Labels: labels,
+		Status: corev1.PodStatus{Phase: phase},
 	}
 }
 
@@ -126,8 +125,8 @@ func TestLoggingProblemConditions(t *testing.T) {
 	} {
 		t.Run(c.name, func(t *testing.T) {
 			cl := fake.NewClientBuilder().WithScheme(scheme(t)).WithObjects(&v1beta1.Logging{
-				ObjectMeta: metav1.ObjectMeta{Name: "lg"},
-				Status:     v1beta1.LoggingStatus{Problems: c.problems, ProblemsCount: len(c.problems)},
+				Name:   "lg",
+				Status: v1beta1.LoggingStatus{Problems: c.problems, ProblemsCount: len(c.problems)},
 			}).Build()
 
 			healthy, err := LoggingHealthy("lg").Met(t.Context(), cl)
@@ -160,8 +159,8 @@ func TestJobStartedCountsTerminalStatesToo(t *testing.T) {
 	} {
 		t.Run(c.name, func(t *testing.T) {
 			cl := fake.NewClientBuilder().WithScheme(scheme(t)).WithObjects(&batchv1.Job{
-				ObjectMeta: metav1.ObjectMeta{Name: "d", Namespace: "ns"},
-				Status:     c.status,
+				Name: "d", Namespace: "ns",
+				Status: c.status,
 			}).Build()
 
 			met, err := JobStarted("ns", "d").Met(t.Context(), cl)
@@ -185,8 +184,8 @@ func TestDeploymentWantingNoReplicasIsNeverReady(t *testing.T) {
 	} {
 		t.Run(c.name, func(t *testing.T) {
 			cl := fake.NewClientBuilder().WithScheme(scheme(t)).WithObjects(&appsv1.Deployment{
-				ObjectMeta: metav1.ObjectMeta{Name: "es", Namespace: "ns"},
-				Spec:       appsv1.DeploymentSpec{Replicas: c.replicas},
+				Name: "es", Namespace: "ns",
+				Spec: appsv1.DeploymentSpec{Replicas: c.replicas},
 				Status: appsv1.DeploymentStatus{Conditions: []appsv1.DeploymentCondition{
 					{Type: appsv1.DeploymentAvailable, Status: corev1.ConditionTrue},
 				}},
@@ -220,9 +219,9 @@ func TestDeploymentNeedsEveryReplicaAndTheCondition(t *testing.T) {
 	} {
 		t.Run(c.name, func(t *testing.T) {
 			cl := fake.NewClientBuilder().WithScheme(scheme(t)).WithObjects(&appsv1.Deployment{
-				ObjectMeta: metav1.ObjectMeta{Name: "es", Namespace: "ns"},
-				Spec:       appsv1.DeploymentSpec{Replicas: &two},
-				Status:     c.status,
+				Name: "es", Namespace: "ns",
+				Spec:   appsv1.DeploymentSpec{Replicas: &two},
+				Status: c.status,
 			}).Build()
 
 			met, err := Deployment("ns", "es").Met(t.Context(), cl)

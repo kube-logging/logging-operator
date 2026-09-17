@@ -51,7 +51,7 @@ func CreateOutput(outputSpec v1beta1.OutputSpec, outputName string, secretLoader
 	var converters []DirectiveConverter
 	for _, field := range v.Fields() {
 		if field.Kind() == reflect.Pointer && !field.IsNil() {
-			if converter, ok := field.Interface().(DirectiveConverter); ok {
+			if converter, ok := reflect.TypeAssert[DirectiveConverter](field); ok {
 				converters = append(converters, converter)
 			}
 		}
@@ -75,7 +75,7 @@ func CreateFilterWithOptions(filter v1beta1.Filter, id string, secretLoader secr
 	var converters []DirectiveConverter
 	for _, field := range v.Fields() {
 		if field.Kind() == reflect.Pointer && !field.IsNil() {
-			if converter, ok := field.Interface().(DirectiveConverter); ok {
+			if converter, ok := reflect.TypeAssert[DirectiveConverter](field); ok {
 				converters = append(converters, converter)
 			}
 		}

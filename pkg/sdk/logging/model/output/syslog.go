@@ -125,12 +125,10 @@ type _expSyslog any //nolint:deadcode,unused
 func (s *SyslogOutputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	const pluginType = "syslog_rfc5424"
 	syslog := &types.OutputPlugin{
-		PluginMeta: types.PluginMeta{
-			Type:      pluginType,
-			Directive: "match",
-			Tag:       "**",
-			Id:        id,
-		},
+		Type:      pluginType,
+		Directive: "match",
+		Tag:       "**",
+		Id:        id,
 	}
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(s); err != nil {
 		return nil, err

@@ -231,10 +231,8 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 	if !*r.fluentbitSpec.DisableVarLog {
 		v = append(v, corev1.Volume{
 			Name: "varlogs",
-			VolumeSource: corev1.VolumeSource{
-				HostPath: &corev1.HostPathVolumeSource{
-					Path: "/var/log",
-				},
+			HostPath: &corev1.HostPathVolumeSource{
+				Path: "/var/log",
 			},
 		})
 	}
@@ -242,10 +240,8 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 	if !*r.fluentbitSpec.DisableVarLibDockerContainers {
 		v = append(v, corev1.Volume{
 			Name: "varlibcontainers",
-			VolumeSource: corev1.VolumeSource{
-				HostPath: &corev1.HostPathVolumeSource{
-					Path: r.fluentbitSpec.MountPath,
-				},
+			HostPath: &corev1.HostPathVolumeSource{
+				Path: r.fluentbitSpec.MountPath,
 			},
 		})
 	}
@@ -253,10 +249,8 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 	for vCount, vMnt := range r.fluentbitSpec.ExtraVolumeMounts {
 		v = append(v, corev1.Volume{
 			Name: "extravolumemount" + strconv.Itoa(vCount),
-			VolumeSource: corev1.VolumeSource{
-				HostPath: &corev1.HostPathVolumeSource{
-					Path: vMnt.Source,
-				},
+			HostPath: &corev1.HostPathVolumeSource{
+				Path: vMnt.Source,
 			},
 		})
 	}
@@ -264,30 +258,24 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 	if r.fluentbitSpec.CustomConfigSecret == "" {
 		volume := corev1.Volume{
 			Name: "config",
-			VolumeSource: corev1.VolumeSource{
-				Secret: &corev1.SecretVolumeSource{
-					SecretName: r.nameProvider.ComponentName(fluentBitSecretConfigName),
-				},
+			Secret: &corev1.SecretVolumeSource{
+				SecretName: r.nameProvider.ComponentName(fluentBitSecretConfigName),
 			},
 		}
 		v = append(v, volume)
 	} else {
 		v = append(v, corev1.Volume{
 			Name: "config",
-			VolumeSource: corev1.VolumeSource{
-				Secret: &corev1.SecretVolumeSource{
-					SecretName: r.fluentbitSpec.CustomConfigSecret,
-				},
+			Secret: &corev1.SecretVolumeSource{
+				SecretName: r.fluentbitSpec.CustomConfigSecret,
 			},
 		})
 	}
 	if *r.fluentbitSpec.TLS.Enabled {
 		tlsRelatedVolume := corev1.Volume{
 			Name: "fluent-bit-tls",
-			VolumeSource: corev1.VolumeSource{
-				Secret: &corev1.SecretVolumeSource{
-					SecretName: r.fluentbitSpec.TLS.SecretName,
-				},
+			Secret: &corev1.SecretVolumeSource{
+				SecretName: r.fluentbitSpec.TLS.SecretName,
 			},
 		}
 		v = append(v, tlsRelatedVolume)

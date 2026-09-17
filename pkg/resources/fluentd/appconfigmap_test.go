@@ -184,10 +184,8 @@ func TestNewCheckPodConfigCheckPodOverrides(t *testing.T) {
 		RestartPolicy: &restartAlways,
 	}
 	extraVolume := corev1.Volume{
-		Name: "geoip-db",
-		VolumeSource: corev1.VolumeSource{
-			EmptyDir: &corev1.EmptyDirVolumeSource{},
-		},
+		Name:     "geoip-db",
+		EmptyDir: &corev1.EmptyDirVolumeSource{},
 	}
 	deadline := int64(120)
 	spec := &v1beta1.FluentdSpec{
@@ -216,8 +214,8 @@ func TestNewCheckPodConfigCheckPodOverrides(t *testing.T) {
 func TestNewCheckPodConfigCheckPodOverridesAreAdditive(t *testing.T) {
 	overrideInitContainer := corev1.Container{Name: "geoip-refresh", Image: "busybox:1.37"}
 	overrideVolume := corev1.Volume{
-		Name:         "geoip-db",
-		VolumeSource: corev1.VolumeSource{EmptyDir: &corev1.EmptyDirVolumeSource{}},
+		Name:     "geoip-db",
+		EmptyDir: &corev1.EmptyDirVolumeSource{},
 	}
 	overrides := &v1beta1.ConfigCheckPodOverrides{
 		InitContainers: []corev1.Container{overrideInitContainer},

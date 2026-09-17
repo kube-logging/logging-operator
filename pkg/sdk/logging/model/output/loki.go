@@ -122,12 +122,10 @@ func (r Label) merge(input Label) {
 func (l *LokiOutput) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	const pluginType = "loki"
 	loki := &types.OutputPlugin{
-		PluginMeta: types.PluginMeta{
-			Type:      pluginType,
-			Directive: "match",
-			Tag:       "**",
-			Id:        id,
-		},
+		Type:      pluginType,
+		Directive: "match",
+		Tag:       "**",
+		Id:        id,
 	}
 	if l.ConfigureKubernetesLabels != nil && *l.ConfigureKubernetesLabels { //nolint:nestif
 		if l.Labels == nil {

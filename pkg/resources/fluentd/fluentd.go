@@ -202,7 +202,7 @@ func (r *Reconciler) Reconcile(ctx context.Context) (*reconcile.Result, error) {
 					return nil, errors.WrapWithDetails(err, "failed to patch status", "logging", r.Logging)
 				} else {
 					// explicitly ask for a requeue to short circuit the controller loop after the status update
-					return &reconcile.Result{Requeue: true}, nil
+					return &reconcile.Result{RequeueAfter: resources.StatusRequeue}, nil
 				}
 			} else {
 				if result.Message != "" {
@@ -210,7 +210,7 @@ func (r *Reconciler) Reconcile(ctx context.Context) (*reconcile.Result, error) {
 				} else {
 					r.Log.Info("still waiting for the configcheck result...")
 				}
-				return &reconcile.Result{Requeue: true}, nil
+				return &reconcile.Result{RequeueAfter: configcheck.PollInterval}, nil
 			}
 		}
 	}
@@ -287,7 +287,7 @@ func (r *Reconciler) statusUpdate(ctx context.Context, patchBase client.Patch, r
 		return nil, errors.WrapWithDetails(err, "failed to patch status", "logging", r.Logging)
 	} else {
 		// explicitly ask for a requeue to short circuit the controller loop after the status update
-		return &reconcile.Result{Requeue: true}, nil
+		return &reconcile.Result{RequeueAfter: resources.StatusRequeue}, nil
 	}
 }
 

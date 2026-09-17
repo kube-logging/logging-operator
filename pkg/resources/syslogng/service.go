@@ -154,11 +154,7 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 						RelabelConfigs:       r.syslogNGSpec.Metrics.ServiceMonitorConfig.Relabelings,
 						MetricRelabelConfigs: r.syslogNGSpec.Metrics.ServiceMonitorConfig.MetricsRelabelings,
 						Scheme:               new(monitoringv1.Scheme(r.syslogNGSpec.Metrics.ServiceMonitorConfig.Scheme)),
-						HTTPConfigWithProxyAndTLSFiles: monitoringv1.HTTPConfigWithProxyAndTLSFiles{
-							HTTPConfigWithTLSFiles: monitoringv1.HTTPConfigWithTLSFiles{
-								TLSConfig: r.syslogNGSpec.Metrics.ServiceMonitorConfig.TLSConfig,
-							},
-						},
+						TLSConfig:            r.syslogNGSpec.Metrics.ServiceMonitorConfig.TLSConfig,
 					},
 					{
 						Port:                 model.ConfigReloaderMetricsPortName,
@@ -169,11 +165,7 @@ func (r *Reconciler) monitorServiceMetrics() (runtime.Object, reconciler.Desired
 						RelabelConfigs:       r.syslogNGSpec.Metrics.ServiceMonitorConfig.Relabelings,
 						MetricRelabelConfigs: r.syslogNGSpec.Metrics.ServiceMonitorConfig.MetricsRelabelings,
 						Scheme:               new(monitoringv1.Scheme(r.syslogNGSpec.Metrics.ServiceMonitorConfig.Scheme)),
-						HTTPConfigWithProxyAndTLSFiles: monitoringv1.HTTPConfigWithProxyAndTLSFiles{
-							HTTPConfigWithTLSFiles: monitoringv1.HTTPConfigWithTLSFiles{
-								TLSConfig: r.syslogNGSpec.Metrics.ServiceMonitorConfig.TLSConfig,
-							},
-						},
+						TLSConfig:            r.syslogNGSpec.Metrics.ServiceMonitorConfig.TLSConfig,
 					},
 				},
 				Selector:          metav1.LabelSelector{MatchLabels: r.Logging.GetSyslogNGLabels(ComponentSyslogNG)},
@@ -258,11 +250,7 @@ func (r *Reconciler) monitorBufferServiceMetrics() (runtime.Object, reconciler.D
 					RelabelConfigs:       r.syslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.Relabelings,
 					MetricRelabelConfigs: r.syslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.MetricsRelabelings,
 					Scheme:               new(monitoringv1.Scheme(r.syslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.Scheme)),
-					HTTPConfigWithProxyAndTLSFiles: monitoringv1.HTTPConfigWithProxyAndTLSFiles{
-						HTTPConfigWithTLSFiles: monitoringv1.HTTPConfigWithTLSFiles{
-							TLSConfig: r.syslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.TLSConfig,
-						},
-					},
+					TLSConfig:            r.syslogNGSpec.BufferVolumeMetrics.ServiceMonitorConfig.TLSConfig,
 				}},
 				Selector:          metav1.LabelSelector{MatchLabels: r.Logging.GetSyslogNGLabels(ComponentSyslogNG)},
 				NamespaceSelector: monitoringv1.NamespaceSelector{MatchNames: []string{r.Logging.Spec.ControlNamespace}},

@@ -9,7 +9,7 @@
   ],
   "configMigration": true,
   "constraints": {
-    "go": "1.26"
+    "go": "1.27"
   },
   "customManagers": [
     {
@@ -92,6 +92,15 @@
     "enabled": true
   },
   "packageRules": [
+    {
+      "matchDepNames": [
+        "sigstore/cosign-installer"
+      ],
+      "allowedVersions": "<4",
+      "description": [
+        "Installer v4 ships cosign 3, which signs with the new bundle format by default; consumers verifying with cosign 2 break. Lift deliberately, with a verification story."
+      ]
+    },
     {
       "matchPackageNames": [
         "k8s.io/client-go"

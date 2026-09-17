@@ -116,12 +116,10 @@ type _expConcat any //nolint:deadcode,unused
 func (c *Concat) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	const pluginType = "concat"
 	concat := &types.GenericDirective{
-		PluginMeta: types.PluginMeta{
-			Type:      pluginType,
-			Directive: "filter",
-			Tag:       "**",
-			Id:        id,
-		},
+		Type:      pluginType,
+		Directive: "filter",
+		Tag:       "**",
+		Id:        id,
 	}
 	concatConfig := c.DeepCopy()
 	if concatConfig.Key == "" {

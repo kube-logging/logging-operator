@@ -60,7 +60,7 @@ func TestVolumeBuilder_WithName(t *testing.T) {
 			name: "validReceiverReturnsReceiverWithNewName",
 			v:    NewVolumeBuilder(),
 			args: args{name: "NewName"},
-			want: &VolumeBuilder{Volume: corev1.Volume{Name: "NewName"}},
+			want: &VolumeBuilder{Name: "NewName"},
 		},
 	}
 	for _, tt := range tests {
@@ -92,7 +92,7 @@ func TestVolumeBuilder_WithVolumeSource(t *testing.T) {
 			name: "validReceiverReturnsReceiverWithNewVolumeSource",
 			v:    NewVolumeBuilder(),
 			args: args{volumeSource: corev1.VolumeSource{}},
-			want: &VolumeBuilder{Volume: corev1.Volume{VolumeSource: corev1.VolumeSource{}}},
+			want: &VolumeBuilder{VolumeSource: corev1.VolumeSource{}},
 		},
 	}
 	for _, tt := range tests {
@@ -124,7 +124,7 @@ func TestVolumeBuilder_WithEmptyDir(t *testing.T) {
 			name: "validReceiverReturnsReceiverWithEmptyDir",
 			v:    NewVolumeBuilder(),
 			args: args{emptyDir: corev1.EmptyDirVolumeSource{Medium: corev1.StorageMediumMemory}}, // non default Medium
-			want: &VolumeBuilder{Volume: corev1.Volume{VolumeSource: corev1.VolumeSource{EmptyDir: &corev1.EmptyDirVolumeSource{Medium: corev1.StorageMediumMemory}}}},
+			want: &VolumeBuilder{EmptyDir: &corev1.EmptyDirVolumeSource{Medium: corev1.StorageMediumMemory}},
 		},
 	}
 	for _, tt := range tests {
@@ -156,7 +156,7 @@ func TestVolumeBuilder_WithHostPath(t *testing.T) {
 			name: "validReceiverReturnsReceiverWithHostPath",
 			v:    NewVolumeBuilder(),
 			args: args{hostPath: corev1.HostPathVolumeSource{Path: "/foo/bar/baz"}}, // non default Medium
-			want: &VolumeBuilder{Volume: corev1.Volume{VolumeSource: corev1.VolumeSource{HostPath: &corev1.HostPathVolumeSource{Path: "/foo/bar/baz"}}}},
+			want: &VolumeBuilder{HostPath: &corev1.HostPathVolumeSource{Path: "/foo/bar/baz"}},
 		},
 	}
 	for _, tt := range tests {
@@ -188,7 +188,7 @@ func TestVolumeBuilder_WithHostPathFromPath(t *testing.T) {
 			name: "validReceiverReturnsReceiverWithNewHostPath",
 			v:    NewVolumeBuilder(),
 			args: args{path: "/foo/bar/baz"},
-			want: &VolumeBuilder{Volume: corev1.Volume{VolumeSource: corev1.VolumeSource{HostPath: &corev1.HostPathVolumeSource{Path: "/foo/bar/baz"}}}},
+			want: &VolumeBuilder{HostPath: &corev1.HostPathVolumeSource{Path: "/foo/bar/baz"}},
 		},
 	}
 	for _, tt := range tests {

@@ -172,11 +172,9 @@ func (v esVersion) labels() map[string]string {
 
 func esService(ns string, v esVersion) *corev1.Service {
 	return &corev1.Service{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      v.name,
-			Namespace: ns,
-			Labels:    v.labels(),
-		},
+		Name:      v.name,
+		Namespace: ns,
+		Labels:    v.labels(),
 		Spec: corev1.ServiceSpec{
 			Type: corev1.ServiceTypeClusterIP,
 			Ports: []corev1.ServicePort{
@@ -198,11 +196,9 @@ func esService(ns string, v esVersion) *corev1.Service {
 
 func esDeployment(ns string, v esVersion) *appsv1.Deployment {
 	return &appsv1.Deployment{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      v.name,
-			Namespace: ns,
-			Labels:    v.labels(),
-		},
+		Name:      v.name,
+		Namespace: ns,
+		Labels:    v.labels(),
 		Spec: appsv1.DeploymentSpec{
 			Replicas: new(int32(1)),
 			Selector: &metav1.LabelSelector{
@@ -254,11 +250,9 @@ func esDeployment(ns string, v esVersion) *appsv1.Deployment {
 							// No liveness probe: readiness already gates the wait, and a
 							// 60s + 3x10s deadline killed the JVM mid-boot on a loaded runner.
 							ReadinessProbe: &corev1.Probe{
-								ProbeHandler: corev1.ProbeHandler{
-									HTTPGet: &corev1.HTTPGetAction{
-										Path: "/_cluster/health",
-										Port: intstr.FromInt(9200),
-									},
+								HTTPGet: &corev1.HTTPGetAction{
+									Path: "/_cluster/health",
+									Port: intstr.FromInt(9200),
 								},
 								InitialDelaySeconds: 30,
 								PeriodSeconds:       10,
@@ -302,9 +296,7 @@ func TestElasticsearch_MultiVersion(t *testing.T) {
 	}
 
 	logging := v1beta1.Logging{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: "all-to-es",
-		},
+		Name: "all-to-es",
 		Spec: v1beta1.LoggingSpec{
 			ControlNamespace: ns,
 			FluentdSpec: &v1beta1.FluentdSpec{
@@ -328,18 +320,14 @@ func TestElasticsearch_MultiVersion(t *testing.T) {
 	env.Create(&logging)
 
 	agent := v1beta1.FluentbitAgent{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: "all-to-es",
-		},
+		Name: "all-to-es",
 		Spec: v1beta1.FluentbitSpec{},
 	}
 	env.Create(&agent)
 
 	es7Output := v1beta1.Output{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "es7-output",
-			Namespace: ns,
-		},
+		Name:      "es7-output",
+		Namespace: ns,
 		Spec: v1beta1.OutputSpec{
 			ElasticsearchOutput: &output.ElasticsearchOutput{
 				Host:                        "elasticsearch7.logging.svc.cluster.local",
@@ -375,10 +363,8 @@ func TestElasticsearch_MultiVersion(t *testing.T) {
 	env.Create(&es7Output)
 
 	es8Output := v1beta1.Output{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "es8-output",
-			Namespace: ns,
-		},
+		Name:      "es8-output",
+		Namespace: ns,
 		Spec: v1beta1.OutputSpec{
 			ElasticsearchOutput: &output.ElasticsearchOutput{
 				Host:                        "elasticsearch8.logging.svc.cluster.local",
@@ -412,10 +398,8 @@ func TestElasticsearch_MultiVersion(t *testing.T) {
 	env.Create(&es8Output)
 
 	es9Output := v1beta1.Output{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "es9-output",
-			Namespace: ns,
-		},
+		Name:      "es9-output",
+		Namespace: ns,
 		Spec: v1beta1.OutputSpec{
 			ElasticsearchOutput: &output.ElasticsearchOutput{
 				Host:                        "elasticsearch9.logging.svc.cluster.local",
@@ -453,10 +437,8 @@ func TestElasticsearch_MultiVersion(t *testing.T) {
 	}
 
 	flow := v1beta1.Flow{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "all-logs-to-elasticsearch",
-			Namespace: ns,
-		},
+		Name:      "all-logs-to-elasticsearch",
+		Namespace: ns,
 		Spec: v1beta1.FlowSpec{
 			Filters: []v1beta1.Filter{
 				{

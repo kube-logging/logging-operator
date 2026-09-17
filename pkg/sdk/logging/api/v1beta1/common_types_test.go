@@ -72,7 +72,7 @@ func TestMerge(t *testing.T) {
 	for _, tt := range tests {
 		ttp := tt
 		t.Run(ttp.name, func(t *testing.T) {
-			actual := *(ttp.override.Override(&ttp.rule))
+			actual := *ttp.override.Override(&ttp.rule)
 			if !reflect.DeepEqual(actual, ttp.expected) {
 				t.Fatalf("expected: %v, got: %v", ttp.expected, actual)
 			}
@@ -281,36 +281,28 @@ func TestBufferMetricsIsEnabled(t *testing.T) {
 		{
 			name: "enabled explicitly set to true should return true",
 			metrics: &BufferMetrics{
-				Metrics: Metrics{
-					Enabled: new(true),
-				},
+				Enabled: new(true),
 			},
 			expected: true,
 		},
 		{
 			name: "enabled explicitly set to false should return false",
 			metrics: &BufferMetrics{
-				Metrics: Metrics{
-					Enabled: new(false),
-				},
+				Enabled: new(false),
 			},
 			expected: false,
 		},
 		{
 			name: "no enabled flag but port set should return true (backward compatibility)",
 			metrics: &BufferMetrics{
-				Metrics: Metrics{
-					Port: 9200,
-				},
+				Port: 9200,
 			},
 			expected: true,
 		},
 		{
 			name: "buffer metrics with mount name and port should be enabled",
 			metrics: &BufferMetrics{
-				Metrics: Metrics{
-					Port: 9200,
-				},
+				Port:      9200,
 				MountName: "buffers",
 			},
 			expected: true,

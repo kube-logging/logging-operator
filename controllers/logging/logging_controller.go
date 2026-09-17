@@ -645,9 +645,9 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 		requests := make([]reconcile.Request, 0)
 		for _, l := range loggingList.Items {
 			if l.Spec.WatchNamespaceSelector != nil {
-				requests = append(requests, reconcile.Request{NamespacedName: types.NamespacedName{
+				requests = append(requests, reconcile.Request{
 					Name: l.Name,
-				}})
+				})
 			}
 		}
 		return requests
@@ -676,9 +676,9 @@ func SetupLoggingWithManager(mgr ctrl.Manager, logger logr.Logger) *ctrl.Builder
 				continue
 			}
 			if l.Spec.LoggingRef == changed.Spec.LoggingRef {
-				requests = append(requests, reconcile.Request{NamespacedName: types.NamespacedName{
+				requests = append(requests, reconcile.Request{
 					Name: l.Name,
-				}})
+				})
 			}
 		}
 		return requests
@@ -715,10 +715,8 @@ func reconcileRequestsForLoggingRef(loggings []loggingv1beta1.Logging, loggingRe
 	for _, l := range loggings {
 		if l.Spec.LoggingRef == loggingRef {
 			reqs = append(reqs, reconcile.Request{
-				NamespacedName: types.NamespacedName{
-					Namespace: l.Namespace, // this happens to be empty as long as Logging is cluster scoped
-					Name:      l.Name,
-				},
+				Namespace: l.Namespace, // this happens to be empty as long as Logging is cluster scoped
+				Name:      l.Name,
 			})
 		}
 	}
@@ -729,10 +727,8 @@ func reconcileRequestsForMatchingControlNamespace(loggings []loggingv1beta1.Logg
 	for _, l := range loggings {
 		if l.Spec.ControlNamespace == ControlNamespace {
 			reqs = append(reqs, reconcile.Request{
-				NamespacedName: types.NamespacedName{
-					Namespace: l.Namespace, // this happens to be empty as long as Logging is cluster scoped
-					Name:      l.Name,
-				},
+				Namespace: l.Namespace, // this happens to be empty as long as Logging is cluster scoped
+				Name:      l.Name,
 			})
 		}
 	}

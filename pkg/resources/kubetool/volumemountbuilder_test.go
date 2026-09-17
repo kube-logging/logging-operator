@@ -60,7 +60,7 @@ func TestVolumeMountBuilder_WithName(t *testing.T) {
 			name: "validReceiverReturnsReceiverWithName",
 			v:    NewVolumeMountBuilder(),
 			args: args{name: "NewName"},
-			want: &VolumeMountBuilder{VolumeMount: corev1.VolumeMount{Name: "NewName"}},
+			want: &VolumeMountBuilder{Name: "NewName"},
 		},
 	}
 	for _, tt := range tests {
@@ -92,7 +92,7 @@ func TestVolumeMountBuilder_WithMountPath(t *testing.T) {
 			name: "validReceiverReturnsReceiverWithMountPath",
 			v:    NewVolumeMountBuilder(),
 			args: args{path: "/var/log/foobar"},
-			want: &VolumeMountBuilder{VolumeMount: corev1.VolumeMount{MountPath: "/var/log/foobar"}},
+			want: &VolumeMountBuilder{MountPath: "/var/log/foobar"},
 		},
 	}
 	for _, tt := range tests {
@@ -124,7 +124,7 @@ func TestVolumeMountBuilder_WithSubPath(t *testing.T) {
 			name: "validReceiverReturnsReceiverWithSubPath",
 			v:    NewVolumeMountBuilder(),
 			args: args{subPath: "/var/log/foobar"},
-			want: &VolumeMountBuilder{VolumeMount: corev1.VolumeMount{SubPath: "/var/log/foobar"}},
+			want: &VolumeMountBuilder{SubPath: "/var/log/foobar"},
 		},
 	}
 	for _, tt := range tests {
@@ -156,7 +156,7 @@ func TestVolumeMountBuilder_WithSubPathExpr(t *testing.T) {
 			name: "validReceiverReturnsReceiverWithSubPathExpr",
 			v:    NewVolumeMountBuilder(),
 			args: args{subPathExpr: "/var/log/foobar"},
-			want: &VolumeMountBuilder{VolumeMount: corev1.VolumeMount{SubPathExpr: "/var/log/foobar"}},
+			want: &VolumeMountBuilder{SubPathExpr: "/var/log/foobar"},
 		},
 	}
 	for _, tt := range tests {
@@ -188,7 +188,7 @@ func TestVolumeMountBuilder_WithReadOnly(t *testing.T) {
 			name: "validReceiverReturnsReceiverWithReadOnlyTrue",
 			v:    NewVolumeMountBuilder(),
 			args: args{readOnly: true},
-			want: &VolumeMountBuilder{VolumeMount: corev1.VolumeMount{ReadOnly: true}},
+			want: &VolumeMountBuilder{ReadOnly: true},
 		},
 	}
 	for _, tt := range tests {
@@ -220,7 +220,7 @@ func TestVolumeMountBuilder_WithMountPropagation(t *testing.T) {
 			name: "validReceiverReturnsReceiverWithMountPropagationMode",
 			v:    NewVolumeMountBuilder(),
 			args: args{mountPropagation: corev1.MountPropagationHostToContainer},
-			want: &VolumeMountBuilder{VolumeMount: corev1.VolumeMount{MountPropagation: new(corev1.MountPropagationHostToContainer)}},
+			want: &VolumeMountBuilder{MountPropagation: new(corev1.MountPropagationHostToContainer)},
 		},
 	}
 	for _, tt := range tests {

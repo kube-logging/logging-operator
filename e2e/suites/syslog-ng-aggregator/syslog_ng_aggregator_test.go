@@ -20,7 +20,6 @@ import (
 	"github.com/cisco-open/operator-tools/pkg/typeoverride"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/kube-logging/logging-operator/e2e/internal/harness"
 	"github.com/kube-logging/logging-operator/e2e/internal/image"
@@ -47,10 +46,8 @@ func TestSyslogNGIsRunningAndForwardingLogs(t *testing.T) {
 		Start()
 
 	logging := &v1beta1.Logging{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "syslog-ng-aggregator-test",
-			Namespace: ns,
-		},
+		Name:      "syslog-ng-aggregator-test",
+		Namespace: ns,
 		Spec: v1beta1.LoggingSpec{
 			EnableRecreateWorkloadOnImmutableFieldChange: true,
 			ControlNamespace: ns,
@@ -93,10 +90,8 @@ func TestSyslogNGIsRunningAndForwardingLogs(t *testing.T) {
 								},
 								Volumes: []corev1.Volume{
 									{
-										Name: "buffers",
-										VolumeSource: corev1.VolumeSource{
-											EmptyDir: &corev1.EmptyDirVolumeSource{},
-										},
+										Name:     "buffers",
+										EmptyDir: &corev1.EmptyDirVolumeSource{},
 									},
 								},
 							},
@@ -104,9 +99,7 @@ func TestSyslogNGIsRunningAndForwardingLogs(t *testing.T) {
 					},
 				},
 				BufferVolumeMetrics: &v1beta1.BufferMetrics{
-					Metrics: v1beta1.Metrics{
-						Interval: "1s",
-					},
+					Interval:  "1s",
 					MountName: "buffers",
 				},
 			},
@@ -114,10 +107,8 @@ func TestSyslogNGIsRunningAndForwardingLogs(t *testing.T) {
 	}
 
 	output := &v1beta1.SyslogNGOutput{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "test-output",
-			Namespace: ns,
-		},
+		Name:      "test-output",
+		Namespace: ns,
 		Spec: v1beta1.SyslogNGOutputSpec{
 			HTTP: &syslogngoutput.HTTPOutput{
 				URL: env.Receiver.URL(testTag),
@@ -135,10 +126,8 @@ func TestSyslogNGIsRunningAndForwardingLogs(t *testing.T) {
 	}
 
 	flow := &v1beta1.SyslogNGFlow{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "test-flow",
-			Namespace: ns,
-		},
+		Name:      "test-flow",
+		Namespace: ns,
 		Spec: v1beta1.SyslogNGFlowSpec{
 			Match: &v1beta1.SyslogNGMatch{
 				Regexp: &filter.RegexpMatchExpr{

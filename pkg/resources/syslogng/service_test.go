@@ -22,7 +22,6 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
@@ -30,8 +29,8 @@ import (
 func TestServiceKeepsExistingPrimaryIPFamily(t *testing.T) {
 	r := &Reconciler{
 		Logging: &v1beta1.Logging{
-			ObjectMeta: metav1.ObjectMeta{Name: "test"},
-			Spec:       v1beta1.LoggingSpec{ControlNamespace: "default"},
+			Name: "test",
+			Spec: v1beta1.LoggingSpec{ControlNamespace: "default"},
 		},
 		syslogNGSpec:              &v1beta1.SyslogNGSpec{EnabledIPv6: true},
 		clusterFamilies:           []corev1.IPFamily{corev1.IPv6Protocol, corev1.IPv4Protocol},
@@ -60,12 +59,12 @@ func TestMetricsServiceOverridesAreApplied(t *testing.T) {
 	metricsEnabled := true
 	r := &Reconciler{
 		Logging: &v1beta1.Logging{
-			ObjectMeta: metav1.ObjectMeta{Name: "test"},
-			Spec:       v1beta1.LoggingSpec{ControlNamespace: "default"},
+			Name: "test",
+			Spec: v1beta1.LoggingSpec{ControlNamespace: "default"},
 		},
 		syslogNGSpec: &v1beta1.SyslogNGSpec{
 			Metrics:             &v1beta1.Metrics{Enabled: &metricsEnabled, Port: 9577},
-			BufferVolumeMetrics: &v1beta1.BufferMetrics{Metrics: v1beta1.Metrics{Enabled: &metricsEnabled, Port: 9578}},
+			BufferVolumeMetrics: &v1beta1.BufferMetrics{Enabled: &metricsEnabled, Port: 9578},
 			MetricsServiceOverrides: &typeoverride.Service{
 				ObjectMeta: typeoverride.ObjectMeta{Annotations: map[string]string{"metrics": "yes"}},
 			},

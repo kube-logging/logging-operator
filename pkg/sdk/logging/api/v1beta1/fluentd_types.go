@@ -324,11 +324,9 @@ func (f *FluentdSpec) SetDefaults() error { //nolint: gocyclo
 		}
 		if f.BufferVolumeLivenessProbe == nil {
 			f.BufferVolumeLivenessProbe = &corev1.Probe{
-				ProbeHandler: corev1.ProbeHandler{
-					HTTPGet: &corev1.HTTPGetAction{
-						Port:   intstr.FromString("buffer-metrics"),
-						Scheme: corev1.URISchemeHTTP,
-					},
+				HTTPGet: &corev1.HTTPGetAction{
+					Port:   intstr.FromString("buffer-metrics"),
+					Scheme: corev1.URISchemeHTTP,
 				},
 				InitialDelaySeconds: 600,
 				TimeoutSeconds:      5,
@@ -417,9 +415,7 @@ func (f *FluentdSpec) SetDefaults() error { //nolint: gocyclo
 		if f.LivenessProbe == nil {
 			if f.LivenessDefaultCheck {
 				f.LivenessProbe = &corev1.Probe{
-					ProbeHandler: corev1.ProbeHandler{
-						Exec: &corev1.ExecAction{Command: []string{"/bin/healthy.sh"}},
-					},
+					Exec:                &corev1.ExecAction{Command: []string{"/bin/healthy.sh"}},
 					InitialDelaySeconds: 600,
 					TimeoutSeconds:      0,
 					PeriodSeconds:       60,

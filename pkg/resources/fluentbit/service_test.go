@@ -19,7 +19,6 @@ import (
 
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
@@ -49,7 +48,7 @@ func TestMetricsServicesIPFamilies(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			logging := &v1beta1.Logging{ObjectMeta: metav1.ObjectMeta{Name: "test"}}
+			logging := &v1beta1.Logging{Name: "test"}
 			r := &Reconciler{
 				Logging: logging,
 				fluentbitSpec: &v1beta1.FluentbitSpec{

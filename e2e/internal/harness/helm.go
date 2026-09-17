@@ -15,13 +15,15 @@
 package harness
 
 import (
-	"fmt"
+	"log/slog"
 	"strings"
+	"time"
 
 	"emperror.dev/errors"
-	"helm.sh/helm/v3/pkg/action"
-	"helm.sh/helm/v3/pkg/chart/loader"
-	"helm.sh/helm/v3/pkg/cli"
+	"helm.sh/helm/v4/pkg/action"
+	"helm.sh/helm/v4/pkg/chart/loader"
+	"helm.sh/helm/v4/pkg/cli"
+	"helm.sh/helm/v4/pkg/kube"
 )
 
 // Chart is a helm chart to install: Name is a path when Repo is empty, and a
@@ -49,9 +51,8 @@ func helmInstall(kubeconfig string, chart Chart) error {
 	}
 	var helmLog strings.Builder
 	actionConfig := new(action.Configuration)
-	if err := actionConfig.Init(getter, chart.Namespace, "memory", func(format string, v ...any) {
-		fmt.Fprintf(&helmLog, format+"\n", v...)
-	}); err != nil {
+	actionConfig.SetLogger(slog.NewTextHandler(&helmLog, &slog.HandlerOptions{Level: slog.LevelDebug}))
+	if err := actionConfig.Init(getter, chart.Namespace, "memory"); err != nil {
 		return errors.WrapIf(err, "helm action config init")
 	}
 
@@ -60,6 +61,11 @@ func helmInstall(kubeconfig string, chart Chart) error {
 	installer.CreateNamespace = true
 	installer.ReleaseName = chart.Release
 	installer.RepoURL = chart.Repo
+	// v4 makes the caller choose. hookOnly turns the CRD wait into a no-op,
+	// and a suite creating its first CR raced the CRDs becoming established;
+	// watcher waits for that and for the workloads, as helm 3's --wait did.
+	installer.WaitStrategy = kube.StatusWatcherStrategy
+	installer.Timeout = 5 * time.Minute
 
 	path, err := installer.LocateChart(chart.Name, cli.New())
 	if err != nil {

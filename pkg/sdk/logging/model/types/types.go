@@ -150,20 +150,16 @@ func NewFlatDirective(meta PluginMeta, config any, secretLoader secret.SecretLoa
 
 func NewCopyDirective(directives []Output) Directive {
 	directive := &GenericDirective{
-		PluginMeta: PluginMeta{
-			Directive: "match",
-			Type:      "copy",
-			Tag:       "**",
-		},
+		Directive: "match",
+		Type:      "copy",
+		Tag:       "**",
 	}
 	for _, d := range directives {
 		newCopySection := &GenericDirective{
-			PluginMeta: PluginMeta{
-				Type:      d.GetPluginMeta().Type,
-				Id:        d.GetPluginMeta().Id,
-				LogLevel:  d.GetPluginMeta().LogLevel,
-				Directive: "store",
-			},
+			Type:          d.GetPluginMeta().Type,
+			Id:            d.GetPluginMeta().Id,
+			LogLevel:      d.GetPluginMeta().LogLevel,
+			Directive:     "store",
 			Params:        d.GetParams(),
 			SubDirectives: d.GetSections(),
 		}

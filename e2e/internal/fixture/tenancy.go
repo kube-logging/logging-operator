@@ -33,7 +33,7 @@ const (
 
 func LoggingInfra(nsInfra, release, tag string, buffer *output.Buffer, producerLabels map[string]string) []client.Object {
 	out := &v1beta1.ClusterOutput{
-		ObjectMeta: metav1.ObjectMeta{Name: "http", Namespace: nsInfra},
+		Name: "http", Namespace: nsInfra,
 		Spec: v1beta1.ClusterOutputSpec{
 			OutputSpec: v1beta1.OutputSpec{
 				LoggingRef: InfraRef,
@@ -47,7 +47,7 @@ func LoggingInfra(nsInfra, release, tag string, buffer *output.Buffer, producerL
 	}
 
 	flow := &v1beta1.ClusterFlow{
-		ObjectMeta: metav1.ObjectMeta{Name: "flow", Namespace: nsInfra},
+		Name: "flow", Namespace: nsInfra,
 		Spec: v1beta1.ClusterFlowSpec{
 			LoggingRef: InfraRef,
 			Match: []v1beta1.ClusterMatch{
@@ -58,7 +58,7 @@ func LoggingInfra(nsInfra, release, tag string, buffer *output.Buffer, producerL
 	}
 
 	agent := &v1beta1.FluentbitAgent{
-		ObjectMeta: metav1.ObjectMeta{Name: InfraRef},
+		Name: InfraRef,
 		Spec: v1beta1.FluentbitSpec{
 			LoggingRef:        InfraRef,
 			ConfigHotReload:   &v1beta1.HotReload{Image: image.ConfigReloader().Spec()},
@@ -67,7 +67,7 @@ func LoggingInfra(nsInfra, release, tag string, buffer *output.Buffer, producerL
 	}
 
 	logging := &v1beta1.Logging{
-		ObjectMeta: metav1.ObjectMeta{Name: InfraRef, Labels: map[string]string{"tenant": InfraRef}},
+		Name: InfraRef, Labels: map[string]string{"tenant": InfraRef},
 		Spec: v1beta1.LoggingSpec{
 			LoggingRef:       InfraRef,
 			ControlNamespace: nsInfra,
@@ -80,7 +80,7 @@ func LoggingInfra(nsInfra, release, tag string, buffer *output.Buffer, producerL
 
 func LoggingTenant(nsTenant, nsInfra, release, tag string, buffer *output.Buffer, producerLabels map[string]string) []client.Object {
 	out := &v1beta1.Output{
-		ObjectMeta: metav1.ObjectMeta{Name: "http", Namespace: nsTenant},
+		Name: "http", Namespace: nsTenant,
 		Spec: v1beta1.OutputSpec{
 			LoggingRef: TenantRef,
 			HTTPOutput: &output.HTTPOutputConfig{
@@ -92,7 +92,7 @@ func LoggingTenant(nsTenant, nsInfra, release, tag string, buffer *output.Buffer
 	}
 
 	flow := &v1beta1.Flow{
-		ObjectMeta: metav1.ObjectMeta{Name: "flow", Namespace: nsTenant},
+		Name: "flow", Namespace: nsTenant,
 		Spec: v1beta1.FlowSpec{
 			LoggingRef: TenantRef,
 			Match: []v1beta1.Match{
@@ -105,7 +105,7 @@ func LoggingTenant(nsTenant, nsInfra, release, tag string, buffer *output.Buffer
 	// WatchNamespaces takes namespaces, not loggingRefs: it must name the
 	// namespace the Flow and Output above live in, or they are never picked up.
 	logging := &v1beta1.Logging{
-		ObjectMeta: metav1.ObjectMeta{Name: TenantRef, Labels: map[string]string{"tenant": TenantRef}},
+		Name: TenantRef, Labels: map[string]string{"tenant": TenantRef},
 		Spec: v1beta1.LoggingSpec{
 			LoggingRef:       TenantRef,
 			ControlNamespace: nsTenant,
@@ -119,7 +119,7 @@ func LoggingTenant(nsTenant, nsInfra, release, tag string, buffer *output.Buffer
 
 func LoggingRoute() *v1beta1.LoggingRoute {
 	return &v1beta1.LoggingRoute{
-		ObjectMeta: metav1.ObjectMeta{Name: "tenants"},
+		Name: "tenants",
 		Spec: v1beta1.LoggingRouteSpec{
 			Source: InfraRef,
 			Targets: metav1.LabelSelector{

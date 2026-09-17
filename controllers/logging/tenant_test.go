@@ -48,11 +48,9 @@ func TestFindTenants(t *testing.T) {
 			},
 			loggings: []*v1beta1.Logging{
 				{
-					ObjectMeta: metav1.ObjectMeta{
-						Name: "a",
-						Labels: map[string]string{
-							"name": "a",
-						},
+					Name: "a",
+					Labels: map[string]string{
+						"name": "a",
 					},
 					Spec: v1beta1.LoggingSpec{
 						WatchNamespaces: []string{"asd"},
@@ -77,11 +75,9 @@ func TestFindTenants(t *testing.T) {
 			},
 			loggings: []*v1beta1.Logging{
 				{
-					ObjectMeta: metav1.ObjectMeta{
-						Name: "a",
-						Labels: map[string]string{
-							"name": "a",
-						},
+					Name: "a",
+					Labels: map[string]string{
+						"name": "a",
 					},
 					Spec: v1beta1.LoggingSpec{
 						WatchNamespaces:        nil,
@@ -106,11 +102,9 @@ func TestFindTenants(t *testing.T) {
 			},
 			loggings: []*v1beta1.Logging{
 				{
-					ObjectMeta: metav1.ObjectMeta{
-						Name: "a",
-						Labels: map[string]string{
-							"name": "a",
-						},
+					Name: "a",
+					Labels: map[string]string{
+						"name": "a",
 					},
 				},
 			},
@@ -130,22 +124,18 @@ func TestFindTenants(t *testing.T) {
 			},
 			loggings: []*v1beta1.Logging{
 				{
-					ObjectMeta: metav1.ObjectMeta{
-						Name: "b",
-						Labels: map[string]string{
-							"tenant": "x",
-						},
+					Name: "b",
+					Labels: map[string]string{
+						"tenant": "x",
 					},
 					Spec: v1beta1.LoggingSpec{
 						WatchNamespaces: []string{"bsd"},
 					},
 				},
 				{
-					ObjectMeta: metav1.ObjectMeta{
-						Name: "c",
-						Labels: map[string]string{
-							"tenant": "y",
-						},
+					Name: "c",
+					Labels: map[string]string{
+						"tenant": "y",
 					},
 					Spec: v1beta1.LoggingSpec{
 						WatchNamespaces: []string{"csd"},
@@ -203,7 +193,7 @@ func collectNamespaces(loggings []*v1beta1.Logging) []*corev1.Namespace {
 		for _, ns := range l.Spec.WatchNamespaces {
 			if ns != "" && ns != testNamespace && ns != controlNamespace {
 				nsObj := &corev1.Namespace{
-					ObjectMeta: metav1.ObjectMeta{Name: ns},
+					Name: ns,
 				}
 				namespaces = append(namespaces, nsObj)
 			}

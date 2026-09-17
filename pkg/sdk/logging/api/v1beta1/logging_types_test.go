@@ -15,7 +15,7 @@
 package v1beta1_test
 
 import (
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 
@@ -26,8 +26,8 @@ import (
 // http://onsi.github.io/ginkgo to learn more.
 var _ = Describe("FluentBitSpec", func() {
 	Context("When creating the default FluentBitSpec", func() {
-		It("should overwrite DNSPolicy and HostNetwork", func() {
-			When("Kubelet_Host is not defined", func() {
+		When("Kubelet_Host is not defined", func() {
+			It("should overwrite DNSPolicy and HostNetwork", func() {
 				spec := &v1beta1.FluentbitSpec{
 					FilterKubernetes: v1beta1.FilterKubernetes{
 						UseKubelet: "On",
@@ -43,8 +43,8 @@ var _ = Describe("FluentBitSpec", func() {
 			})
 		})
 
-		It("should use the given DNSPolicy and HostNetwork", func() {
-			When("Kubelet_Host is defined", func() {
+		When("Kubelet_Host is defined", func() {
+			It("should use the given DNSPolicy and HostNetwork", func() {
 				spec := &v1beta1.FluentbitSpec{
 					HostNetwork: false,
 					DNSPolicy:   corev1.DNSClusterFirst,

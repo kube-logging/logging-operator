@@ -34,7 +34,7 @@ type _metaSyslogNGSpec any //nolint:deadcode,unused
 
 const (
 	defaultSyslogngImageRepository           = "ghcr.io/axoflow/axosyslog"
-	defaultSyslogngImageTag                  = "4.26.0"
+	defaultSyslogngImageTag                  = "4.28.0"
 	defaultPrometheusExporterImageRepository = "ghcr.io/axoflow/axosyslog-metrics-exporter"
 	defaultPrometheusExporterImageTag        = "0.0.16"
 	defaultConfigReloaderImageRepository     = "ghcr.io/kube-logging/logging-operator/syslog-ng-reloader"
@@ -210,11 +210,9 @@ func (s *SyslogNGSpec) SetDefaults() {
 		}
 		if s.BufferVolumeMetricsLivenessProbe == nil {
 			s.BufferVolumeMetricsLivenessProbe = &corev1.Probe{
-				ProbeHandler: corev1.ProbeHandler{
-					HTTPGet: &corev1.HTTPGetAction{
-						Port:   intstr.FromString("buffer-metrics"),
-						Scheme: corev1.URISchemeHTTP,
-					},
+				HTTPGet: &corev1.HTTPGetAction{
+					Port:   intstr.FromString("buffer-metrics"),
+					Scheme: corev1.URISchemeHTTP,
 				},
 				InitialDelaySeconds: 600,
 				TimeoutSeconds:      5,

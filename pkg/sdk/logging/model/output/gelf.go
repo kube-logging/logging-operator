@@ -77,12 +77,10 @@ type GelfOutputConfig struct {
 func (s *GelfOutputConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	pluginType := "gelf"
 	gelf := &types.OutputPlugin{
-		PluginMeta: types.PluginMeta{
-			Type:      pluginType,
-			Directive: "match",
-			Tag:       "**",
-			Id:        id,
-		},
+		Type:      pluginType,
+		Directive: "match",
+		Tag:       "**",
+		Id:        id,
 	}
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(s); err != nil {
 		return nil, err

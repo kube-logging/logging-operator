@@ -74,10 +74,8 @@ func (r *Reconciler) drainerJobFor(pvc corev1.PersistentVolumeClaim, fluentdSpec
 
 	spec.Template.Spec.Volumes = append(spec.Template.Spec.Volumes, corev1.Volume{
 		Name: bufVolName,
-		VolumeSource: corev1.VolumeSource{
-			PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-				ClaimName: pvc.Name,
-			},
+		PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
+			ClaimName: pvc.Name,
 		},
 	})
 	for _, n := range fluentdSpec.ExtraVolumes {

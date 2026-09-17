@@ -17,6 +17,7 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/go-logr/logr"
 	corev1 "k8s.io/api/core/v1"
@@ -29,6 +30,10 @@ import (
 	telemetry_controller "github.com/kube-logging/logging-operator/pkg/resources/telemetry-controller"
 	loggingv1beta1 "github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
 )
+
+// aggregatorReadyPoll is how long to wait before checking the aggregator pod
+// again; the literal 5 it replaces was five nanoseconds.
+const aggregatorReadyPoll = 5 * time.Second
 
 const (
 	TelemetryControllerFinalizer = "telemetrycontroller.logging.banzaicloud.io/finalizer"
@@ -67,7 +72,7 @@ func (r *TelemetryControllerReconciler) Reconcile(ctx context.Context, req ctrl.
 
 		if err := r.isAggregatorReady(ctx, log, logging); err != nil {
 			r.Log.Info(fmt.Sprintf("Aggregator pod is not ready yet: %s", err))
-			return ctrl.Result{RequeueAfter: 5}, nil
+			return ctrl.Result{RequeueAfter: aggregatorReadyPoll}, nil
 		}
 
 		if err := r.deployTelemetryControllerResources(ctx, log, &objectsToCreate); err != nil {

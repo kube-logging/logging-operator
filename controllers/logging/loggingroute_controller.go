@@ -20,7 +20,6 @@ import (
 
 	"emperror.dev/errors"
 	"github.com/go-logr/logr"
-	apitypes "k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
@@ -106,7 +105,7 @@ func SetupLoggingRouteWithManager(mgr ctrl.Manager, logger logr.Logger) error {
 				return nil
 			}
 			for _, lr := range lrList.Items {
-				requests = append(requests, reconcile.Request{NamespacedName: apitypes.NamespacedName{Name: lr.Name}})
+				requests = append(requests, reconcile.Request{Name: lr.Name})
 			}
 		}
 		return requests

@@ -24,7 +24,6 @@ import (
 
 	"github.com/pborman/uuid"
 	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -35,8 +34,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
-	//nolint: gci
-	// +kubebuilder:scaffold:imports
 )
 
 // These tests use Ginkgo (BDD-style Go testing framework). Refer to
@@ -98,9 +95,7 @@ func beforeSuite() error {
 
 	for _, ns := range []string{controlNamespace, testNamespace} {
 		err := k8sClient.Create(context.TODO(), &corev1.Namespace{
-			ObjectMeta: metav1.ObjectMeta{
-				Name: ns,
-			},
+			Name: ns,
 		})
 		if err != nil {
 			return err
@@ -123,7 +118,12 @@ func duplicateRequest(t *testing.T, inner reconcile.Reconciler, stopped *bool, e
 				t.Logf("reconcile failure err: %+v req: %+v, result: %+v", err, req, result)
 			}
 			if errors != nil {
-				errors <- err
+				// Nobody reads the channel once the test has returned, and a send
+				// that blocks here keeps the worker, and so the manager, alive.
+				select {
+				case errors <- err:
+				case <-ctx.Done():
+				}
 			}
 		}
 		return result, err

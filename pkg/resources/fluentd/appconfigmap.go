@@ -316,10 +316,8 @@ func (r *Reconciler) newCheckPod(hashKey string, fluentdSpec v1beta1.FluentdSpec
 	if fluentdSpec.TLS.Enabled {
 		tlsVolume := corev1.Volume{
 			Name: "fluentd-tls",
-			VolumeSource: corev1.VolumeSource{
-				Secret: &corev1.SecretVolumeSource{
-					SecretName: fluentdSpec.TLS.SecretName,
-				},
+			Secret: &corev1.SecretVolumeSource{
+				SecretName: fluentdSpec.TLS.SecretName,
 			},
 		}
 		pod.Spec.Volumes = append(pod.Spec.Volumes, tlsVolume)
@@ -359,52 +357,40 @@ func (r *Reconciler) volumesCheckPod(hashKey string, fluentdSpec v1beta1.Fluentd
 	v = []corev1.Volume{
 		{
 			Name: "config",
-			VolumeSource: corev1.VolumeSource{
-				Secret: &corev1.SecretVolumeSource{
-					SecretName: r.Logging.QualifiedName(fmt.Sprintf("fluentd-configcheck-%s", hashKey)),
-				},
+			Secret: &corev1.SecretVolumeSource{
+				SecretName: r.Logging.QualifiedName(fmt.Sprintf("fluentd-configcheck-%s", hashKey)),
 			},
 		},
 		{
 			Name: "output-secret",
-			VolumeSource: corev1.VolumeSource{
-				Secret: &corev1.SecretVolumeSource{
-					SecretName: r.Logging.QualifiedName(fmt.Sprintf("fluentd-configcheck-output-%s", hashKey)),
-				},
+			Secret: &corev1.SecretVolumeSource{
+				SecretName: r.Logging.QualifiedName(fmt.Sprintf("fluentd-configcheck-output-%s", hashKey)),
 			},
 		},
 		// When deploying logging operator in secured k8s clusters (securityContext.readOnlyRootFilesystem)
 		// A emptyDir volume is needed to be able to check the configuration for using File out type.
 		{
-			Name: "tmp",
-			VolumeSource: corev1.VolumeSource{
-				EmptyDir: &corev1.EmptyDirVolumeSource{},
-			},
+			Name:     "tmp",
+			EmptyDir: &corev1.EmptyDirVolumeSource{},
 		},
 	}
 
 	if fluentdSpec.CompressConfigFile {
 		v = append(v, corev1.Volume{
-			Name: "app-config",
-			VolumeSource: corev1.VolumeSource{
-				EmptyDir: &corev1.EmptyDirVolumeSource{},
-			},
+			Name:     "app-config",
+			EmptyDir: &corev1.EmptyDirVolumeSource{},
 		})
 		v = append(v, corev1.Volume{
 			Name: "app-config-compress",
-			VolumeSource: corev1.VolumeSource{
-				Secret: &corev1.SecretVolumeSource{
-					SecretName: r.Logging.QualifiedName(fmt.Sprintf("fluentd-configcheck-app-%s", hashKey)),
-				},
+			Secret: &corev1.SecretVolumeSource{
+				SecretName: r.Logging.QualifiedName(fmt.Sprintf("fluentd-configcheck-app-%s", hashKey)),
 			},
 		})
 	} else {
 		v = append(v, corev1.Volume{
 			Name: "app-config",
-			VolumeSource: corev1.VolumeSource{
-				Secret: &corev1.SecretVolumeSource{
-					SecretName: r.Logging.QualifiedName(fmt.Sprintf("fluentd-configcheck-app-%s", hashKey)),
-				},
+			Secret: &corev1.SecretVolumeSource{
+				SecretName: r.Logging.QualifiedName(fmt.Sprintf("fluentd-configcheck-app-%s", hashKey)),
 			},
 		})
 	}

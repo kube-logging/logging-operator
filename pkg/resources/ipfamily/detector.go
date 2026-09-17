@@ -23,7 +23,6 @@ import (
 	"github.com/go-logr/logr"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -101,10 +100,8 @@ func (d *Detector) allocatable(ctx context.Context, namespace string, family cor
 func dryRunService(c client.Client) dryRunner {
 	return func(ctx context.Context, namespace string, family corev1.IPFamily) error {
 		probe := &corev1.Service{
-			ObjectMeta: metav1.ObjectMeta{
-				GenerateName: "logging-ipfamily-probe-",
-				Namespace:    namespace,
-			},
+			GenerateName: "logging-ipfamily-probe-",
+			Namespace:    namespace,
 			Spec: corev1.ServiceSpec{
 				Ports:      []corev1.ServicePort{{Port: 1}},
 				IPFamilies: []corev1.IPFamily{family},

@@ -1,4 +1,4 @@
-FROM ruby:3.4.8-alpine3.23 AS base
+FROM ruby:4.0.7-alpine3.23 AS base
 
 ARG BUILD_DEPS=" \
       make gcc g++ libc-dev \
@@ -31,7 +31,7 @@ RUN addgroup -S -g 101 fluent && adduser -S -G fluent -u 100 fluent \
  && fluent-gem install fluent-plugin-label-router -v 0.5.0 \
  && fluent-gem install snappy -v 0.0.15 \
  && find /usr/local/bundle/gems/ -newer /etc/gemrc -exec chown fluent:fluent {} \; \
- && apk del $BUILD_DEPS \
+ && apk --no-cache del $BUILD_DEPS \
  && rm -rf /usr/local/bundle/cache/* && find /usr/local/bundle -name '*.o' -delete
 
 COPY fluent.conf /fluentd/etc/
@@ -61,7 +61,7 @@ RUN apk add --no-cache $BUILD_DEPS \
  && touch /etc/gemrc \
  && fluent-gem install --file Gemfile.filters \
  && find /usr/local/bundle/gems/ -newer /etc/gemrc -exec chown fluent:fluent {} \; \
- && apk del $BUILD_DEPS \
+ && apk --no-cache del $BUILD_DEPS \
  && rm -rf /usr/local/bundle/cache/* && find /usr/local/bundle -name '*.o' -delete
 
 USER fluent
@@ -82,7 +82,7 @@ RUN apk add --no-cache libcurl $BUILD_DEPS \
  && fluent-gem specific_install -l https://github.com/kube-logging/fluent-plugin-elasticsearch.git --ref f711c4322e37852a83caab0385ba4567031eb9ab \
  && fluent-gem install --file /Gemfile.outputs \
  && find /usr/local/bundle/gems/ -newer /etc/gemrc -exec chown fluent:fluent {} \; \
- && apk del $BUILD_DEPS \
+ && apk --no-cache del $BUILD_DEPS \
  && rm -rf /usr/local/bundle/cache/* && find /usr/local/bundle -name '*.o' -delete
 
 USER fluent

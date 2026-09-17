@@ -18,12 +18,11 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/MakeNowJust/heredoc"
+	"github.com/MakeNowJust/heredoc/v2"
 	"github.com/andreyvit/diff"
 	"github.com/cisco-open/operator-tools/pkg/utils"
 	"github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/kube-logging/logging-operator/pkg/resources/fluentd"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
@@ -37,10 +36,8 @@ func TestFlowMatch(t *testing.T) {
 	output := testOutput()
 
 	flow := &v1beta1.Flow{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "test-flow",
-			Namespace: output.Namespace,
-		},
+		Name:      "test-flow",
+		Namespace: output.Namespace,
 		Spec: v1beta1.FlowSpec{
 			Match: []v1beta1.Match{
 				{
@@ -79,10 +76,8 @@ func TestClusterFlowMatch(t *testing.T) {
 	output := testClusterOutput()
 
 	flow := &v1beta1.ClusterFlow{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "test-flow",
-			Namespace: logging.Spec.ControlNamespace,
-		},
+		Name:      "test-flow",
+		Namespace: logging.Spec.ControlNamespace,
 		Spec: v1beta1.ClusterFlowSpec{
 			Match: []v1beta1.ClusterMatch{
 				{
@@ -120,10 +115,8 @@ func TestClusterFlowMatchWithNamespaces(t *testing.T) {
 	output := testClusterOutput()
 
 	flow := &v1beta1.ClusterFlow{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "test-flow",
-			Namespace: logging.Spec.ControlNamespace,
-		},
+		Name:      "test-flow",
+		Namespace: logging.Spec.ControlNamespace,
 		Spec: v1beta1.ClusterFlowSpec{
 			Match: []v1beta1.ClusterMatch{
 				{
@@ -163,10 +156,8 @@ func TestClusterFlowMatchWithNamespacesRegex(t *testing.T) {
 	output := testClusterOutput()
 
 	flow := &v1beta1.ClusterFlow{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "test-flow",
-			Namespace: logging.Spec.ControlNamespace,
-		},
+		Name:      "test-flow",
+		Namespace: logging.Spec.ControlNamespace,
 		Spec: v1beta1.ClusterFlowSpec{
 			Match: []v1beta1.ClusterMatch{
 				{
@@ -206,10 +197,8 @@ func TestInvalidFlowIfMatchAndSelectorBothSet(t *testing.T) {
 	output := testOutput()
 
 	flow := &v1beta1.Flow{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "test-flow",
-			Namespace: output.Namespace,
-		},
+		Name:      "test-flow",
+		Namespace: output.Namespace,
 		Spec: v1beta1.FlowSpec{
 			Selectors: map[string]string{
 				"a": "b",
@@ -246,10 +235,8 @@ func TestInvalidFlowIfSelectorAndExcludeBothSet(t *testing.T) {
 	output := testOutput()
 
 	flow := &v1beta1.Flow{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "test-flow",
-			Namespace: output.Namespace,
-		},
+		Name:      "test-flow",
+		Namespace: output.Namespace,
 		Spec: v1beta1.FlowSpec{
 			Match: []v1beta1.Match{
 				{
@@ -288,10 +275,8 @@ func TestInvalidClusterFlowIfSelectorAndExcludeBothSet(t *testing.T) {
 	output := testClusterOutput()
 
 	flow := &v1beta1.ClusterFlow{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "test-flow",
-			Namespace: logging.Spec.ControlNamespace,
-		},
+		Name:      "test-flow",
+		Namespace: logging.Spec.ControlNamespace,
 		Spec: v1beta1.ClusterFlowSpec{
 			Match: []v1beta1.ClusterMatch{
 				{
@@ -330,10 +315,8 @@ func TestInvalidClusterFlowIfMatchAndSelectorBothSet(t *testing.T) {
 	output := testClusterOutput()
 
 	flow := &v1beta1.ClusterFlow{
-		ObjectMeta: v1.ObjectMeta{
-			Name:      "test-flow",
-			Namespace: logging.Spec.ControlNamespace,
-		},
+		Name:      "test-flow",
+		Namespace: logging.Spec.ControlNamespace,
 		Spec: v1beta1.ClusterFlowSpec{
 			Selectors: map[string]string{
 				"a": "b",

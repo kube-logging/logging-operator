@@ -23,7 +23,6 @@ import (
 
 	v1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"github.com/stretchr/testify/require"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/kube-logging/logging-operator/e2e/internal/fixture"
 	"github.com/kube-logging/logging-operator/e2e/internal/harness"
@@ -100,7 +99,7 @@ func fluentbitWithMetrics() *v1beta1.FluentbitSpec {
 // because its metrics have to survive the aggregator being replaced.
 func syslogNGLogging() *v1beta1.Logging {
 	return &v1beta1.Logging{
-		ObjectMeta: metav1.ObjectMeta{Name: loggingName, Namespace: ns},
+		Name: loggingName, Namespace: ns,
 		Spec: v1beta1.LoggingSpec{
 			ControlNamespace: ns,
 			FluentbitSpec:    fluentbitWithMetrics(),
@@ -116,7 +115,7 @@ func syslogNGLogging() *v1beta1.Logging {
 
 func fluentdLogging() *v1beta1.Logging {
 	return &v1beta1.Logging{
-		ObjectMeta: metav1.ObjectMeta{Name: loggingName, Namespace: ns},
+		Name: loggingName, Namespace: ns,
 		Spec: v1beta1.LoggingSpec{
 			ControlNamespace: ns,
 			FluentbitSpec:    fluentbitWithMetrics(),

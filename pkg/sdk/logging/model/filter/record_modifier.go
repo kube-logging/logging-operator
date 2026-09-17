@@ -108,12 +108,10 @@ func (r *Replace) ToDirective(secretLoader secret.SecretLoader, id string) (type
 func (r *RecordModifier) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	const pluginType = "record_modifier"
 	recordModifier := &types.GenericDirective{
-		PluginMeta: types.PluginMeta{
-			Type:      pluginType,
-			Directive: "filter",
-			Tag:       "**",
-			Id:        id,
-		},
+		Type:      pluginType,
+		Directive: "filter",
+		Tag:       "**",
+		Id:        id,
 	}
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(r); err != nil {
 		return nil, err

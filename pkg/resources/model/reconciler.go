@@ -441,7 +441,7 @@ func checkSecrets(v reflect.Value, secrets secret.SecretLoader) (problems []stri
 	case reflect.Struct:
 		it := mirror.NewStructIter(v)
 		for it.Next() {
-			if s, _ := it.Value().Interface().(*secret.Secret); s != nil {
+			if s, _ := reflect.TypeAssert[*secret.Secret](it.Value()); s != nil {
 				if _, err := secrets.Load(s); err != nil {
 					problems = append(problems, err.Error())
 				}
@@ -463,7 +463,7 @@ func (r patchRequest) IsEmptyPatch() bool {
 
 func jsonFieldName(f reflect.StructField) string {
 	t := f.Tag.Get("json")
-	n := strings.Split(t, ",")[0]
+	n, _, _ := strings.Cut(t, ",")
 	if n != "" {
 		return n
 	}

@@ -33,14 +33,10 @@ const (
 
 func CreateTenant(logging *v1beta1.Logging) *telemetryv1alpha1.Tenant {
 	tenantBase := &telemetryv1alpha1.Tenant{
-		TypeMeta: metav1.TypeMeta{
-			APIVersion: telemetryv1alpha1.GroupVersion.String(),
-			Kind:       tenantKind,
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Name:   logging.Name,
-			Labels: logging.Spec.RouteConfig.TenantLabels,
-		},
+		APIVersion: telemetryv1alpha1.GroupVersion.String(),
+		Kind:       tenantKind,
+		Name:       logging.Name,
+		Labels:     logging.Spec.RouteConfig.TenantLabels,
 		Spec: telemetryv1alpha1.TenantSpec{
 			SubscriptionNamespaceSelectors: []metav1.LabelSelector{
 				{
@@ -68,14 +64,10 @@ func CreateTenant(logging *v1beta1.Logging) *telemetryv1alpha1.Tenant {
 
 func CreateSubscription(logging *v1beta1.Logging) *telemetryv1alpha1.Subscription {
 	return &telemetryv1alpha1.Subscription{
-		TypeMeta: metav1.TypeMeta{
-			APIVersion: telemetryv1alpha1.GroupVersion.String(),
-			Kind:       subscriptionKind,
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      logging.Name,
-			Namespace: logging.Spec.ControlNamespace,
-		},
+		APIVersion: telemetryv1alpha1.GroupVersion.String(),
+		Kind:       subscriptionKind,
+		Name:       logging.Name,
+		Namespace:  logging.Spec.ControlNamespace,
 		Spec: telemetryv1alpha1.SubscriptionSpec{
 			Condition: "true",
 			Outputs: []telemetryv1alpha1.NamespacedName{
@@ -90,24 +82,18 @@ func CreateSubscription(logging *v1beta1.Logging) *telemetryv1alpha1.Subscriptio
 
 func CreateOutput(logging *v1beta1.Logging) *telemetryv1alpha1.Output {
 	return &telemetryv1alpha1.Output{
-		TypeMeta: metav1.TypeMeta{
-			APIVersion: telemetryv1alpha1.GroupVersion.String(),
-			Kind:       outputKind,
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      logging.Name,
-			Namespace: logging.Spec.ControlNamespace,
-		},
+		APIVersion: telemetryv1alpha1.GroupVersion.String(),
+		Kind:       outputKind,
+		Name:       logging.Name,
+		Namespace:  logging.Spec.ControlNamespace,
 		Spec: telemetryv1alpha1.OutputSpec{
 			Fluentforward: &telemetryv1alpha1.Fluentforward{
-				TCPClientSettings: telemetryv1alpha1.TCPClientSettings{
-					Endpoint: &telemetryv1alpha1.Endpoint{
-						TCPAddr:               aggregatorEndpoint(logging),
-						ValidateTCPResolution: false,
-					},
-					TLSSetting: &telemetryv1alpha1.TLSClientSetting{
-						Insecure: true,
-					},
+				Endpoint: &telemetryv1alpha1.Endpoint{
+					TCPAddr:               aggregatorEndpoint(logging),
+					ValidateTCPResolution: false,
+				},
+				TLSSetting: &telemetryv1alpha1.TLSClientSetting{
+					Insecure: true,
 				},
 				Tag: new("otelcol"),
 				Kubernetes: &telemetryv1alpha1.KubernetesMetadata{

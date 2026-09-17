@@ -101,12 +101,10 @@ func (l *LogDNAOutput) ToDirective(secretLoader secret.SecretLoader, id string) 
 	const pluginType = "logdna"
 	pluginID := id + "_" + pluginType
 	logdna := &types.OutputPlugin{
-		PluginMeta: types.PluginMeta{
-			Type:      pluginType,
-			Directive: "match",
-			Tag:       "**",
-			Id:        pluginID,
-		},
+		Type:      pluginType,
+		Directive: "match",
+		Tag:       "**",
+		Id:        pluginID,
 	}
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(l); err != nil {
 		return nil, err

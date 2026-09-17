@@ -39,7 +39,6 @@ func installOperator(t *testing.T, c *kindCluster, cfg config) {
 	t.Logf("images loaded in %s", since(loading))
 
 	installing := time.Now()
-	defer func() { t.Logf("operator installed in %s", since(installing)) }()
 	operator := image.Operator()
 	requireNoError(t, helmInstall(c.kubeconfig, Chart{
 		Release:   "logging-operator",
@@ -76,4 +75,5 @@ func installOperator(t *testing.T, c *kindCluster, cfg config) {
 			"extraArgs": cfg.operatorArgs,
 		},
 	}))
+	t.Logf("operator installed in %s", since(installing))
 }

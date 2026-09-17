@@ -41,8 +41,8 @@ func TestRenderDirective_Injection(t *testing.T) {
 		{
 			name: "newline in value is escaped into a single quoted line",
 			directive: &types.GenericDirective{
-				PluginMeta: types.PluginMeta{Directive: "record"},
-				Params:     types.Params{"x": "y\n</record>\n</filter>\n<match **>\n  @type exec\n  command id\n</match>"},
+				Directive: "record",
+				Params:    types.Params{"x": "y\n</record>\n</filter>\n<match **>\n  @type exec\n  command id\n</match>"},
 			},
 			contains:    []string{`x "y\n</record>\n</filter>\n<match **>\n  @type exec\n  command id\n</match>"`},
 			notContains: []string{"\n<match **>\n", "\n  @type exec\n"},
@@ -50,8 +50,8 @@ func TestRenderDirective_Injection(t *testing.T) {
 		{
 			name: "ruby interpolation is neutralized when quoting",
 			directive: &types.GenericDirective{
-				PluginMeta: types.PluginMeta{Directive: "record"},
-				Params:     types.Params{"x": "a\n#{Socket.gethostname}"},
+				Directive: "record",
+				Params:    types.Params{"x": "a\n#{Socket.gethostname}"},
 			},
 			contains:    []string{`x "a\n\#{Socket.gethostname}"`},
 			notContains: []string{`"a\n#{Socket.gethostname}"`},
@@ -59,24 +59,24 @@ func TestRenderDirective_Injection(t *testing.T) {
 		{
 			name: "quotes, backslashes and tabs are escaped",
 			directive: &types.GenericDirective{
-				PluginMeta: types.PluginMeta{Directive: "record"},
-				Params:     types.Params{"x": "a\nb\"c\\d\te"},
+				Directive: "record",
+				Params:    types.Params{"x": "a\nb\"c\\d\te"},
 			},
 			contains: []string{`x "a\nb\"c\\d\te"`},
 		},
 		{
 			name: "value without newline is left unquoted",
 			directive: &types.GenericDirective{
-				PluginMeta: types.PluginMeta{Directive: "record"},
-				Params:     types.Params{"foo": "bar", "labels": `{"a":"b"}`},
+				Directive: "record",
+				Params:    types.Params{"foo": "bar", "labels": `{"a":"b"}`},
 			},
 			contains: []string{"foo bar", `labels {"a":"b"}`},
 		},
 		{
 			name: "trailing newline in value is stripped, not quoted",
 			directive: &types.GenericDirective{
-				PluginMeta: types.PluginMeta{Directive: "match"},
-				Params:     types.Params{"password": "changeme\n"},
+				Directive: "match",
+				Params:    types.Params{"password": "changeme\n"},
 			},
 			contains:    []string{"password changeme\n"},
 			notContains: []string{`password "changeme`},
@@ -84,8 +84,8 @@ func TestRenderDirective_Injection(t *testing.T) {
 		{
 			name: "trailing CRLF in value is stripped, not quoted",
 			directive: &types.GenericDirective{
-				PluginMeta: types.PluginMeta{Directive: "match"},
-				Params:     types.Params{"password": "changeme\r\n"},
+				Directive: "match",
+				Params:    types.Params{"password": "changeme\r\n"},
 			},
 			contains:    []string{"password changeme\n"},
 			notContains: []string{`password "changeme`, "\r"},
@@ -93,8 +93,8 @@ func TestRenderDirective_Injection(t *testing.T) {
 		{
 			name: "trailing CR in value is stripped, not quoted",
 			directive: &types.GenericDirective{
-				PluginMeta: types.PluginMeta{Directive: "match"},
-				Params:     types.Params{"password": "changeme\r"},
+				Directive: "match",
+				Params:    types.Params{"password": "changeme\r"},
 			},
 			contains:    []string{"password changeme\n"},
 			notContains: []string{`password "changeme`, "\r"},
@@ -102,8 +102,8 @@ func TestRenderDirective_Injection(t *testing.T) {
 		{
 			name: "embedded newline is still escaped even with a trailing newline",
 			directive: &types.GenericDirective{
-				PluginMeta: types.PluginMeta{Directive: "record"},
-				Params:     types.Params{"x": "a\n</record>\n<match **>\n  @type exec\n</match>\n"},
+				Directive: "record",
+				Params:    types.Params{"x": "a\n</record>\n<match **>\n  @type exec\n</match>\n"},
 			},
 			contains:    []string{`x "a\n</record>\n<match **>\n  @type exec\n</match>\n"`},
 			notContains: []string{"\n<match **>\n", "\n  @type exec\n"},
@@ -111,29 +111,29 @@ func TestRenderDirective_Injection(t *testing.T) {
 		{
 			name: "newline in parameter name is rejected",
 			directive: &types.GenericDirective{
-				PluginMeta: types.PluginMeta{Directive: "record"},
-				Params:     types.Params{"bad\n</record>\n<match **>": "v"},
+				Directive: "record",
+				Params:    types.Params{"bad\n</record>\n<match **>": "v"},
 			},
 			wantErr: true,
 		},
 		{
 			name:      "newline in tag is rejected",
-			directive: &types.GenericDirective{PluginMeta: types.PluginMeta{Directive: "match", Tag: "x>\n<match **"}},
+			directive: &types.GenericDirective{Directive: "match", Tag: "x>\n<match **"},
 			wantErr:   true,
 		},
 		{
 			name:      "newline in id is rejected",
-			directive: &types.GenericDirective{PluginMeta: types.PluginMeta{Directive: "match", Id: "x\n@type exec"}},
+			directive: &types.GenericDirective{Directive: "match", Id: "x\n@type exec"},
 			wantErr:   true,
 		},
 		{
 			name:      "newline in label is rejected",
-			directive: &types.GenericDirective{PluginMeta: types.PluginMeta{Directive: "match", Label: "x\n@type exec"}},
+			directive: &types.GenericDirective{Directive: "match", Label: "x\n@type exec"},
 			wantErr:   true,
 		},
 		{
 			name:      "newline in log_level is rejected",
-			directive: &types.GenericDirective{PluginMeta: types.PluginMeta{Directive: "match", LogLevel: "info\n@type exec"}},
+			directive: &types.GenericDirective{Directive: "match", LogLevel: "info\n@type exec"},
 			wantErr:   true,
 		},
 	}

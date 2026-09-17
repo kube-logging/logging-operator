@@ -47,10 +47,8 @@ func TestWatchSelectors(t *testing.T) {
 		Start()
 
 	logging := &v1beta1.Logging{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "watch-selector-test",
-			Namespace: ns,
-		},
+		Name:      "watch-selector-test",
+		Namespace: ns,
 		Spec: v1beta1.LoggingSpec{
 			ControlNamespace: ns,
 			FluentbitSpec: &v1beta1.FluentbitSpec{
@@ -71,12 +69,10 @@ func TestWatchSelectors(t *testing.T) {
 	env.Create(unmanagedFluentd())
 
 	unmanagedSecret := &corev1.Secret{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "unmanaged-fluentd-secret",
-			Namespace: ns,
-			Labels: map[string]string{
-				"app": "fluentd",
-			},
+		Name:      "unmanaged-fluentd-secret",
+		Namespace: ns,
+		Labels: map[string]string{
+			"app": "fluentd",
 		},
 		Data: map[string][]byte{
 			"key": []byte("value"),
@@ -126,7 +122,7 @@ func requireOwnedBy(t *testing.T, owner *v1beta1.Logging, ref *metav1.OwnerRefer
 func unmanagedFluentd() *appsv1.StatefulSet {
 	labels := map[string]string{types.NameLabel: "fluentd"}
 	return &appsv1.StatefulSet{
-		ObjectMeta: metav1.ObjectMeta{Name: "fluentd", Namespace: unmanagedNS, Labels: labels},
+		Name: "fluentd", Namespace: unmanagedNS, Labels: labels,
 		Spec: appsv1.StatefulSetSpec{
 			ServiceName: "fluentd",
 			Replicas:    new(int32(1)),

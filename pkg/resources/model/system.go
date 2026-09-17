@@ -129,10 +129,8 @@ func CreateSystem(resources LoggingResources, secrets SecretLoaderFactory, logge
 		}
 	} else {
 		errorFlow = &types.Flow{
-			PluginMeta: types.PluginMeta{
-				Directive: "label",
-				Tag:       "@ERROR",
-			},
+			Directive: "label",
+			Tag:       "@ERROR",
 			FlowLabel: "@ERROR",
 		}
 		plugin, err := output.NewNullOutputConfig().ToDirective(nil, "main-fluentd-error")
@@ -197,10 +195,8 @@ func filtersForFilters(flowID string, flowName string, rawFilterEnabled bool, se
 
 func FlowForError(outputRef string, clusterOutputs ClusterOutputs, secrets SecretLoaderFactory) (*types.Flow, error) {
 	errorFlow := &types.Flow{
-		PluginMeta: types.PluginMeta{
-			Directive: "label",
-			Tag:       "@ERROR",
-		},
+		Directive: "label",
+		Tag:       "@ERROR",
 		FlowLabel: "@ERROR",
 	}
 

@@ -19,7 +19,6 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/kube-logging/logging-operator/e2e/internal/harness"
 	"github.com/kube-logging/logging-operator/e2e/internal/image"
@@ -41,7 +40,7 @@ var producerLabels = map[string]string{"my-unique-label": "log-producer"}
 // so neither can be the one the Logging picks.
 func detachedFluentd(name string) *v1beta1.FluentdConfig {
 	return &v1beta1.FluentdConfig{
-		ObjectMeta: metav1.ObjectMeta{Name: name, Namespace: ns},
+		Name: name, Namespace: ns,
 		Spec: v1beta1.FluentdSpec{
 			Image:               image.Fluentd().Spec(),
 			ConfigReloaderImage: image.ConfigReloader().Spec(),
@@ -77,7 +76,7 @@ func TestFluentdAggregator_detached_multiple_failure(t *testing.T) {
 		Start()
 
 	env.Create(&v1beta1.Logging{
-		ObjectMeta: metav1.ObjectMeta{Name: "fluentd-aggregator-multiworker-test", Namespace: ns},
+		Name: "fluentd-aggregator-multiworker-test", Namespace: ns,
 		Spec: v1beta1.LoggingSpec{
 			EnableRecreateWorkloadOnImmutableFieldChange: true,
 			ControlNamespace: ns,
@@ -98,7 +97,7 @@ func TestFluentdAggregator_detached_multiple_failure(t *testing.T) {
 
 	tags := "time"
 	out := &v1beta1.Output{
-		ObjectMeta: metav1.ObjectMeta{Name: "test-output", Namespace: ns},
+		Name: "test-output", Namespace: ns,
 		Spec: v1beta1.OutputSpec{
 			HTTPOutput: &output.HTTPOutputConfig{
 				Endpoint:    env.Receiver.URL(testTag),
@@ -115,7 +114,7 @@ func TestFluentdAggregator_detached_multiple_failure(t *testing.T) {
 	env.Create(out)
 
 	env.Create(&v1beta1.Flow{
-		ObjectMeta: metav1.ObjectMeta{Name: "test-flow", Namespace: ns},
+		Name: "test-flow", Namespace: ns,
 		Spec: v1beta1.FlowSpec{
 			Match: []v1beta1.Match{
 				{Select: &v1beta1.Select{Labels: producerLabels}},

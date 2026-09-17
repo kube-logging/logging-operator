@@ -313,51 +313,41 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 	v = []corev1.Volume{
 		{
 			Name: "config",
-			VolumeSource: corev1.VolumeSource{
-				Secret: &corev1.SecretVolumeSource{
-					SecretName: r.Logging.QualifiedName(SecretConfigName),
-				},
+			Secret: &corev1.SecretVolumeSource{
+				SecretName: r.Logging.QualifiedName(SecretConfigName),
 			},
 		},
 		{
 			Name: "output-secret",
-			VolumeSource: corev1.VolumeSource{
-				Secret: &corev1.SecretVolumeSource{
-					SecretName: r.Logging.QualifiedName(OutputSecretName),
-				},
+			Secret: &corev1.SecretVolumeSource{
+				SecretName: r.Logging.QualifiedName(OutputSecretName),
 			},
 		},
 	}
 
 	if r.fluentdSpec.Security.IsReadOnlyRootFilesystem() {
 		v = append(v, corev1.Volume{
-			Name:         "tmp",
-			VolumeSource: corev1.VolumeSource{EmptyDir: &corev1.EmptyDirVolumeSource{}},
+			Name:     "tmp",
+			EmptyDir: &corev1.EmptyDirVolumeSource{},
 		})
 	}
 
 	if r.fluentdSpec.CompressConfigFile {
 		v = append(v, corev1.Volume{
-			Name: "app-config",
-			VolumeSource: corev1.VolumeSource{
-				EmptyDir: &corev1.EmptyDirVolumeSource{},
-			},
+			Name:     "app-config",
+			EmptyDir: &corev1.EmptyDirVolumeSource{},
 		})
 		v = append(v, corev1.Volume{
 			Name: "app-config-compress",
-			VolumeSource: corev1.VolumeSource{
-				Secret: &corev1.SecretVolumeSource{
-					SecretName: r.Logging.QualifiedName(AppSecretConfigName),
-				},
+			Secret: &corev1.SecretVolumeSource{
+				SecretName: r.Logging.QualifiedName(AppSecretConfigName),
 			},
 		})
 	} else {
 		v = append(v, corev1.Volume{
 			Name: "app-config",
-			VolumeSource: corev1.VolumeSource{
-				Secret: &corev1.SecretVolumeSource{
-					SecretName: r.Logging.QualifiedName(AppSecretConfigName),
-				},
+			Secret: &corev1.SecretVolumeSource{
+				SecretName: r.Logging.QualifiedName(AppSecretConfigName),
 			},
 		})
 	}
@@ -365,10 +355,8 @@ func (r *Reconciler) generateVolume() (v []corev1.Volume) {
 	if r.fluentdSpec.TLS.Enabled {
 		tlsRelatedVolume := corev1.Volume{
 			Name: "fluentd-tls",
-			VolumeSource: corev1.VolumeSource{
-				Secret: &corev1.SecretVolumeSource{
-					SecretName: r.fluentdSpec.TLS.SecretName,
-				},
+			Secret: &corev1.SecretVolumeSource{
+				SecretName: r.fluentdSpec.TLS.SecretName,
 			},
 		}
 		v = append(v, tlsRelatedVolume)
@@ -517,10 +505,8 @@ func generateReadinessCheck(spec *v1beta1.FluentdSpec) *corev1.Probe {
 			)
 		}
 		return &corev1.Probe{
-			ProbeHandler: corev1.ProbeHandler{
-				Exec: &corev1.ExecAction{
-					Command: append(check, strings.Join(bash, "\n")),
-				},
+			Exec: &corev1.ExecAction{
+				Command: append(check, strings.Join(bash, "\n")),
 			},
 			InitialDelaySeconds: spec.ReadinessDefaultCheck.InitialDelaySeconds,
 			TimeoutSeconds:      spec.ReadinessDefaultCheck.TimeoutSeconds,

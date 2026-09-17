@@ -19,7 +19,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/MakeNowJust/heredoc"
+	"github.com/MakeNowJust/heredoc/v2"
 	"github.com/andreyvit/diff"
 	"github.com/cisco-open/operator-tools/pkg/secret"
 
@@ -41,9 +41,7 @@ func TestRenderDirective(t *testing.T) {
 		{
 			name: "single level just name",
 			directive: &types.GenericDirective{
-				PluginMeta: types.PluginMeta{
-					Directive: "match",
-				},
+				Directive: "match",
 			},
 			expected: heredoc.Doc(`
             <match>
@@ -53,10 +51,8 @@ func TestRenderDirective(t *testing.T) {
 		{
 			name: "single level with tag and attributes",
 			directive: &types.GenericDirective{
-				PluginMeta: types.PluginMeta{
-					Directive: "match",
-					Tag:       "tag",
-				},
+				Directive: "match",
+				Tag:       "tag",
 				Params: types.Params{
 					"path": "file",
 				},
@@ -70,10 +66,8 @@ func TestRenderDirective(t *testing.T) {
 		{
 			name: "single level with just tag",
 			directive: &types.GenericDirective{
-				PluginMeta: types.PluginMeta{
-					Directive: "match",
-					Tag:       "tag",
-				},
+				Directive: "match",
+				Tag:       "tag",
 			},
 			expected: heredoc.Doc(`
             <match tag>
@@ -83,9 +77,7 @@ func TestRenderDirective(t *testing.T) {
 		{
 			name: "single level with just attributes",
 			directive: &types.GenericDirective{
-				PluginMeta: types.PluginMeta{
-					Directive: "match",
-				},
+				Directive: "match",
 				Params: types.Params{
 					"path": "file",
 				},
@@ -99,26 +91,20 @@ func TestRenderDirective(t *testing.T) {
 		{
 			name: "two levels",
 			directive: &types.GenericDirective{
-				PluginMeta: types.PluginMeta{
-					Directive: "match",
-				},
+				Directive: "match",
 				Params: types.Params{
 					"path": "file",
 				},
 				SubDirectives: []types.Directive{
 					&types.GenericDirective{
-						PluginMeta: types.PluginMeta{
-							Directive: "router1",
-						},
+						Directive: "router1",
 						Params: types.Params{
 							"namespace": "asd",
 							"labels":    "{\"a\":\"b\"}",
 						},
 					},
 					&types.GenericDirective{
-						PluginMeta: types.PluginMeta{
-							Directive: "router2",
-						},
+						Directive: "router2",
 						Params: types.Params{
 							"namespace": "asd2",
 						},
@@ -470,11 +456,9 @@ func TestRenderErrorOutput(t *testing.T) {
 	system := types.NewSystemBuilder(toDirective(t, input.NewTailInputConfig("input.log")), nil, types.NewRouter("test", nil))
 
 	errorFlow := &types.Flow{
-		PluginMeta: types.PluginMeta{
-			Id:        "error",
-			Directive: "label",
-			Tag:       "@ERROR",
-		},
+		Id:        "error",
+		Directive: "label",
+		Tag:       "@ERROR",
 		FlowLabel: "@ERROR",
 	}
 	errorFlow.WithOutputs(toDirective(t, output.NewNullOutputConfig()))

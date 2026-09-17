@@ -115,12 +115,10 @@ func (d *DetectExceptions) ToDirective(secretLoader secret.SecretLoader, id stri
 		detect.MatchTag = "kubernetes.**"
 	}
 	detector := &types.OutputPlugin{
-		PluginMeta: types.PluginMeta{
-			Type:      pluginType,
-			Directive: "match",
-			Tag:       detect.MatchTag,
-			Id:        id,
-		},
+		Type:      pluginType,
+		Directive: "match",
+		Tag:       detect.MatchTag,
+		Id:        id,
 	}
 	if params, err := types.NewStructToStringMapper(secretLoader).StringsMap(detect); err != nil {
 		return nil, err

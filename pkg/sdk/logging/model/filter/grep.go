@@ -256,9 +256,7 @@ func (r *ExcludeSection) ToDirective(secretLoader secret.SecretLoader, id string
 
 func (r *OrSection) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	or := &types.GenericDirective{
-		PluginMeta: types.PluginMeta{
-			Directive: "or",
-		},
+		Directive: "or",
 	}
 
 	for _, regexp := range r.Regexp {
@@ -281,9 +279,7 @@ func (r *OrSection) ToDirective(secretLoader secret.SecretLoader, id string) (ty
 
 func (r *AndSection) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	and := &types.GenericDirective{
-		PluginMeta: types.PluginMeta{
-			Directive: "and",
-		},
+		Directive: "and",
 	}
 
 	for _, regexp := range r.Regexp {
@@ -307,12 +303,10 @@ func (r *AndSection) ToDirective(secretLoader secret.SecretLoader, id string) (t
 func (g *GrepConfig) ToDirective(secretLoader secret.SecretLoader, id string) (types.Directive, error) {
 	const pluginType = "grep"
 	grep := &types.GenericDirective{
-		PluginMeta: types.PluginMeta{
-			Type:      pluginType,
-			Directive: "filter",
-			Tag:       "**",
-			Id:        id,
-		},
+		Type:      pluginType,
+		Directive: "filter",
+		Tag:       "**",
+		Id:        id,
 	}
 	for _, regexp := range g.Regexp {
 		if meta, err := regexp.ToDirective(secretLoader, ""); err != nil {

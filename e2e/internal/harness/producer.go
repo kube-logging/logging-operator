@@ -15,7 +15,7 @@
 package harness
 
 import (
-	"github.com/MakeNowJust/heredoc"
+	"github.com/MakeNowJust/heredoc/v2"
 	"github.com/cisco-open/operator-tools/pkg/types"
 	"github.com/cisco-open/operator-tools/pkg/utils"
 	appsv1 "k8s.io/api/apps/v1"
@@ -35,10 +35,8 @@ func logProducer(namespace string, extraLabels map[string]string) []client.Objec
 	lbls := utils.MergeLabels(map[string]string{types.NameLabel: logProducerName}, extraLabels)
 	return []client.Object{
 		&corev1.ConfigMap{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      logProducerConfig,
-				Namespace: namespace,
-			},
+			Name:      logProducerConfig,
+			Namespace: namespace,
 			Data: map[string]string{
 				"config.ini": heredoc.Doc(`
 					[message]
@@ -50,10 +48,8 @@ func logProducer(namespace string, extraLabels map[string]string) []client.Objec
 			},
 		},
 		&appsv1.Deployment{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      logProducerName,
-				Namespace: namespace,
-			},
+			Name:      logProducerName,
+			Namespace: namespace,
 			Spec: appsv1.DeploymentSpec{
 				Replicas: new(int32(1)),
 				Selector: metav1.SetAsLabelSelector(labels.Set(lbls)),
@@ -77,12 +73,8 @@ func logProducer(namespace string, extraLabels map[string]string) []client.Objec
 						Volumes: []corev1.Volume{
 							{
 								Name: "config",
-								VolumeSource: corev1.VolumeSource{
-									ConfigMap: &corev1.ConfigMapVolumeSource{
-										LocalObjectReference: corev1.LocalObjectReference{
-											Name: logProducerConfig,
-										},
-									},
+								ConfigMap: &corev1.ConfigMapVolumeSource{
+									Name: logProducerConfig,
 								},
 							},
 						},
