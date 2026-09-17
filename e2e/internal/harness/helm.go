@@ -17,6 +17,7 @@ package harness
 import (
 	"log/slog"
 	"strings"
+	"time"
 
 	"emperror.dev/errors"
 	"helm.sh/helm/v4/pkg/action"
@@ -60,8 +61,11 @@ func helmInstall(kubeconfig string, chart Chart) error {
 	installer.CreateNamespace = true
 	installer.ReleaseName = chart.Release
 	installer.RepoURL = chart.Repo
-	// v4 refuses to install without one; hookOnly is v3's no-wait default.
-	installer.WaitStrategy = kube.HookOnlyStrategy
+	// v4 makes the caller choose. hookOnly turns the CRD wait into a no-op,
+	// and a suite creating its first CR raced the CRDs becoming established;
+	// watcher waits for that and for the workloads, as helm 3's --wait did.
+	installer.WaitStrategy = kube.StatusWatcherStrategy
+	installer.Timeout = 5 * time.Minute
 
 	path, err := installer.LocateChart(chart.Name, cli.New())
 	if err != nil {
