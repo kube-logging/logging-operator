@@ -140,6 +140,7 @@ func (b *Builder) Start() *Env {
 	scheme, err := buildScheme(b.cfg.schemeBuilders)
 	requireNoError(t, err)
 
+	started := time.Now()
 	c, err := newCluster(b.cfg.cluster, scheme)
 	if err != nil {
 		// The kind cluster is up before the client can fail, and teardown is
@@ -147,6 +148,7 @@ func (b *Builder) Start() *Env {
 		deleteClusterOrLog(t, b.cfg.cluster)
 	}
 	requireNoError(t, err)
+	t.Logf("cluster %s up in %s", b.cfg.cluster, since(started))
 
 	// Not t.Context(): that is canceled before the first Cleanup runs, which
 	// would stop the cache before the log dump reads through it.
@@ -317,6 +319,13 @@ func (e *Env) collectArtifacts() {
 		// Logged, never fatal: coverage is not the suite's verdict.
 		e.T.Logf("Failed collecting coverage files: %s", err)
 	}
+}
+
+// since is what the lifecycle timings print. They are the only timing a CI
+// log gives: go test buffers a package's output, so the runner's timestamps
+// all say when the buffer was flushed.
+func since(t time.Time) time.Duration {
+	return time.Since(t).Round(time.Second)
 }
 
 func buildScheme(extra []func(*runtime.Scheme) error) (*runtime.Scheme, error) {

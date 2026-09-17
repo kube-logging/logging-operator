@@ -17,6 +17,7 @@ package harness
 import (
 	"path/filepath"
 	"testing"
+	"time"
 
 	corev1 "k8s.io/api/core/v1"
 
@@ -31,10 +32,14 @@ func installOperator(t *testing.T, c *kindCluster, cfg config) {
 	}
 	// One invocation, so docker save writes shared layers once instead of once
 	// per image.
+	loading := time.Now()
 	if err := c.loadImages(images...); err != nil {
 		t.Fatalf("kind load images: %s", err)
 	}
+	t.Logf("images loaded in %s", since(loading))
 
+	installing := time.Now()
+	defer func() { t.Logf("operator installed in %s", since(installing)) }()
 	operator := image.Operator()
 	requireNoError(t, helmInstall(c.kubeconfig, Chart{
 		Release:   "logging-operator",
