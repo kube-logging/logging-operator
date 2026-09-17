@@ -71,13 +71,13 @@ var Global = GlobalConfig{
 
 // HostTailer configuration
 var HostTailer = HostTailerConfig{
-	FluentBitImage: "ghcr.io/fluent/fluent-bit:5.1.0",
+	FluentBitImage: "ghcr.io/fluent/fluent-bit:5.1.2",
 	TailerAffix:    "host-tailer",
 }
 
 // EventTailer configuration
 var EventTailer = EventTailerConfig{
-	ImageWithTag:          "ghcr.io/kube-logging/eventrouter:1.0.0",
+	ImageWithTag:          "ghcr.io/kube-logging/eventrouter:1.0.1",
 	TailerAffix:           "event-tailer",
 	ConfigurationFileName: "config.json",
 	PositionVolumeName:    "event-tailer-position",
@@ -102,7 +102,7 @@ func (t EventTailerConfig) UsesEnvConfig(image string) bool {
 
 // TailerWebhook configuration
 var TailerWebhook = TailerWebhookConfig{
-	FluentBitImage:    "ghcr.io/fluent/fluent-bit:5.1.0",
+	FluentBitImage:    "ghcr.io/fluent/fluent-bit:5.1.2",
 	AnnotationKey:     "sidecar.logging-extensions.banzaicloud.io/tail",
 	ServerPath:        "/tailer-webhook",
 	ServerPort:        9443,

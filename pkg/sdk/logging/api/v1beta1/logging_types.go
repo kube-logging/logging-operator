@@ -206,7 +206,7 @@ var Version string
 
 const (
 	DefaultFluentbitImageRepository               = "ghcr.io/fluent/fluent-bit"
-	DefaultFluentbitImageTag                      = "5.1.0"
+	DefaultFluentbitImageTag                      = "5.1.2"
 	DefaultFluentbitBufferVolumeImageRepository   = "ghcr.io/kube-logging/logging-operator/node-exporter"
 	DefaultFluentbitBufferVolumeImageTag          = "latest"
 	DefaultFluentbitBufferStorageVolumeName       = "fluentbit-buffer"
@@ -218,7 +218,7 @@ const (
 	DefaultFluentdDrainWatchImageRepository       = "ghcr.io/kube-logging/logging-operator/fluentd-drain-watch"
 	DefaultFluentdDrainWatchImageTag              = "latest"
 	DefaultFluentdDrainPauseImageRepository       = "registry.k8s.io/pause"
-	DefaultFluentdDrainPauseImageTag              = "3.9"
+	DefaultFluentdDrainPauseImageTag              = "3.10.2"
 	DefaultFluentdVolumeModeImageRepository       = "docker.io/library/busybox"
 	DefaultFluentdVolumeModeImageTag              = "latest"
 	DefaultFluentdConfigReloaderImageRepository   = "ghcr.io/kube-logging/logging-operator/config-reloader"
