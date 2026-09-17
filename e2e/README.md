@@ -1,12 +1,10 @@
 # End-to-end tests
 
-One directory per suite. Each is its own Go package and test binary, and each
-provisions its own KIND cluster, installs the operator into it and tears it down
-afterwards. Suites do not share a cluster, so they can run concurrently and a
-failure in one leaves the others alone.
-
-`internal/` is the harness rather than a suite, and the Makefile filters it out
-of the selection.
+One directory per suite under `suites/`. Each is its own Go package and test
+binary, and each provisions its own KIND cluster, installs the operator into it
+and tears it down afterwards. Suites do not share a cluster, so they can run
+concurrently and a failure in one leaves the others alone. `internal/` is the
+harness.
 
 ## Running them
 
@@ -42,7 +40,7 @@ It resets on reboot.
 
 | variable | default | what it does |
 | --- | --- | --- |
-| `E2E_TEST` | all | suite directory to run |
+| `E2E_TEST` | all | suite directory under `suites/` to run |
 | `E2E_TEST_TIMEOUT` | `20m` | per suite binary |
 | `E2E_CLUSTERS` | `4` | suite binaries at once (`go test -p`) |
 | `E2E_SUITE_PARALLEL` | `2` | clusters one binary builds at once |

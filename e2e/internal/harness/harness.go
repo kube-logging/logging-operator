@@ -360,7 +360,7 @@ func projectDir() string {
 	if dir := os.Getenv("PROJECT_DIR"); dir != "" {
 		return dir
 	}
-	return "../.."
+	return "../../.."
 }
 
 func artifactPath(name string) (string, error) {

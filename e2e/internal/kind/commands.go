@@ -37,7 +37,7 @@ const (
 	imageEnv          = "KIND_IMAGE"
 	commandTimeoutEnv = "KIND_COMMAND_TIMEOUT"
 
-	defaultPath = "../../bin/kind"
+	defaultPath = "../../../bin/kind"
 
 	// timeoutFraction is the share of the enclosing -timeout that one invocation
 	// may consume. The cap is derived from the surrounding budget rather than
