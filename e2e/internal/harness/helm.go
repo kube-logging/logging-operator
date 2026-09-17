@@ -22,6 +22,7 @@ import (
 	"helm.sh/helm/v4/pkg/action"
 	"helm.sh/helm/v4/pkg/chart/loader"
 	"helm.sh/helm/v4/pkg/cli"
+	"helm.sh/helm/v4/pkg/kube"
 )
 
 // Chart is a helm chart to install: Name is a path when Repo is empty, and a
@@ -59,6 +60,8 @@ func helmInstall(kubeconfig string, chart Chart) error {
 	installer.CreateNamespace = true
 	installer.ReleaseName = chart.Release
 	installer.RepoURL = chart.Repo
+	// v4 refuses to install without one; hookOnly is v3's no-wait default.
+	installer.WaitStrategy = kube.HookOnlyStrategy
 
 	path, err := installer.LocateChart(chart.Name, cli.New())
 	if err != nil {
