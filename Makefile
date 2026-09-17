@@ -80,7 +80,7 @@ GO_TEST_COVERAGE := ${BIN}/go-test-coverage
 HELM_DOCS := ${BIN}/helm-docs
 
 KIND := ${BIN}/kind
-KIND_IMAGE ?= kindest/node:v1.35.0@sha256:4613778f3cfcd10e615029370f5786704559103cf27bef934597ba562b269661
+KIND_IMAGE ?= kindest/node:v1.37.0@sha256:a1ed56cfb0e7b93589bdf97c8cd566405a265939e3620fc4f5de89adff580ae5
 KIND_CLUSTER := kind
 
 KUBEBUILDER := ${BIN}/kubebuilder
