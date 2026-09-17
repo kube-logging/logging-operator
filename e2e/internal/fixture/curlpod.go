@@ -27,7 +27,7 @@ func CurlPod(namespace, name string) *corev1.Pod {
 		Spec: corev1.PodSpec{
 			Containers: []corev1.Container{{
 				Name:    "curl",
-				Image:   "curlimages/curl:latest",
+				Image:   "curlimages/curl:8.22.0",
 				Command: []string{"sleep", "3600"},
 			}},
 		},

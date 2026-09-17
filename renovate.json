@@ -55,6 +55,20 @@
       "description": [
         "The KIND node image is not a *_VERSION variable, so the general Makefile manager does not see it."
       ]
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^e2e/internal/fixture/curlpod\\.go$/"
+      ],
+      "matchStrings": [
+        "\"curlimages/curl:(?<currentValue>[^\"]+)\""
+      ],
+      "datasourceTemplate": "docker",
+      "depNameTemplate": "curlimages/curl",
+      "description": [
+        "The e2e curl pod's image is a Go string literal, which no built-in manager reads."
+      ]
     }
   ],
   "enabled": true,
