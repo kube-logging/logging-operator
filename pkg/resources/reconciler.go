@@ -16,12 +16,17 @@ package resources
 
 import (
 	"context"
+	"time"
 
 	"github.com/cisco-open/operator-tools/pkg/reconciler"
 	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
+
+// StatusRequeue re-runs the loop with the status it just wrote, ahead of the
+// watch event that also carries it.
+const StatusRequeue = time.Second
 
 // ComponentReconciler reconciler interface
 type ComponentReconciler func() (*reconcile.Result, error)

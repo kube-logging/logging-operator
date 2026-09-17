@@ -16,6 +16,7 @@ package configcheck
 
 import (
 	"context"
+	"time"
 
 	"emperror.dev/errors"
 	"github.com/cisco-open/operator-tools/pkg/types"
@@ -24,7 +25,13 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-const HashLabel = "logging.banzaicloud.io/config-hash"
+const (
+	HashLabel = "logging.banzaicloud.io/config-hash"
+
+	// PollInterval is how long a reconciler waits before looking for a
+	// configcheck pod's verdict again.
+	PollInterval = 5 * time.Second
+)
 
 func WithHashLabel(accessor v1.Object, hash string) {
 	l := accessor.GetLabels()
