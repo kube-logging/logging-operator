@@ -15,94 +15,60 @@
 package harness
 
 import (
-	"fmt"
 	"path/filepath"
-	"strings"
 	"testing"
 
-	"helm.sh/helm/v3/pkg/action"
-	"helm.sh/helm/v3/pkg/chart/loader"
-	"helm.sh/helm/v3/pkg/cli"
 	corev1 "k8s.io/api/core/v1"
 
 	"github.com/kube-logging/logging-operator/e2e/internal/image"
 )
 
 func installOperator(t *testing.T, c *kindCluster, cfg config) {
-	restClientGetter, err := newRESTClientGetter(c.kubeconfig, cfg.controlNamespace)
-	if err != nil {
-		t.Fatalf("helm rest client getter: %s", err)
-	}
-	actionConfig := new(action.Configuration)
-
-	// Held back rather than logged: helm narrates every resource it creates,
-	// and the lines only say anything when the install fails.
-	var helmLog strings.Builder
-	if err := actionConfig.Init(restClientGetter, cfg.controlNamespace, "memory", func(format string, v ...any) {
-		fmt.Fprintf(&helmLog, format+"\n", v...)
-	}); err != nil {
-		t.Fatalf("helm action config init: %s", err)
-	}
-
-	installer := action.NewInstall(actionConfig)
-
-	installer.Namespace = cfg.controlNamespace
-	installer.CreateNamespace = true
-	installer.ReleaseName = "logging-operator"
-
-	cp, err := installer.LocateChart(filepath.Join(projectDir(), "charts/logging-operator"), cli.New())
-	if err != nil {
-		t.Fatalf("helm locate chart: %s", err)
-	}
-	chartReq, err := loader.Load(cp)
-	if err != nil {
-		t.Fatalf("helm load chart: %s", err)
-	}
-
-	loggingOperatorImage := image.Operator()
 	images := make([]string, 0, len(image.All()))
 	for _, img := range image.All() {
 		t.Logf("%s: loading %s", img.Env, img.Ref())
 		images = append(images, img.Ref())
 	}
-
 	// One invocation, so docker save writes shared layers once instead of once
 	// per image.
 	if err := c.loadImages(images...); err != nil {
 		t.Fatalf("kind load images: %s", err)
 	}
 
-	_, err = installer.Run(chartReq, map[string]any{
-		"nameOverride": cfg.release,
-		"image": map[string]any{
-			"repository": loggingOperatorImage.Repository,
-			"tag":        loggingOperatorImage.Tag,
-			"pullPolicy": corev1.PullNever,
-		},
-		"testReceiver": map[string]any{
-			"enabled": true,
-		},
-		"volumes": []map[string]any{
-			{
-				"name":     "coverage-data",
-				"emptyDir": map[string]string{},
+	operator := image.Operator()
+	requireNoError(t, helmInstall(c.kubeconfig, Chart{
+		Release:   "logging-operator",
+		Namespace: cfg.controlNamespace,
+		Name:      filepath.Join(projectDir(), "charts/logging-operator"),
+		Values: map[string]any{
+			"nameOverride": cfg.release,
+			"image": map[string]any{
+				"repository": operator.Repository,
+				"tag":        operator.Tag,
+				"pullPolicy": corev1.PullNever,
 			},
-		},
-		"volumeMounts": []map[string]any{
-			{
-				"mountPath": "/covdatafiles",
-				"name":      "coverage-data",
+			"testReceiver": map[string]any{
+				"enabled": true,
 			},
-		},
-		"env": []map[string]any{
-			{
-				"name":  "GOCOVERDIR",
-				"value": "/covdatafiles",
+			"volumes": []map[string]any{
+				{
+					"name":     "coverage-data",
+					"emptyDir": map[string]string{},
+				},
 			},
+			"volumeMounts": []map[string]any{
+				{
+					"mountPath": "/covdatafiles",
+					"name":      "coverage-data",
+				},
+			},
+			"env": []map[string]any{
+				{
+					"name":  "GOCOVERDIR",
+					"value": "/covdatafiles",
+				},
+			},
+			"extraArgs": cfg.operatorArgs,
 		},
-		"extraArgs": cfg.operatorArgs,
-	})
-	if err != nil {
-		t.Fatalf("helm chart install: %s\n%s", err, helmLog.String())
-	}
+	}))
 }

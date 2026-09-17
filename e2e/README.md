@@ -23,8 +23,7 @@ reuses them. Rebuild only when you change operator code, not test code.
 
 ### What has to be installed
 
-`docker`, and `helm` on `PATH` for the one suite that installs a chart.
-`make test-e2e` fetches `kind` into `bin/` for you; `make test-e2e-nodeps`
+`docker`. `make test-e2e` fetches `kind` into `bin/` for you; `make test-e2e-nodeps`
 assumes it is already there.
 
 On Linux, KIND needs more inotify instances than the default 128:
@@ -86,8 +85,8 @@ func TestSomething(t *testing.T) {
 }
 ```
 
-`Start()` returns an `Env` carrying `T`, `Ctx`, `Client`, `Kubeconfig`,
-`Release`, `ControlNamespace` and `Receiver`. Teardown is registered for you and runs in
+`Start()` returns an `Env` carrying `T`, `Ctx`, `Client`, `Release`,
+`ControlNamespace` and `Receiver`. Teardown is registered for you and runs in
 order: artifacts (the log dump and coverage), stopping the cluster, deleting
 it. Each step is isolated, so one failing does not strand
 the cluster.

@@ -122,8 +122,7 @@ type Env struct {
 	T   *testing.T
 	Ctx context.Context
 
-	Client     client.Client
-	Kubeconfig string
+	Client client.Client
 
 	Release          string
 	ControlNamespace string
@@ -159,7 +158,6 @@ func (b *Builder) Start() *Env {
 		T:                t,
 		Ctx:              ctx,
 		Client:           c.GetClient(),
-		Kubeconfig:       c.kubeconfig,
 		Release:          b.cfg.release,
 		ControlNamespace: b.cfg.controlNamespace,
 		cluster:          c,

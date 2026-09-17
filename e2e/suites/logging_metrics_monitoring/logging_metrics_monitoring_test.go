@@ -24,7 +24,6 @@ import (
 	v1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"github.com/stretchr/testify/require"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"sigs.k8s.io/e2e-framework/third_party/helm"
 
 	"github.com/kube-logging/logging-operator/e2e/internal/fixture"
 	"github.com/kube-logging/logging-operator/e2e/internal/harness"
@@ -142,7 +141,13 @@ func TestLoggingMetrics_Monitoring(t *testing.T) {
 		WithScheme(v1.AddToScheme).
 		Start()
 
-	require.NoError(t, installPrometheusOperator(env))
+	// The CRDs alone: the ServiceMonitors are read here, not by a Prometheus.
+	env.InstallChart(harness.Chart{
+		Release:   "prometheus-operator-crds",
+		Namespace: ns,
+		Repo:      "https://prometheus-community.github.io/helm-charts",
+		Name:      "prometheus-operator-crds",
+	})
 
 	logging := syslogNGLogging()
 	env.Create(logging)
@@ -171,36 +176,6 @@ func TestLoggingMetrics_Monitoring(t *testing.T) {
 
 	serviceMonitors := append(serviceMonitorsFluentd.Items, serviceMonitorsSyslogNG.Items...)
 	require.NoError(t, checkServiceMonitorAvailability(serviceMonitors))
-}
-
-// installPrometheusOperator keeps the chart install rather than a manifest: the
-// stack is what the ServiceMonitors are read by, and pinning our own copy of it
-// would be a second thing to keep current.
-func installPrometheusOperator(env *harness.Env) error {
-	manager := helm.New(env.Kubeconfig)
-
-	if err := manager.RunRepo(helm.WithArgs("add", "prometheus-community", "https://prometheus-community.github.io/helm-charts")); err != nil {
-		return fmt.Errorf("failed to add prometheus-community repo: %v", err)
-	}
-
-	if err := manager.RunRepo(helm.WithArgs("update")); err != nil {
-		return fmt.Errorf("failed to update helm repos: %v", err)
-	}
-
-	if err := manager.RunInstall(
-		helm.WithName("prometheus"),
-		helm.WithChart("prometheus-community/kube-prometheus-stack"),
-		helm.WithArgs("--create-namespace"),
-		helm.WithNamespace("monitoring"),
-		helm.WithArgs("--set", "prometheus.prometheusSpec.serviceMonitorSelectorNilUsesHelmValues=false"),
-		helm.WithArgs("--set", "prometheus.prometheusSpec.podMonitorSelectorNilUsesHelmValues=false"),
-		helm.WithArgs("--set", "prometheus.prometheusSpec.maximumStartupDurationSeconds=900"),
-		helm.WithWait(),
-	); err != nil {
-		return fmt.Errorf("failed to install prometheus: %v", err)
-	}
-
-	return nil
 }
 
 func checkServiceMonitorAvailability(serviceMonitors []v1.ServiceMonitor) error {
