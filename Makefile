@@ -343,7 +343,7 @@ ${SETUP_ENVTEST}: | ${BIN}
 	GOBIN=${BIN} go install ${IMPORT_PATH}@${VERSION}
 
 stern: | ${BIN}
-	GOBIN=${BIN} go install github.com/stern/stern@latest
+	GOBIN=${BIN} go install github.com/stern/stern@v${STERN_VERSION}
 
 ${ENVTEST_BIN_DIR}: | ${BIN}
 	mkdir -p $@

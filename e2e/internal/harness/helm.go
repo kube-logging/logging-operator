@@ -15,7 +15,7 @@
 package harness
 
 import (
-	"fmt"
+	"log/slog"
 	"strings"
 
 	"emperror.dev/errors"
@@ -49,9 +49,8 @@ func helmInstall(kubeconfig string, chart Chart) error {
 	}
 	var helmLog strings.Builder
 	actionConfig := new(action.Configuration)
-	if err := actionConfig.Init(getter, chart.Namespace, "memory", func(format string, v ...any) {
-		fmt.Fprintf(&helmLog, format+"\n", v...)
-	}); err != nil {
+	actionConfig.SetLogger(slog.NewTextHandler(&helmLog, &slog.HandlerOptions{Level: slog.LevelDebug}))
+	if err := actionConfig.Init(getter, chart.Namespace, "memory"); err != nil {
 		return errors.WrapIf(err, "helm action config init")
 	}
 
