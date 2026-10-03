@@ -131,7 +131,7 @@ jobs:
         run: make test-e2e-ci
 
       - name: Run coverage report
-        uses: vladopajic/go-test-coverage@f94bcf0d6b9fa5fb8b783830b22648f6c17475e2 # v2.19.0
+        uses: vladopajic/go-test-coverage@f484eec846448c97c777a26f8b58c5a69a327e12 # v2.20.0
         with:
           profile: ./build/_test_coverage/coverage_e2e.out
           source-dir: ./
