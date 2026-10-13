@@ -25,6 +25,9 @@ RUN addgroup -S -g 101 fluent && adduser -S -G fluent -u 100 fluent \
  && echo 'gem: --no-document' >> /etc/gemrc \
  && gem install fluentd -v 1.19.3 \
  && gem install bigdecimal -v 3.3.1 \
+ # Ruby 4.0 bundles bigdecimal 4.0.1, which conflicts with the ~> 3.1 that fluent-plugin-kafka requires
+ && rm -rf /usr/local/lib/ruby/gems/4.0.0/gems/bigdecimal-4.0.1 \
+ && rm -rf /usr/local/lib/ruby/gems/4.0.0/specifications/bigdecimal-4.0.1.gemspec \
  && gem install ostruct -v 0.6.3 \
  && gem install oj -v 3.17.3 \
  && fluent-gem install specific_install -v 0.3.8 \

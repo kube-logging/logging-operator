@@ -17,7 +17,7 @@ GEM
     async-pool (0.12.0)
       async (>= 2.0)
     base64 (0.3.0)
-    bigdecimal (4.1.3)
+    bigdecimal (3.3.1)
     concurrent-ruby (1.3.8)
     console (1.38.0)
       fiber-annotation
@@ -144,7 +144,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  bigdecimal (= 4.1.3)
+  bigdecimal (= 3.3.1)
   fluent-plugin-concat (= 2.6.2)
   fluent-plugin-dedot_filter (= 1.0.0)
   fluent-plugin-detect-exceptions (= 0.0.16)
