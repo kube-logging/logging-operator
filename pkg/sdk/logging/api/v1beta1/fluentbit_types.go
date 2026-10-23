@@ -148,6 +148,8 @@ type FluentbitSpec struct {
 	// Available in Logging operator version 4.4 and later.
 	HealthCheck     *HealthCheck `json:"healthCheck,omitempty"`
 	ConfigHotReload *HotReload   `json:"configHotReload,omitempty"`
+	// Configure sidecar containers in Fluent Bit pods, for example: [https://github.com/kube-logging/logging-operator/blob/master/config/samples/fluentbit_sidecars.yaml](https://github.com/kube-logging/logging-operator/blob/master/config/samples/fluentbit_sidecars.yaml).
+	SidecarContainers []corev1.Container `json:"sidecarContainers,omitempty"`
 }
 
 // FluentbitStatus defines the resource status for FluentbitAgent

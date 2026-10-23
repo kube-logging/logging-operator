@@ -72,6 +72,9 @@ func (r *Reconciler) daemonSet() (runtime.Object, reconciler.DesiredState, error
 	if c := r.bufferMetricsSidecarContainer(); c != nil {
 		containers = append(containers, *c)
 	}
+	if len(r.fluentbitSpec.SidecarContainers) != 0 {
+		containers = append(containers, r.fluentbitSpec.SidecarContainers...)
+	}
 
 	desired := &appsv1.DaemonSet{
 		ObjectMeta: meta,

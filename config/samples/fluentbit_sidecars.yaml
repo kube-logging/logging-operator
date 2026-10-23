@@ -1,0 +1,21 @@
+# example config for using sidecar containers in fluent-bit pods
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Logging
+metadata:
+  name: fluentbit-sidecars
+spec:
+  controlNamespace: kube-logging
+  fluentd: {}
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: FluentbitAgent
+metadata:
+  name: fluentbit-sidecars
+spec:
+  sidecarContainers:
+    - command:
+        - sleep
+        - infinity
+      image: alpine
+      name: fluentbitsidecar
