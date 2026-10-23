@@ -10,7 +10,7 @@ When enabling the multi-worker setup, it is recommended to ensure the following 
 - Place the fluentds on separate Nodes
 - Increase the compute and memory resources 
 - Do not use specific filter plugins
-  - detectExceptions [is not working](https://github.com/kube-logging/logging-operator/issues/1490)
+  - detectExceptions [is not working](https://github.com/kube-logging/logging-operator/issues/1490), flows using it are reported as invalid
 - Also scale [horizontally](https://kube-logging.dev/docs/logging-infrastructure/fluentd/#autoscaling)
 
 To ensure that the fluentd Pods have enough resources, a common approach is to use specific Nodes for the fluentds and to reserve enough computing and memory resources. A new nodePool should be created with a specific label and a taint. Ideally, the nodeType is compute-optimized. It could look like the following:

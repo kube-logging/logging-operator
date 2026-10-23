@@ -112,3 +112,76 @@ func TestCreateFilterDefaultsToRawDisabled(t *testing.T) {
 	require.Error(t, err)
 	require.ErrorIs(t, err, plugins.ErrRawFilterDisabled)
 }
+
+func detectExceptionsFilter() v1beta1.Filter {
+	return v1beta1.Filter{
+		DetectExceptions: &modelfilter.DetectExceptions{
+			Languages: []string{"java"},
+		},
+	}
+}
+
+func TestCreateFilterMultiWorkerGate(t *testing.T) {
+	stdout := v1beta1.Filter{StdOut: &modelfilter.StdOutFilterConfig{OutputType: "json"}}
+
+	tests := []struct {
+		name    string
+		filter  v1beta1.Filter
+		options *plugins.CreateFilterOptions
+		wantErr bool
+	}{
+		{
+			name:    "detectExceptions allowed without options",
+			filter:  detectExceptionsFilter(),
+			options: nil,
+		},
+		{
+			name:    "detectExceptions allowed with a single worker",
+			filter:  detectExceptionsFilter(),
+			options: &plugins.CreateFilterOptions{MultiWorker: false},
+		},
+		{
+			name:    "detectExceptions rejected with multiple workers",
+			filter:  detectExceptionsFilter(),
+			options: &plugins.CreateFilterOptions{MultiWorker: true},
+			wantErr: true,
+		},
+		{
+			name:    "other filters unaffected with multiple workers",
+			filter:  stdout,
+			options: &plugins.CreateFilterOptions{MultiWorker: true},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := plugins.CreateFilterWithOptions(tt.filter, "test", nil, tt.options)
+			if tt.wantErr {
+				require.ErrorIs(t, err, plugins.ErrDetectExceptionsMultiWorker)
+				return
+			}
+			require.NoError(t, err)
+		})
+	}
+}
+
+func TestHasDetectExceptionsFilter(t *testing.T) {
+	stdout := v1beta1.Filter{StdOut: &modelfilter.StdOutFilterConfig{OutputType: "json"}}
+
+	tests := []struct {
+		name    string
+		filters []v1beta1.Filter
+		want    bool
+	}{
+		{name: "no filters", filters: nil, want: false},
+		{name: "only other filters", filters: []v1beta1.Filter{stdout}, want: false},
+		{name: "detectExceptions filter alone", filters: []v1beta1.Filter{detectExceptionsFilter()}, want: true},
+		{name: "detectExceptions filter among others", filters: []v1beta1.Filter{stdout, detectExceptionsFilter()}, want: true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			require.Equal(t, tt.want, plugins.HasDetectExceptionsFilter(tt.filters))
+		})
+	}
+}

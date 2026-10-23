@@ -30,6 +30,8 @@ This filter plugin consumes a log stream of JSON objects which contain single-li
 
 > Note: As Tag management is not supported yet, this Plugin is **mutually exclusive** with [Tag normaliser](../tagnormaliser)
 
+> Note: The plugin doesn't support [multiple Fluentd workers](https://docs.fluentd.org/deployment/multi-process-workers). If the Fluentd `workers` setting is greater than 1, flows using this filter are reported as invalid and the Fluentd configuration is not updated, unless `skipInvalidResources` is enabled on the Logging resource, in which case these flows are skipped.
+
 ## Example output configurations
 
 ```yaml
