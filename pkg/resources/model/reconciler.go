@@ -50,6 +50,9 @@ func NewValidationReconciler( //nolint: gocyclo
 			})
 		}
 
+		_, fluentdSpec := resources.GetFluentd()
+		multiWorker := fluentdSpec != nil && fluentdSpec.Workers > 1
+
 		for i := range resources.Fluentd.ClusterOutputs {
 			output := &resources.Fluentd.ClusterOutputs[i]
 			registerForPatching(output)
@@ -126,6 +129,10 @@ func NewValidationReconciler( //nolint: gocyclo
 				flow.Status.Problems = append(flow.Status.Problems, plugins.ErrRawFilterDisabled.Error())
 			}
 
+			if multiWorker && plugins.HasDetectExceptionsFilter(flow.Spec.Filters) {
+				flow.Status.Problems = append(flow.Status.Problems, plugins.ErrDetectExceptionsMultiWorker.Error())
+			}
+
 			for _, ref := range flow.Spec.GlobalOutputRefs {
 				switch output := resources.Fluentd.ClusterOutputs.FindByName(ref); {
 				case output == nil:
@@ -156,6 +163,10 @@ func NewValidationReconciler( //nolint: gocyclo
 
 			if !resources.Logging.Spec.EnableRawFluentdFilter && plugins.HasRawFilter(flow.Spec.Filters) {
 				flow.Status.Problems = append(flow.Status.Problems, plugins.ErrRawFilterDisabled.Error())
+			}
+
+			if multiWorker && plugins.HasDetectExceptionsFilter(flow.Spec.Filters) {
+				flow.Status.Problems = append(flow.Status.Problems, plugins.ErrDetectExceptionsMultiWorker.Error())
 			}
 
 			hasValidOutput := false

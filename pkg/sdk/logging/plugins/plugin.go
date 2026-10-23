@@ -28,14 +28,29 @@ import (
 // ErrRawFilterDisabled is returned when a filter uses the raw plugin while the feature is disabled on the Logging resource.
 var ErrRawFilterDisabled = errors.New("raw filter is disabled; set logging.spec.enableRawFluentdFilter=true on the Logging resource to enable it")
 
+// ErrDetectExceptionsMultiWorker is returned when a filter uses the detectExceptions plugin while fluentd runs multiple workers.
+var ErrDetectExceptionsMultiWorker = errors.New("detectExceptions filter does not support multiple fluentd workers; remove the filter or set fluentd workers to 1")
+
 type CreateFilterOptions struct {
 	RawFilterEnabled bool
+	// MultiWorker is set when fluentd runs more than one worker process.
+	MultiWorker bool
 }
 
 // HasRawFilter reports whether any of the filters uses the raw plugin.
 func HasRawFilter(filters []v1beta1.Filter) bool {
 	for _, f := range filters {
 		if f.Raw != nil {
+			return true
+		}
+	}
+	return false
+}
+
+// HasDetectExceptionsFilter reports whether any of the filters uses the detectExceptions plugin.
+func HasDetectExceptionsFilter(filters []v1beta1.Filter) bool {
+	for _, f := range filters {
+		if f.DetectExceptions != nil {
 			return true
 		}
 	}
@@ -87,6 +102,9 @@ func CreateFilterWithOptions(filter v1beta1.Filter, id string, secretLoader secr
 		if err := checkRawFilter(converters, options); err != nil {
 			return nil, err
 		}
+		if err := checkMultiWorkerFilter(converters, options); err != nil {
+			return nil, err
+		}
 		return converters[0].ToDirective(secretLoader, id)
 	default:
 		return nil, errors.Errorf("more then one plugin config is not allowed for a filter")
@@ -101,6 +119,20 @@ func checkRawFilter(converters []DirectiveConverter, options *CreateFilterOption
 	if options == nil || !options.RawFilterEnabled {
 		// WithStack so the reported stack points at the caller instead of this package's init.
 		return errors.WithStack(ErrRawFilterDisabled)
+	}
+
+	return nil
+}
+
+// checkMultiWorkerFilter rejects detectExceptions in multi-worker setups: the plugin is not
+// multi-worker ready, so fluentd refuses to start with it.
+func checkMultiWorkerFilter(converters []DirectiveConverter, options *CreateFilterOptions) error {
+	if _, ok := converters[0].(*modelfilter.DetectExceptions); !ok {
+		return nil
+	}
+
+	if options != nil && options.MultiWorker {
+		return errors.WithStack(ErrDetectExceptionsMultiWorker)
 	}
 
 	return nil

@@ -46,8 +46,10 @@ import (
 	"github.com/kube-logging/logging-operator/pkg/resources/fluentd"
 	"github.com/kube-logging/logging-operator/pkg/resources/model"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/filter"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
 	syslogngoutput "github.com/kube-logging/logging-operator/pkg/sdk/logging/model/syslogng/output"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/plugins"
 )
 
 var (
@@ -707,6 +709,56 @@ func TestMultiProcessWorker(t *testing.T) {
 			}
 		}
 	}
+}
+
+func TestFlowWithDetectExceptionsMultiProcessWorker(t *testing.T) {
+	g := gomega.NewGomegaWithT(t)
+	defer beforeEach(t)()
+
+	logging := &v1beta1.Logging{
+		Name: "test-" + uuid.New()[:8],
+		Spec: v1beta1.LoggingSpec{
+			FluentdSpec: &v1beta1.FluentdSpec{
+				Workers: 2,
+			},
+			FlowConfigCheckDisabled: true,
+			SkipInvalidResources:    true,
+			WatchNamespaces:         []string{testNamespace},
+			ControlNamespace:        controlNamespace,
+		},
+	}
+	output := &v1beta1.Output{
+		Name:      "test-output",
+		Namespace: testNamespace,
+		Spec: v1beta1.OutputSpec{
+			NullOutputConfig: &output.NullOutputConfig{},
+		},
+	}
+	flow := &v1beta1.Flow{
+		Name:      "test-flow",
+		Namespace: testNamespace,
+		Spec: v1beta1.FlowSpec{
+			Filters: []v1beta1.Filter{
+				{
+					DetectExceptions: &filter.DetectExceptions{},
+				},
+			},
+			LocalOutputRefs: []string{output.Name},
+		},
+	}
+	defer ensureCreated(t, logging)()
+	defer ensureCreated(t, output)()
+	defer ensureCreated(t, flow)()
+
+	g.Eventually(func() ([]string, error) {
+		err := mgr.GetClient().Get(context.TODO(), utils.ObjectKeyFromObjectMeta(flow), flow)
+		return flow.Status.Problems, err
+	}, timeout).Should(gomega.ConsistOf(plugins.ErrDetectExceptionsMultiWorker.Error()))
+
+	secret := &corev1.Secret{}
+	defer ensureCreatedEventually(t, controlNamespace, logging.QualifiedName(fluentd.AppSecretConfigName), secret)()
+
+	g.Expect(string(secret.Data[fluentd.AppConfigKey])).ShouldNot(gomega.ContainSubstring("detect_exceptions"))
 }
 
 func TestClusterOutputWithoutPlugin(t *testing.T) {

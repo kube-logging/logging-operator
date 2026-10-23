@@ -16,6 +16,7 @@ package model
 
 import (
 	"context"
+	"slices"
 	"testing"
 
 	"github.com/cisco-open/operator-tools/pkg/secret"
@@ -25,7 +26,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/api/v1beta1"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/filter"
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/output"
+	"github.com/kube-logging/logging-operator/pkg/sdk/logging/plugins"
 )
 
 type stubSecretLoaderFactory struct {
@@ -98,6 +101,86 @@ func TestValidationReconciler_DefaultFlowRef(t *testing.T) {
 			active := res.Fluentd.ClusterOutputs[0].Status.Active
 			if got := active != nil && *active; got != tt.want {
 				t.Errorf("Status.Active = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+// fluent-plugin-detect-exceptions is not multi-worker ready, so fluentd refuses to start
+// when a flow uses it with more than one worker.
+func TestValidationReconciler_DetectExceptionsMultiWorker(t *testing.T) {
+	tests := []struct {
+		name        string
+		workers     int32
+		filters     []v1beta1.Filter
+		wantProblem bool
+	}{
+		{
+			name:        "detectExceptions with multiple workers",
+			workers:     2,
+			filters:     []v1beta1.Filter{{DetectExceptions: &filter.DetectExceptions{}}},
+			wantProblem: true,
+		},
+		{
+			name:    "detectExceptions with a single worker",
+			workers: 1,
+			filters: []v1beta1.Filter{{DetectExceptions: &filter.DetectExceptions{}}},
+		},
+		{
+			name:    "other filters with multiple workers",
+			workers: 2,
+			filters: []v1beta1.Filter{{StdOut: &filter.StdOutFilterConfig{}}},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			clusterOutput := v1beta1.ClusterOutput{
+				Name: "general", Namespace: "test",
+				Spec: v1beta1.ClusterOutputSpec{OutputSpec: v1beta1.OutputSpec{NullOutputConfig: output.NewNullOutputConfig()}},
+			}
+			clusterFlow := v1beta1.ClusterFlow{
+				Name: "clusterflow", Namespace: "test",
+				Spec: v1beta1.ClusterFlowSpec{Filters: tt.filters, GlobalOutputRefs: []string{"general"}},
+			}
+			flow := v1beta1.Flow{
+				Name: "flow", Namespace: "test",
+				Spec: v1beta1.FlowSpec{Filters: tt.filters, GlobalOutputRefs: []string{"general"}},
+			}
+			logging := loggingFor()
+			logging.Spec.FluentdSpec = &v1beta1.FluentdSpec{Workers: tt.workers}
+
+			scheme := runtime.NewScheme()
+			if err := v1beta1.AddToScheme(scheme); err != nil {
+				t.Fatalf("add to scheme: %v", err)
+			}
+			cl := fake.NewClientBuilder().
+				WithScheme(scheme).
+				WithObjects(&clusterOutput, &clusterFlow, &flow, &logging).
+				WithStatusSubresource(&clusterOutput, &clusterFlow, &flow, &logging).
+				Build()
+
+			res := LoggingResources{
+				Logging: logging,
+				Fluentd: FluentdLoggingResources{
+					ClusterOutputs: ClusterOutputs{clusterOutput},
+					ClusterFlows:   []v1beta1.ClusterFlow{clusterFlow},
+					Flows:          []v1beta1.Flow{flow},
+				},
+			}
+
+			reconcile := NewValidationReconciler(cl, res, stubSecretLoaderFactory{client: cl}, logr.Discard())
+			if _, err := reconcile(context.Background()); err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+
+			for kind, status := range map[string]v1beta1.FlowStatus{
+				"ClusterFlow": res.Fluentd.ClusterFlows[0].Status,
+				"Flow":        res.Fluentd.Flows[0].Status,
+			} {
+				got := slices.Contains(status.Problems, plugins.ErrDetectExceptionsMultiWorker.Error())
+				if got != tt.wantProblem {
+					t.Errorf("%s problems = %v, want detectExceptions problem: %v", kind, status.Problems, tt.wantProblem)
+				}
 			}
 		})
 	}
