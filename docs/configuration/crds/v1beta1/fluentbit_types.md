@@ -232,6 +232,11 @@ Deprecated, use positiondb
 ### serviceAccount (*typeoverride.ServiceAccount, optional) {#fluentbitspec-serviceaccount}
 
 
+### sidecarContainers ([]corev1.Container, optional) {#fluentbitspec-sidecarcontainers}
+
+Configure sidecar containers in Fluent Bit pods, for example: [https://github.com/kube-logging/logging-operator/blob/master/config/samples/fluentbit_sidecars.yaml](https://github.com/kube-logging/logging-operator/blob/master/config/samples/fluentbit_sidecars.yaml). 
+
+
 ### syslogng_output (*FluentbitTCPOutput, optional) {#fluentbitspec-syslogng_output}
 
 
