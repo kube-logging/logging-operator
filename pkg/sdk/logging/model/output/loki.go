@@ -48,7 +48,7 @@ spec:
 type _docLoki any //nolint:deadcode,unused
 
 // +name:"Grafana Loki"
-// +url:"https://github.com/grafana/loki/tree/master/fluentd/fluent-plugin-grafana-loki"
+// +url:"https://github.com/grafana/loki/tree/main/clients/cmd/fluentd"
 // +version:"1.2.19"
 // +description:"Transfer logs to Loki"
 // +status:"GA"

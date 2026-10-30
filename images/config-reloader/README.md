@@ -1,10 +1,10 @@
 <p align="center">
-  <a href="https://github.com/vlzemtsov/config-reloader/">
+  <a href="https://github.com/kaasops/config-reloader/">
     <img src="https://img.shields.io/badge/license-Apache%20v2-green.svg" alt="license">
   </a>
 </p>
 
-This directory is a fork of @zvlb's repository you can find the origin here -> <https://github.com/zvlb/config-reloader/>
+This directory is a fork of @zvlb's repository you can find the origin here -> <https://github.com/kaasops/config-reloader/>
 
 # Kubernetes Config (ConfigMap and Secret) Reloader
 
