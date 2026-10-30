@@ -45,7 +45,7 @@ For more information please click on the plugin name
 | **[LogicMonitorLogs](outputs/lm_logs/)** | outputs | Send your logs to LogicMonitor Logs | GA | [v1.2.5](https://github.com/logicmonitor/lm-logs-fluentd/releases/tag/v.1.2.5) |
 | **[LogDNA](outputs/logdna/)** | outputs | Send your logs to LogDNA | GA | [0.4.0](https://github.com/logdna/fluent-plugin-logdna/releases/tag/v0.4.0) |
 | **[LogZ](outputs/logz/)** | outputs | Store logs in LogZ.io | GA | [0.0.21](https://github.com/logzio/fluent-plugin-logzio/releases/tag/v0.0.21) |
-| **[Grafana Loki](outputs/loki/)** | outputs | Transfer logs to Loki | GA | [1.2.19](https://github.com/grafana/loki/tree/master/fluentd/fluent-plugin-grafana-loki) |
+| **[Grafana Loki](outputs/loki/)** | outputs | Transfer logs to Loki | GA | [1.2.19](https://github.com/grafana/loki/tree/main/clients/cmd/fluentd) |
 | **[Mattermost](outputs/mattermost/)** | outputs | Sends logs to Mattermost via webhooks. | GA | [0.2.2](https://github.com/levigo-systems/fluent-plugin-mattermost) |
 | **[NewRelic Logs](outputs/newrelic/)** | outputs | Send logs to New Relic Logs | GA | [1.2.1](https://github.com/newrelic/newrelic-fluentd-output) |
 | **[Null](outputs/null/)** | outputs | Null output plugin just throws away events. | GA | [more info](https://docs.fluentd.org/output/null) |
