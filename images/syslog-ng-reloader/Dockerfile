@@ -1,6 +1,6 @@
 FROM ghcr.io/kube-logging/custom-runner:v1.0.0 AS custom-runner
 
-FROM alpine:3.24.1@sha256:28bd5fe8b56d1bd048e5babf5b10710ebe0bae67db86916198a6eec434943f8b
+FROM alpine:3.24.4@sha256:93b41ef40b1677fce8fcc64ff4af09daddfacf5040afde618bc46c1e2d1cc7d4
 
 RUN apk add socat
 
