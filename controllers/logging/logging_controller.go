@@ -179,6 +179,10 @@ func (r *LoggingReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		// reseting the vectors should remove all orphaned metrics
 		stateMetrics.Reset()
 		problemsMetrics.Reset()
+		// The vector is shared, so retain every Logging resource's observed status.
+		for _, ob := range loggingResources.AllLoggings {
+			problemsMetrics.With(prometheus.Labels{"name": ob.Name, "namespace": ob.Namespace, "kind": "Logging"}).Set(float64(ob.Status.ProblemsCount))
+		}
 		for _, ob := range loggingResources.Fluentd.Flows {
 			updateResourceStateMetrics(&ob, utils.DerefOrZero(ob.Status.Active), ob.Status.ProblemsCount, stateMetrics, problemsMetrics)
 		}

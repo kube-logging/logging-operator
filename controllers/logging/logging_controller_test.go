@@ -40,6 +40,7 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/metrics"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 
 	controllers "github.com/kube-logging/logging-operator/controllers/logging"
@@ -1186,6 +1187,72 @@ func TestFlowWithDanglingLocalAndGlobalOutputRefs(t *testing.T) {
 		err := mgr.GetClient().Get(context.TODO(), utils.ObjectKeyFromObjectMeta(flow), flow)
 		return flow.Status.ProblemsCount == len(flow.Status.Problems), err
 	}, timeout).Should(gomega.BeTrue())
+}
+
+func TestLoggingProblemMetrics(t *testing.T) {
+	g := gomega.NewGomegaWithT(t)
+	defer beforeEach(t)()
+
+	loggings := []*v1beta1.Logging{
+		{Name: "metrics-" + uuid.New()[:8]},
+		{Name: "metrics-" + uuid.New()[:8]},
+	}
+	for _, logging := range loggings {
+		logging.Spec.LoggingRef = logging.Name
+		logging.Spec.ControlNamespace = controlNamespace
+		logging.Spec.WatchNamespaces = []string{testNamespace}
+		defer ensureCreated(t, logging)()
+	}
+
+	problems := func() (map[string]float64, error) {
+		families, err := metrics.Registry.Gather()
+		if err != nil {
+			return nil, err
+		}
+		values := make(map[string]float64)
+		for _, family := range families {
+			if family.GetName() != "logging_resource_problems" {
+				continue
+			}
+			for _, metric := range family.Metric {
+				labels := make(map[string]string)
+				for _, label := range metric.Label {
+					labels[label.GetName()] = label.GetValue()
+				}
+				if labels["kind"] == "Logging" && labels["namespace"] == "" &&
+					(labels["name"] == loggings[0].Name || labels["name"] == loggings[1].Name) {
+					values[labels["name"]] = metric.GetGauge().GetValue()
+				}
+			}
+		}
+		return values, nil
+	}
+	want := map[string]float64{loggings[0].Name: 0, loggings[1].Name: 0}
+	g.Eventually(problems, timeout).Should(gomega.Equal(want))
+
+	for i, logging := range loggings {
+		g.Eventually(func() error {
+			if err := k8sClient.Get(context.TODO(), client.ObjectKeyFromObject(logging), logging); err != nil {
+				return err
+			}
+			logging.Status.ConfigCheckResults = map[string]bool{"failed-config": false, "valid-config": true}
+			return k8sClient.Status().Update(context.TODO(), logging)
+		}, timeout).Should(gomega.Succeed())
+		want[logging.Name] = 1
+		g.Eventually(problems, timeout).Should(gomega.Equal(want), "logging %d", i)
+	}
+
+	for _, logging := range loggings {
+		g.Eventually(func() error {
+			if err := k8sClient.Get(context.TODO(), client.ObjectKeyFromObject(logging), logging); err != nil {
+				return err
+			}
+			logging.Status.ConfigCheckResults = map[string]bool{"valid-config": true}
+			return k8sClient.Status().Update(context.TODO(), logging)
+		}, timeout).Should(gomega.Succeed())
+		want[logging.Name] = 0
+		g.Eventually(problems, timeout).Should(gomega.Equal(want))
+	}
 }
 
 func TestWatchNamespaces(t *testing.T) {
