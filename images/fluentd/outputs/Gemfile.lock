@@ -371,7 +371,7 @@ GEM
     pstore (0.2.1)
     public_suffix (7.0.5)
     racc (1.8.1)
-    rack (3.2.6)
+    rack (3.2.8)
     rack-oauth2 (1.21.3)
       activesupport
       attr_required
