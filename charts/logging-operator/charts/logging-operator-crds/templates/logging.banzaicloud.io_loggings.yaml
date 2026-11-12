@@ -2420,6 +2420,32 @@ spec:
                           type: array
                       type: object
                     type: array
+                  filterMultiline:
+                    properties:
+                      buffer:
+                        type: string
+                      emitterMemBufLimit:
+                        type: string
+                      emitterName:
+                        type: string
+                      emitterStorageType:
+                        type: string
+                      flushMs:
+                        format: int32
+                        minimum: 0
+                        type: integer
+                      keyContent:
+                        type: string
+                      match:
+                        minLength: 1
+                        type: string
+                      parser:
+                        minLength: 1
+                        type: string
+                    required:
+                    - match
+                    - parser
+                    type: object
                   flush:
                     format: int32
                     type: integer

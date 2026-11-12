@@ -73,6 +73,31 @@ var fluentBitConfigTemplate = `
 {{- template "input" .Input }}
 {{- end }}
 
+{{- with .FilterMultiline }}
+[FILTER]
+    Name multiline
+    Match {{ .Match }}
+    multiline.parser {{ .Parser }}
+    {{- if .KeyContent }}
+    multiline.key_content {{ .KeyContent }}
+    {{- end }}
+    {{- if .Buffer }}
+    buffer {{ .Buffer }}
+    {{- end }}
+    {{- if .FlushMS }}
+    flush_ms {{ .FlushMS }}
+    {{- end }}
+    {{- if .EmitterName }}
+    emitter_name {{ .EmitterName }}
+    {{- end }}
+    {{- if .EmitterStorageType }}
+    emitter_storage.type {{ .EmitterStorageType }}
+    {{- end }}
+    {{- if .EmitterMemBufLimit }}
+    emitter_mem_buf_limit {{ .EmitterMemBufLimit }}
+    {{- end }}
+{{- end }}
+
 {{- if .FluentdFilterGrep }}
 [FILTER]
     Name        grep

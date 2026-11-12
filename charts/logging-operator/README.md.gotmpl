@@ -18,3 +18,15 @@ Use `createCustomResource=false` with Helm v3 to avoid trying to create CRDs fro
 
 The chart does **not** install `logging` resource to deploy Fluentd (or Syslog-ng) and Fluent-bit on the cluster by default, but
 it can be enabled by setting the `logging.enabled` value to true.
+
+### Multiline exceptions and Fluentd workers
+
+See [values-multiline-example.yaml](values-multiline-example.yaml) for CRI fragment
+reassembly followed by Java and Python exception detection in Fluent Bit, and two
+Fluentd workers. The multiline filter is optional and runs before the other
+filters. Use `customParsers` for additional multiline parser definitions.
+The example assumes CRI container logs; adapt the tail parser for other runtimes.
+Remove Fluentd `detectExceptions` filters when moving exception detection to
+Fluent Bit, and ensure all remaining Fluentd plugins support multiple workers.
+Buffered multiline records are held in memory by default; configure emitter
+storage and limits for your deployment if needed.

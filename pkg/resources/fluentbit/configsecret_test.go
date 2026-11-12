@@ -15,6 +15,7 @@
 package fluentbit
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -119,4 +120,32 @@ func TestInputTailRendersTheDBSyncKeyFluentBitUnderstands(t *testing.T) {
 
 	assert.Contains(t, rendered, "DB.sync  Normal")
 	assert.NotContains(t, rendered, "DB_Sync")
+}
+
+func TestMultilineFilter(t *testing.T) {
+	base := fluentBitConfig{
+		FluentdFilterGrep: &FluentdFilterGrep{Match: "*"},
+		KubernetesFilter:  map[string]string{"Match": "*"},
+	}
+	rendered, err := generateConfig(base)
+	require.NoError(t, err)
+	assert.NotContains(t, rendered, "Name multiline")
+
+	base.FilterMultiline = &v1beta1.FilterMultiline{
+		Match: "kubernetes.*", Parser: "java, python_exception", KeyContent: "log",
+		Buffer: "On", FlushMS: 2000, EmitterName: "exception_multiline",
+		EmitterStorageType: "filesystem", EmitterMemBufLimit: "20M",
+	}
+	rendered, err = generateConfig(base)
+	require.NoError(t, err)
+	for _, line := range []string{
+		"Match kubernetes.*", "multiline.parser java, python_exception",
+		"multiline.key_content log", "buffer On", "flush_ms 2000",
+		"emitter_name exception_multiline", "emitter_storage.type filesystem",
+		"emitter_mem_buf_limit 20M",
+	} {
+		assert.Contains(t, rendered, line)
+	}
+	assert.Less(t, strings.Index(rendered, "Name multiline"), strings.Index(rendered, "Name        grep"))
+	assert.Less(t, strings.Index(rendered, "Name multiline"), strings.Index(rendered, "Name        kubernetes"))
 }

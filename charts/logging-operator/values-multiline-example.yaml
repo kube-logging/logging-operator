@@ -1,0 +1,30 @@
+logging:
+  enabled: true
+  fluentd:
+    workers: 2
+  fluentbit:
+    inputTail:
+      multiline.parser:
+        - cri
+    customParsers: |
+      [MULTILINE_PARSER]
+          Name python_exception
+          Type regex
+          Flush_Timeout 2000
+          Key_Content log
+          Key_Group stream
+          Rule "start_state" "/^Traceback \(most recent call last\):$/" "python"
+          Rule "python" "/^[\t ]+.+$/" "python"
+          Rule "python" "/^(?:[^\s.():]+\.)*[^\s.():]+:.*$/" "python_end"
+          Rule "python" "/^(?:KeyboardInterrupt|SystemExit|StopIteration|GeneratorExit)$/" "python_end"
+          Rule "python_end" "/^\s*$/" "python_end"
+          Rule "python_end" "/^(?:During handling of the above exception, another exception occurred:|The above exception was the direct cause of the following exception:)$/" "python_chain"
+          Rule "python_chain" "/^\s*$/" "python_chain"
+          Rule "python_chain" "/^Traceback \(most recent call last\):$/" "python"
+    filterMultiline:
+      match: kubernetes.*
+      parser: java, python_exception
+      keyContent: log
+      buffer: "On"
+      flushMs: 2000
+      emitterName: exception_multiline

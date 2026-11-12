@@ -109,6 +109,8 @@ type FluentbitSpec struct {
 	FilterAws         *FilterAws               `json:"filterAws,omitempty"`
 	FilterModify      []FilterModify           `json:"filterModify,omitempty"`
 	FilterGrep        *FilterGrep              `json:"filterGrep,omitempty"`
+	// FilterMultiline combines application stack traces before other filters.
+	FilterMultiline *FilterMultiline `json:"filterMultiline,omitempty"`
 	// Deprecated, use inputTail.parser
 	Parser string `json:"parser,omitempty"`
 	// Parameters for Kubernetes metadata filter
@@ -152,6 +154,22 @@ type FluentbitSpec struct {
 
 // FluentbitStatus defines the resource status for FluentbitAgent
 type FluentbitStatus struct{}
+
+// FilterMultiline configures Fluent Bit's multiline filter.
+type FilterMultiline struct {
+	// +kubebuilder:validation:MinLength=1
+	Match string `json:"match"`
+	// Comma-separated names of multiline parsers.
+	// +kubebuilder:validation:MinLength=1
+	Parser     string `json:"parser"`
+	KeyContent string `json:"keyContent,omitempty"`
+	Buffer     string `json:"buffer,omitempty"`
+	// +kubebuilder:validation:Minimum=0
+	FlushMS            int32  `json:"flushMs,omitempty"`
+	EmitterName        string `json:"emitterName,omitempty"`
+	EmitterStorageType string `json:"emitterStorageType,omitempty"`
+	EmitterMemBufLimit string `json:"emitterMemBufLimit,omitempty"`
+}
 
 // +kubebuilder:object:generate=true
 
