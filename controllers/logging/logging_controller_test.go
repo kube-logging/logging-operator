@@ -90,6 +90,64 @@ func TestFluentdResourcesCreatedAndRemoved(t *testing.T) {
 	defer ensureCreatedEventually(t, controlNamespace, logging.QualifiedName(fluentd.StatefulSetName), deployment)()
 }
 
+func TestFluentbitMultilineConfig(t *testing.T) {
+	g := gomega.NewGomegaWithT(t)
+	defer beforeEach(t)()
+
+	const parser = "[MULTILINE_PARSER]\n    Name custom_test\n    Type regex\n"
+	multiline := &v1beta1.FilterMultiline{
+		Match: "kubernetes.*", Parser: "java, custom_test",
+		KeyContent: "log", Buffer: "On", FlushMS: 2000,
+	}
+	logging := &v1beta1.Logging{
+		Name: "test-" + uuid.New()[:8],
+		Spec: v1beta1.LoggingSpec{
+			ControlNamespace:        controlNamespace,
+			WatchNamespaces:         []string{testNamespace},
+			FlowConfigCheckDisabled: true,
+			FluentdSpec:             &v1beta1.FluentdSpec{},
+			FluentbitSpec: &v1beta1.FluentbitSpec{
+				InputTail:       v1beta1.InputTail{MultilineParser: []string{"cri"}},
+				CustomParsers:   parser,
+				FilterMultiline: multiline,
+			},
+		},
+	}
+	defer ensureCreated(t, logging)()
+
+	saved := &v1beta1.Logging{}
+	g.Expect(k8sClient.Get(context.Background(), types.NamespacedName{Name: logging.Name}, saved)).To(gomega.Succeed())
+	g.Expect(saved.Spec.FluentbitSpec.FilterMultiline).To(gomega.Equal(multiline))
+
+	agent := &v1beta1.FluentbitAgent{
+		Name: "test-" + uuid.New()[:8],
+		Spec: v1beta1.FluentbitSpec{LoggingRef: "schema-only", FilterMultiline: multiline},
+	}
+	defer ensureCreated(t, agent)()
+	savedAgent := &v1beta1.FluentbitAgent{}
+	g.Expect(k8sClient.Get(context.Background(), types.NamespacedName{Name: agent.Name}, savedAgent)).To(gomega.Succeed())
+	g.Expect(savedAgent.Spec.FilterMultiline).To(gomega.Equal(multiline))
+	invalidAgent := &v1beta1.FluentbitAgent{
+		Name: "test-" + uuid.New()[:8],
+		Spec: v1beta1.FluentbitSpec{FilterMultiline: &v1beta1.FilterMultiline{Match: "*"}},
+	}
+	g.Expect(apierrors.IsInvalid(k8sClient.Create(context.Background(), invalidAgent))).To(gomega.BeTrue())
+
+	secret := &corev1.Secret{}
+	defer ensureCreatedEventually(t, controlNamespace, logging.QualifiedName("fluentbit"), secret)()
+	config := string(secret.Data["fluent-bit.conf"])
+	g.Expect(config).To(gomega.ContainSubstring("Name multiline"))
+	g.Expect(config).To(gomega.ContainSubstring("Name        kubernetes"))
+	g.Expect(config).To(gomega.ContainSubstring("multiline.parser cri"))
+	g.Expect(config).To(gomega.ContainSubstring("multiline.parser java, custom_test"))
+	g.Expect(config).To(gomega.ContainSubstring("multiline.key_content log"))
+	g.Expect(config).To(gomega.ContainSubstring("buffer On"))
+	g.Expect(config).To(gomega.ContainSubstring("flush_ms 2000"))
+	g.Expect(config).To(gomega.ContainSubstring("Parsers_File /fluent-bit/etc-operator/custom-parsers.conf"))
+	g.Expect(string(secret.Data["custom-parsers.conf"])).To(gomega.Equal(parser))
+	g.Expect(strings.Index(config, "Name multiline")).To(gomega.BeNumerically("<", strings.Index(config, "Name        kubernetes")))
+}
+
 func TestSingleFlowWithoutOutputRefs(t *testing.T) {
 	g := gomega.NewGomegaWithT(t)
 	defer beforeEach(t)()

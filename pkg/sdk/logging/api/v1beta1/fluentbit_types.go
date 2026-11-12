@@ -157,17 +157,24 @@ type FluentbitStatus struct{}
 
 // FilterMultiline configures Fluent Bit's multiline filter.
 type FilterMultiline struct {
+	// Match Fluent Bit tags to process.
 	// +kubebuilder:validation:MinLength=1
 	Match string `json:"match"`
 	// Comma-separated names of multiline parsers.
 	// +kubebuilder:validation:MinLength=1
-	Parser     string `json:"parser"`
+	Parser string `json:"parser"`
+	// Record key containing the text to process.
 	KeyContent string `json:"keyContent,omitempty"`
-	Buffer     string `json:"buffer,omitempty"`
+	// Enable buffering across chunks, for example "On".
+	Buffer string `json:"buffer,omitempty"`
+	// Flush interval for pending records in milliseconds.
 	// +kubebuilder:validation:Minimum=0
-	FlushMS            int32  `json:"flushMs,omitempty"`
-	EmitterName        string `json:"emitterName,omitempty"`
+	FlushMS int32 `json:"flushMs,omitempty"`
+	// Name of the emitter that re-injects combined records.
+	EmitterName string `json:"emitterName,omitempty"`
+	// Emitter storage type: memory or filesystem.
 	EmitterStorageType string `json:"emitterStorageType,omitempty"`
+	// Maximum memory buffered by the emitter, for example "10M".
 	EmitterMemBufLimit string `json:"emitterMemBufLimit,omitempty"`
 }
 

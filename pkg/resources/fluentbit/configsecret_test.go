@@ -139,13 +139,15 @@ func TestMultilineFilter(t *testing.T) {
 	rendered, err = generateConfig(base)
 	require.NoError(t, err)
 	for _, line := range []string{
-		"Match kubernetes.*", "multiline.parser java, python_exception",
+		"Name multiline", "Match kubernetes.*", "multiline.parser java, python_exception",
 		"multiline.key_content log", "buffer On", "flush_ms 2000",
 		"emitter_name exception_multiline", "emitter_storage.type filesystem",
 		"emitter_mem_buf_limit 20M",
 	} {
 		assert.Contains(t, rendered, line)
 	}
+	require.Contains(t, rendered, "Name        grep")
+	require.Contains(t, rendered, "Name        kubernetes")
 	assert.Less(t, strings.Index(rendered, "Name multiline"), strings.Index(rendered, "Name        grep"))
 	assert.Less(t, strings.Index(rendered, "Name multiline"), strings.Index(rendered, "Name        kubernetes"))
 }
