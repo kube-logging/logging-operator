@@ -78,6 +78,7 @@ type fluentBitConfig struct {
 	KubernetesFilter         map[string]string
 	AwsFilter                map[string]string
 	FluentdFilterGrep        *FluentdFilterGrep
+	FilterMultiline          *v1beta1.FilterMultiline
 	BufferStorage            map[string]string
 	FilterModify             []v1beta1.FilterModify
 	FluentForwardOutput      *fluentForwardOutputConfig
@@ -233,6 +234,7 @@ func (r *Reconciler) configSecret() (runtime.Object, reconciler.DesiredState, er
 		Namespace:                r.Logging.Spec.FluentbitAgentNamespace,
 		DisableKubernetesFilter:  disableKubernetesFilter,
 		FilterModify:             r.fluentbitSpec.FilterModify,
+		FilterMultiline:          r.fluentbitSpec.FilterMultiline,
 		HealthCheck:              r.fluentbitSpec.HealthCheck,
 	}
 
