@@ -31,5 +31,5 @@ Fluent Bit, and ensure all remaining Fluentd plugins support multiple workers.
 Buffered multiline records are held in memory by default; configure emitter
 storage and limits for your deployment if needed.
 
-The example's generated Fluent Bit configuration can be tested locally with
-Docker: `go test -tags=integration ./pkg/resources/fluentbit -run TestMultilineExampleRuntime`.
+The example is exercised by the `fluentbit-multiline` end-to-end suite. See
+the [end-to-end test guide](../../e2e/README.md) for running it.
