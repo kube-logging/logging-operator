@@ -4,6 +4,12 @@
 
 replicaCount: 1
 
+global:
+  # -- Registry to pull all images from, for example a private mirror. It replaces the registry of the operator and test receiver images,
+  # and the operator uses it for the default images of the components it deploys (Fluentd, Fluent Bit, syslog-ng and their sidecars).
+  # Images set explicitly in the Logging and other resources are not changed.
+  registry: ""
+
 image:
   # -- Name of the image repository to pull the container image from.
   repository: ghcr.io/kube-logging/logging-operator

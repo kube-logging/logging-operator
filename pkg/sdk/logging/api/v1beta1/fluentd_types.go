@@ -183,7 +183,7 @@ func (f *FluentdSpec) SetDefaults() error { //nolint: gocyclo
 			return errors.New("`fluentdPvcSpec` field is deprecated, use: `bufferStorageVolume`")
 		}
 		if f.Image.Repository == "" {
-			f.Image.Repository = DefaultFluentdImageRepository
+			f.Image.Repository = defaultImageRepository(DefaultFluentdImageRepository)
 		}
 		if f.Image.Tag == "" {
 			if Version == "" {
@@ -276,7 +276,7 @@ func (f *FluentdSpec) SetDefaults() error { //nolint: gocyclo
 			}
 		}
 		if f.VolumeModImage.Repository == "" {
-			f.VolumeModImage.Repository = DefaultFluentdVolumeModeImageRepository
+			f.VolumeModImage.Repository = defaultImageRepository(DefaultFluentdVolumeModeImageRepository)
 		}
 		if f.VolumeModImage.Tag == "" {
 			f.VolumeModImage.Tag = DefaultFluentdVolumeModeImageTag
@@ -285,7 +285,7 @@ func (f *FluentdSpec) SetDefaults() error { //nolint: gocyclo
 			f.VolumeModImage.PullPolicy = "IfNotPresent"
 		}
 		if f.ConfigReloaderImage.Repository == "" {
-			f.ConfigReloaderImage.Repository = DefaultFluentdConfigReloaderImageRepository
+			f.ConfigReloaderImage.Repository = defaultImageRepository(DefaultFluentdConfigReloaderImageRepository)
 		}
 		if f.ConfigReloaderImage.Tag == "" {
 			if Version == "" {
@@ -298,7 +298,7 @@ func (f *FluentdSpec) SetDefaults() error { //nolint: gocyclo
 			f.ConfigReloaderImage.PullPolicy = "IfNotPresent"
 		}
 		if f.BufferVolumeImage.Repository == "" {
-			f.BufferVolumeImage.Repository = DefaultFluentdBufferVolumeImageRepository
+			f.BufferVolumeImage.Repository = defaultImageRepository(DefaultFluentdBufferVolumeImageRepository)
 		}
 		if f.BufferVolumeImage.Tag == "" {
 			if Version == "" {
@@ -358,7 +358,7 @@ func (f *FluentdSpec) SetDefaults() error { //nolint: gocyclo
 			f.Scaling.PodManagementPolicy = "OrderedReady"
 		}
 		if f.Scaling.Drain.Image.Repository == "" {
-			f.Scaling.Drain.Image.Repository = DefaultFluentdDrainWatchImageRepository
+			f.Scaling.Drain.Image.Repository = defaultImageRepository(DefaultFluentdDrainWatchImageRepository)
 		}
 		if f.Scaling.Drain.Image.Tag == "" {
 			if Version == "" {
@@ -371,7 +371,7 @@ func (f *FluentdSpec) SetDefaults() error { //nolint: gocyclo
 			f.Scaling.Drain.Image.PullPolicy = "IfNotPresent"
 		}
 		if f.Scaling.Drain.PauseImage.Repository == "" {
-			f.Scaling.Drain.PauseImage.Repository = DefaultFluentdDrainPauseImageRepository
+			f.Scaling.Drain.PauseImage.Repository = defaultImageRepository(DefaultFluentdDrainPauseImageRepository)
 		}
 		if f.Scaling.Drain.PauseImage.Tag == "" {
 			f.Scaling.Drain.PauseImage.Tag = DefaultFluentdDrainPauseImageTag

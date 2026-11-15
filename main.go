@@ -98,6 +98,7 @@ func main() {
 	var enableTelemetryControllerRoute bool
 	var klogLevel int
 	var syncPeriod string
+	var defaultImageRegistry string
 
 	flag.StringVar(&metricsAddr, "metrics-addr", ":8080", "The address the metric endpoint binds to.")
 	flag.StringVar(&healthProbeAddr, "health-probe-bind-address", ":8081", "The address the health probe (healthz/readyz) endpoint binds to.")
@@ -114,7 +115,10 @@ func main() {
 	flag.BoolVar(&finalizerCleanup, "finalizer-cleanup", false, "Remove finalizers from Logging resources during operator shutdown, useful for Helm uninstallation")
 	flag.BoolVar(&enableTelemetryControllerRoute, "enable-telemetry-controller-route", false, "Enable the Telemetry Controller route for Logging resources")
 	flag.StringVar(&syncPeriod, "sync-period", "", "SyncPeriod determines the minimum frequency at which watched resources are reconciled. Defaults to 10 hours. Parsed using time.ParseDuration.")
+	flag.StringVar(&defaultImageRegistry, "default-image-registry", "", "Registry to pull the default images of the deployed components from, for example a private mirror. Images set explicitly in the resources are not changed.")
 	flag.Parse()
+
+	setDefaultImageRegistry(defaultImageRegistry)
 
 	ctx := context.Background()
 
@@ -461,4 +465,16 @@ func logEncoder(format string) (zap.Opts, error) {
 	default:
 		return nil, fmt.Errorf("unknown output format %q, want json or console", format)
 	}
+}
+
+// setDefaultImageRegistry points the default images of the Logging and extensions resources
+// at the given registry.
+func setDefaultImageRegistry(registry string) {
+	if registry == "" {
+		return
+	}
+	loggingv1beta1.SetDefaultImageRegistry(registry)
+	config.HostTailer.FluentBitImage = loggingv1beta1.ReplaceImageRegistry(registry, config.HostTailer.FluentBitImage)
+	config.EventTailer.ImageWithTag = loggingv1beta1.ReplaceImageRegistry(registry, config.EventTailer.ImageWithTag)
+	config.TailerWebhook.FluentBitImage = loggingv1beta1.ReplaceImageRegistry(registry, config.TailerWebhook.FluentBitImage)
 }

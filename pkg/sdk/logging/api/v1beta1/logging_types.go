@@ -303,7 +303,7 @@ func FluentBitDefaults(fluentbitSpec *FluentbitSpec) error { //nolint: gocyclo
 			return errors.New("`parser` field is deprecated, use `inputTail.Parser`")
 		}
 		if fluentbitSpec.Image.Repository == "" {
-			fluentbitSpec.Image.Repository = DefaultFluentbitImageRepository
+			fluentbitSpec.Image.Repository = defaultImageRepository(DefaultFluentbitImageRepository)
 		}
 		if fluentbitSpec.Image.Tag == "" {
 			fluentbitSpec.Image.Tag = DefaultFluentbitImageTag
@@ -372,7 +372,7 @@ func FluentBitDefaults(fluentbitSpec *FluentbitSpec) error { //nolint: gocyclo
 			fluentbitSpec.Security.RoleBasedAccessControlCreate = new(true)
 		}
 		if fluentbitSpec.BufferVolumeImage.Repository == "" {
-			fluentbitSpec.BufferVolumeImage.Repository = DefaultFluentbitBufferVolumeImageRepository
+			fluentbitSpec.BufferVolumeImage.Repository = defaultImageRepository(DefaultFluentbitBufferVolumeImageRepository)
 		}
 		if fluentbitSpec.BufferVolumeImage.Tag == "" {
 			if Version == "" {
@@ -520,7 +520,7 @@ func FluentBitDefaults(fluentbitSpec *FluentbitSpec) error { //nolint: gocyclo
 		}
 		if fluentbitSpec.ConfigHotReload != nil {
 			if fluentbitSpec.ConfigHotReload.Image.Repository == "" {
-				fluentbitSpec.ConfigHotReload.Image.Repository = DefaultFluentbitConfigReloaderImageRepository
+				fluentbitSpec.ConfigHotReload.Image.Repository = defaultImageRepository(DefaultFluentbitConfigReloaderImageRepository)
 			}
 			if fluentbitSpec.ConfigHotReload.Image.Tag == "" {
 				if Version == "" {
