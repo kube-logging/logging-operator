@@ -27,6 +27,7 @@ rules:
   - endpoints
   - namespaces
   - nodes
+  - nodes/pods
   - nodes/proxy
   verbs:
   - get

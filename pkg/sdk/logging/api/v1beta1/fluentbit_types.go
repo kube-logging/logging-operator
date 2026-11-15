@@ -114,7 +114,11 @@ type FluentbitSpec struct {
 	// Parameters for Kubernetes metadata filter
 	FilterKubernetes FilterKubernetes `json:"filterKubernetes,omitempty"`
 	// Disable Kubernetes metadata filter
-	DisableKubernetesFilter *bool         `json:"disableKubernetesFilter,omitempty"`
+	DisableKubernetesFilter *bool `json:"disableKubernetesFilter,omitempty"`
+	// Leave nodes/proxy out of the Fluent Bit ClusterRole when filterKubernetes.Use_Kubelet is On.
+	// The kubelet then has to authorize the /pods endpoint as nodes/pods, which needs fine-grained
+	// kubelet authorization (on by default since Kubernetes 1.33).
+	KubeletFineGrainedAuthz bool          `json:"kubeletFineGrainedAuthz,omitempty"`
 	BufferStorage           BufferStorage `json:"bufferStorage,omitempty"`
 	// +docLink:"volume.KubernetesVolume,https://github.com/cisco-open/operator-tools/tree/master/docs/types"
 	BufferStorageVolume       volume.KubernetesVolume     `json:"bufferStorageVolume,omitempty"`

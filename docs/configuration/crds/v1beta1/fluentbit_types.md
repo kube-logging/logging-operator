@@ -172,6 +172,11 @@ Available in Logging operator version 4.4 and later.
 ### inputTail (InputTail, optional) {#fluentbitspec-inputtail}
 
 
+### kubeletFineGrainedAuthz (bool, optional) {#fluentbitspec-kubeletfinegrainedauthz}
+
+Leave nodes/proxy out of the Fluent Bit ClusterRole when filterKubernetes.Use_Kubelet is On. The kubelet then has to authorize the /pods endpoint as nodes/pods, which needs fine-grained kubelet authorization (on by default since Kubernetes 1.33). 
+
+
 ### labels (map[string]string, optional) {#fluentbitspec-labels}
 
 
