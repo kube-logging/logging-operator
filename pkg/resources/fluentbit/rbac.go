@@ -71,7 +71,12 @@ func (r *Reconciler) clusterRole() (runtime.Object, reconciler.DesiredState, err
 	if *r.fluentbitSpec.Security.RoleBasedAccessControlCreate {
 		clusterRoleResources := []string{"pods", "namespaces"}
 		if r.fluentbitSpec.FilterKubernetes.UseKubelet == "On" {
-			clusterRoleResources = append(clusterRoleResources, "nodes", "nodes/proxy")
+			// The kubelet authorizes /pods as nodes/pods when fine-grained kubelet authorization
+			// is enabled, and falls back to nodes/proxy otherwise.
+			clusterRoleResources = append(clusterRoleResources, "nodes", "nodes/pods")
+			if !r.fluentbitSpec.KubeletFineGrainedAuthz {
+				clusterRoleResources = append(clusterRoleResources, "nodes/proxy")
+			}
 		}
 		return &rbacv1.ClusterRole{
 			ObjectMeta: r.FluentbitObjectMetaClusterScope(clusterRoleName),

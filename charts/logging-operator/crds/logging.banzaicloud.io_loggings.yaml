@@ -2538,6 +2538,8 @@ spec:
                       storage.type:
                         type: string
                     type: object
+                  kubeletFineGrainedAuthz:
+                    type: boolean
                   labels:
                     additionalProperties:
                       type: string
