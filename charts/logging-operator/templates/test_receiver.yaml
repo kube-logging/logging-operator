@@ -39,7 +39,7 @@ spec:
     {{- end }}
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.testReceiver.image }}"
+          image: "{{ include "logging-operator.image" (dict "registry" .Values.global.registry "image" .Values.testReceiver.image) }}"
           args:
           {{- range .Values.testReceiver.args }}
             - {{ . }}

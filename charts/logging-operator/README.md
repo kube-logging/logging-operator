@@ -35,6 +35,7 @@ Use `createCustomResource=false` with Helm v3 to avoid trying to create CRDs fro
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | replicaCount | int | `1` |  |
+| global.registry | string | `""` | Registry to pull all images from, for example a private mirror. It replaces the registry of the operator and test receiver images, and the operator uses it for the default images of the components it deploys (Fluentd, Fluent Bit, syslog-ng and their sidecars). Images set explicitly in the Logging and other resources are not changed. |
 | image.repository | string | `"ghcr.io/kube-logging/logging-operator"` | Name of the image repository to pull the container image from. |
 | image.tag | string | `""` | Image tag override for the default value (chart appVersion). |
 | image.digest | string | `""` | Image digest override (format: `sha256:...`). Takes precedence over `image.tag` and the chart appVersion. |

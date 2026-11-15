@@ -41,12 +41,16 @@ spec:
     {{- end }}
       containers:
         - name: {{ .Chart.Name }}
+          {{- $repository := include "logging-operator.image" (dict "registry" .Values.global.registry "image" .Values.image.repository) }}
           {{- if .Values.image.digest }}
-          image: "{{ .Values.image.repository }}@{{ .Values.image.digest }}"
+          image: "{{ $repository }}@{{ .Values.image.digest }}"
           {{- else }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          image: "{{ $repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           {{- end }}
           args:
+          {{- with .Values.global.registry }}
+            - -default-image-registry={{ . }}
+          {{- end }}
           {{- range .Values.extraArgs }}
             - {{ . }}
           {{- end }}

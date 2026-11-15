@@ -74,3 +74,23 @@ Formats the cluster domain as a suffix, e.g.:
 {{- printf ".%s" .Values.logging.clusterDomain -}}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Replace the registry of an image with global.registry when it is set.
+An image without a registry, like fluent/fluent-bit, gets the registry added in front.
+Usage: include "logging-operator.image" (dict "registry" .Values.global.registry "image" .Values.image.repository)
+*/}}
+{{- define "logging-operator.image" -}}
+{{- $registry := .registry | default "" | trimSuffix "/" -}}
+{{- $image := .image -}}
+{{- if $registry -}}
+{{- $parts := splitList "/" $image -}}
+{{- $host := first $parts -}}
+{{- if and (gt (len $parts) 1) (or (contains "." $host) (contains ":" $host) (eq $host "localhost")) -}}
+{{- $image = rest $parts | join "/" -}}
+{{- end -}}
+{{- printf "%s/%s" $registry $image -}}
+{{- else -}}
+{{- $image -}}
+{{- end -}}
+{{- end -}}

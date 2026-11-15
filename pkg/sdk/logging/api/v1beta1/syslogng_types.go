@@ -156,7 +156,7 @@ func (s *SyslogNGSpec) SetDefaults() {
 			s.SyslogNGImage = &BasicImageSpec{}
 		}
 		if s.SyslogNGImage.Repository == "" {
-			s.SyslogNGImage.Repository = defaultSyslogngImageRepository
+			s.SyslogNGImage.Repository = defaultImageRepository(defaultSyslogngImageRepository)
 		}
 		if s.SyslogNGImage.Tag == "" {
 			s.SyslogNGImage.Tag = defaultSyslogngImageTag
@@ -165,7 +165,7 @@ func (s *SyslogNGSpec) SetDefaults() {
 			s.ConfigReloadImage = &BasicImageSpec{}
 		}
 		if s.ConfigReloadImage.Repository == "" {
-			s.ConfigReloadImage.Repository = defaultConfigReloaderImageRepository
+			s.ConfigReloadImage.Repository = defaultImageRepository(defaultConfigReloaderImageRepository)
 		}
 		if s.ConfigReloadImage.Tag == "" {
 			if Version == "" {
@@ -178,7 +178,7 @@ func (s *SyslogNGSpec) SetDefaults() {
 			s.MetricsExporterImage = &BasicImageSpec{}
 		}
 		if s.MetricsExporterImage.Repository == "" {
-			s.MetricsExporterImage.Repository = defaultPrometheusExporterImageRepository
+			s.MetricsExporterImage.Repository = defaultImageRepository(defaultPrometheusExporterImageRepository)
 		}
 		if s.MetricsExporterImage.Tag == "" {
 			s.MetricsExporterImage.Tag = defaultPrometheusExporterImageTag
@@ -187,7 +187,7 @@ func (s *SyslogNGSpec) SetDefaults() {
 			s.BufferVolumeMetricsImage = &BasicImageSpec{}
 		}
 		if s.BufferVolumeMetricsImage.Repository == "" {
-			s.BufferVolumeMetricsImage.Repository = defaultBufferVolumeImageRepository
+			s.BufferVolumeMetricsImage.Repository = defaultImageRepository(defaultBufferVolumeImageRepository)
 		}
 		if s.BufferVolumeMetricsImage.Tag == "" {
 			if Version == "" {
