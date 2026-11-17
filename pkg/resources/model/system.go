@@ -35,26 +35,7 @@ func CreateSystem(resources LoggingResources, secrets SecretLoaderFactory, logge
 	logging := resources.Logging
 	_, fluentdSpec := resources.GetFluentd()
 
-	var forwardInput *input.ForwardInputConfig
-	if fluentdSpec != nil && fluentdSpec.ForwardInputConfig != nil {
-		forwardInput = fluentdSpec.ForwardInputConfig
-	} else {
-		forwardInput = input.NewForwardInputConfig()
-	}
-
-	if fluentdSpec != nil && fluentdSpec.TLS.Enabled {
-		forwardInput.Transport = &common.Transport{
-			Version:        "TLSv1_2",
-			CaPath:         "/fluentd/tls/ca.crt",
-			CertPath:       "/fluentd/tls/tls.crt",
-			PrivateKeyPath: "/fluentd/tls/tls.key",
-			ClientCertAuth: true,
-		}
-		forwardInput.Security = &common.Security{
-			SelfHostname: "fluentd",
-			SharedKey:    fluentdSpec.TLS.SharedKey,
-		}
-	}
+	forwardInput := forwardInputConfig(fluentdSpec)
 
 	rootInput, err := forwardInput.ToDirective(secrets.OutputSecretLoaderForNamespace(logging.Spec.ControlNamespace), "main")
 	if err != nil {
@@ -417,4 +398,37 @@ func FlowForDefaultFlow(logging v1beta1.Logging, clusterOutputs ClusterOutputs, 
 	result.WithFilters(filters...)
 
 	return result, errs
+}
+
+// forwardInputConfig returns the forward input used as the root of the fluentd config.
+// It works on a copy, so the TLS settings never leak back into the user's spec.
+func forwardInputConfig(fluentdSpec *v1beta1.FluentdSpec) *input.ForwardInputConfig {
+	forwardInput := input.NewForwardInputConfig()
+	if fluentdSpec == nil {
+		return forwardInput
+	}
+	if fluentdSpec.ForwardInputConfig != nil {
+		forwardInput = fluentdSpec.ForwardInputConfig.DeepCopy()
+	}
+
+	if fluentdSpec.TLS.Enabled {
+		// Only the certificate paths and client cert auth are forced. Ciphers, version,
+		// protocol and the rest of a user-provided transport are kept.
+		if forwardInput.Transport == nil {
+			forwardInput.Transport = &common.Transport{}
+		}
+		if forwardInput.Transport.Version == "" {
+			forwardInput.Transport.Version = "TLSv1_2"
+		}
+		forwardInput.Transport.CaPath = "/fluentd/tls/ca.crt"
+		forwardInput.Transport.CertPath = "/fluentd/tls/tls.crt"
+		forwardInput.Transport.PrivateKeyPath = "/fluentd/tls/tls.key"
+		forwardInput.Transport.ClientCertAuth = true
+		forwardInput.Security = &common.Security{
+			SelfHostname: "fluentd",
+			SharedKey:    fluentdSpec.TLS.SharedKey,
+		}
+	}
+
+	return forwardInput
 }
