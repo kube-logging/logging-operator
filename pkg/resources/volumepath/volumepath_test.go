@@ -307,6 +307,13 @@ func TestTopLevelPathList(t *testing.T) {
 			l:    Init([]string{"/foo", "/var/log", "/bar/", "/var/log/nginx", "/var/bar", "/should/remain/intact", "/var/bar/baz"}),
 			want: Init([]string{"/foo", "/var/log", "/bar/", "/var/log", "/var/bar", "/should/remain/intact", "/var/bar"}),
 		},
+		{
+			// Sibling directories that merely share a string prefix must not be
+			// collapsed: "/var/log" is not a parent of "/var/logs".
+			name: "siblingPathsSharingPrefix",
+			l:    Init([]string{"/var/log", "/var/logs"}),
+			want: Init([]string{"/var/log", "/var/logs"}),
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

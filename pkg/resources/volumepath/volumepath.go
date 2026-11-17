@@ -108,7 +108,7 @@ func (l *List) TopLevelPathList() *List {
 			matches := l.Apply(ApplyFn(
 				func(strs []string, idx int) *string {
 					str := strs[idx]
-					if strings.HasPrefix(path, str) {
+					if isPathPrefix(path, str) {
 						return &str
 					}
 					return nil
@@ -124,6 +124,19 @@ func (l *List) TopLevelPathList() *List {
 		})
 
 	return l.Apply(modify)
+}
+
+// isPathPrefix reports whether prefix is path itself or one of its parent
+// directories. Unlike strings.HasPrefix it respects directory boundaries, so
+// "/var/log" is not treated as a parent of the sibling directory "/var/logs".
+func isPathPrefix(path, prefix string) bool {
+	if !strings.HasPrefix(path, prefix) {
+		return false
+	}
+	if len(path) == len(prefix) || strings.HasSuffix(prefix, "/") {
+		return true
+	}
+	return path[len(prefix)] == '/'
 }
 
 // RemoveInvalidPath filters out file pathes do not match validatorFn
