@@ -20,7 +20,7 @@ type _hugoElasticsearchDatastream any //nolint:deadcode,unused
 
 // +docName:"Sending messages over Elasticsearch datastreams"
 /*
-Based on the [ElasticSearch datastream destination of AxoSyslog core](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-elasticsearch-datastream/).
+Based on the [ElasticSearch datastream destination of AxoSyslog core](https://axoflow.com/docs/axosyslog-core/chapter-destinations/elasticsearch-data-stream/).
 
 ## Example
 
@@ -43,7 +43,7 @@ spec:
 type _docSElasticsearchDatastream any //nolint:deadcode,unused
 
 // +name:"Elasticsearch datastream"
-// +url:"https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-elasticsearch-datastream/"
+// +url:"https://axoflow.com/docs/axosyslog-core/chapter-destinations/elasticsearch-data-stream/"
 // +description:"Sending messages over Elasticsearch datastreams"
 // +status:"Testing"
 type _metaElasticsearchDatastream any //nolint:deadcode,unused

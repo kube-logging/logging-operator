@@ -7,7 +7,7 @@ generated_file: true
 # Sending messages over Elasticsearch datastreams
 ## Overview
 
-Based on the [ElasticSearch datastream destination of AxoSyslog core](https://axoflow.com/docs/axosyslog-core/chapter-destinations/configuring-destinations-elasticsearch-datastream/).
+Based on the [ElasticSearch datastream destination of AxoSyslog core](https://axoflow.com/docs/axosyslog-core/chapter-destinations/elasticsearch-data-stream/).
 
 ## Example
 
