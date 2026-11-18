@@ -44,7 +44,7 @@ Note: In case of syslog-ng the name of the standalone config resource is `Syslog
 
 ### Schema and migration
 
-The schema for `FluentdConfig.spec` / `SyslogNGConfig.spec` is the same as it was withing `Logging.spec.fluentd` / `Logging.spec.syslogNG`,
+The schema for `FluentdConfig.spec` / `SyslogNGConfig.spec` is the same as it was within `Logging.spec.fluentd` / `Logging.spec.syslogNG`,
 so the migration should be a trivial lift and shift exercise.
 
 ### Restrictions and status

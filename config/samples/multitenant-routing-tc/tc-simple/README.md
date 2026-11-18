@@ -1,4 +1,4 @@
-# Telemtry Controller multi-tenant routing
+# Telemetry Controller multi-tenant routing
 
 ```bash
 git clone https://github.com/kube-logging/telemetry-controller
