@@ -39,7 +39,7 @@ tolerations:
   value: cpu
 ```
 
-Additionaly we will have to increase the resources that are requested by the fluentd Pods. In the default setting they use following requests and limits:
+Additionally we will have to increase the resources that are requested by the fluentd Pods. In the default setting they use following requests and limits:
 ```yaml
 resources:
   limits:

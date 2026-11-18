@@ -77,7 +77,7 @@ spec:
     jsonKeyDelim: ';'
 ```
 
-> However you need to be extra carefull to follow through this change on all resources!
+> However you need to be extra careful to follow through this change on all resources!
 
 ### Flow
 #### Match
@@ -182,7 +182,7 @@ The `regexp` field can have the following fields
   regexp:
     pattern: <a pattern string>                            // Pattern match against, e.g. "my-app-\d+". The pattern's type is determined by the type field.
     value: <a field reference>                             // Reference to a field whose value to match. If this field is set, the template field cannot be used.
-    template: <a templeted string combining field values>  // Template expression whose value to match. If this field is set, the value field cannot be used. For more info, see https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/74#TOPIC-1829197
+    template: <a templated string combining field values>  // Template expression whose value to match. If this field is set, the value field cannot be used. For more info, see https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/74#TOPIC-1829197
     type: <pattern type>                                   // Pattern type. Default is PCRE. For more info, see https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/81#TOPIC-1829223
     flags: <list of flags>                                 // Pattern flags. For more info, see https://www.syslog-ng.com/technical-documents/doc/syslog-ng-open-source-edition/3.37/administration-guide/81#TOPIC-1829224
 ```

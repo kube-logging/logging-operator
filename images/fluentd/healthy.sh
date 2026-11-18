@@ -7,7 +7,7 @@
 # you want to change the fluentd configuration, reducing amount of
 # logs fluentd collects, consider changing the threshold or turning
 # liveness probe off completely.
-# soiurce https://github.com/kubernetes/kubernetes/blob/master/cluster/addons/fluentd-gcp/fluentd-gcp-ds.yaml#L58
+# source https://github.com/kubernetes/kubernetes/blob/master/cluster/addons/fluentd-gcp/fluentd-gcp-ds.yaml#L58
 
 BUFFER_PATH=${BUFFER_PATH:-/buffers};
 LIVENESS_THRESHOLD_SECONDS=${LIVENESS_THRESHOLD_SECONDS:-300};

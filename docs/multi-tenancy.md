@@ -1,6 +1,6 @@
 # Multi-tenancy overview
 
-Logging operator supports sevaral multi-tenant scenarios
+Logging operator supports several multi-tenant scenarios
 
 ## Multi tenancy behaviour and basic primitives
 
