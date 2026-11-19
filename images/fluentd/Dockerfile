@@ -1,28 +1,15 @@
-FROM ruby:4.0.7-alpine3.23 AS base
+FROM ruby:4.0.7-slim-trixie AS ruby-slim
 
-ARG BUILD_DEPS=" \
-      make gcc g++ libc-dev \
-      wget bzip2 zlib-dev git linux-headers \
-      automake autoconf libtool build-base \
-      ruby-dev libc6-compat geoip-dev \
-      snappy-dev gnupg bash openssl-dev \
-      "
+RUN echo 'gem: --no-document' >> /etc/gemrc
 
-RUN addgroup -S -g 101 fluent && adduser -S -G fluent -u 100 fluent \
- # for log storage (maybe shared with host)
- && mkdir -p /fluentd/log \
- # configuration/plugins path (default: copied from .)
- && mkdir -p /fluentd/etc /fluentd/plugins \
- && chown -R fluent /fluentd && chgrp -R fluent /fluentd \
- && mkdir -p /buffers && chown -R fluent /buffers \
- && apk add --no-cache \
-        ca-certificates \
-        tini libmaxminddb geoip \
-        snappy libssl3 libcrypto3 \
- && apk add --no-cache $BUILD_DEPS \
- # Remove fortify headers to fix PATH_MAX compilation errors in native gems
- && rm -rf /usr/include/fortify \
- && echo 'gem: --no-document' >> /etc/gemrc \
+### Build stages: compile gems with native extensions
+FROM ruby-slim AS build-base
+
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+        build-essential autoconf automake libtool pkg-config \
+        git zlib1g-dev libgeoip-dev libsnappy-dev libssl-dev \
+ && rm -rf /var/lib/apt/lists/* \
  && gem install fluentd -v 1.19.3 \
  && gem install bigdecimal -v 3.3.1 \
  && gem install ostruct -v 0.6.3 \
@@ -30,59 +17,67 @@ RUN addgroup -S -g 101 fluent && adduser -S -G fluent -u 100 fluent \
  && fluent-gem install specific_install -v 0.3.8 \
  && fluent-gem install fluent-plugin-label-router -v 0.5.0 \
  && fluent-gem install snappy -v 0.0.15 \
- && find /usr/local/bundle/gems/ -newer /etc/gemrc -exec chown fluent:fluent {} \; \
- && apk --no-cache del $BUILD_DEPS \
  && rm -rf /usr/local/bundle/cache/* && find /usr/local/bundle -name '*.o' -delete
 
+FROM build-base AS build-filters
+
+COPY filters/Gemfile /Gemfile.filters
+COPY filters/Gemfile.lock /Gemfile.filters.lock
+
+ENV BUNDLE_WITHOUT="output,test,development"
+
+RUN fluent-gem install --file /Gemfile.filters \
+ && rm -rf /usr/local/bundle/cache/* && find /usr/local/bundle -name '*.o' -delete
+
+FROM build-filters AS build-full
+
+COPY outputs/Gemfile /Gemfile.outputs
+COPY outputs/Gemfile.lock /Gemfile.outputs.lock
+
+RUN fluent-gem specific_install -l https://github.com/kube-logging/fluent-plugin-syslog_rfc5424.git --ref 4ab9f7df3757b0e31e4bc209acab05a518efdce3 \
+ && fluent-gem specific_install -l https://github.com/kube-logging/fluent-plugin-elasticsearch.git --ref f711c4322e37852a83caab0385ba4567031eb9ab \
+ && fluent-gem install --file /Gemfile.outputs \
+ && rm -rf /usr/local/bundle/cache/* && find /usr/local/bundle -name '*.o' -delete
+
+### Runtime stages: no compiler, only the gems from the matching build stage
+FROM ruby-slim AS runtime
+
+RUN groupadd --system --gid 101 fluent \
+ && useradd --system --gid fluent --uid 100 --create-home --shell /usr/sbin/nologin fluent \
+ && mkdir -p /fluentd/log /fluentd/etc /fluentd/plugins /buffers \
+ && chown -R fluent:fluent /fluentd /buffers \
+ && apt-get update \
+ && apt-get install -y --no-install-recommends \
+        ca-certificates tini libjemalloc2 \
+        libgeoip1t64 libmaxminddb0 libsnappy1v5 libcurl4t64 \
+ && rm -rf /var/lib/apt/lists/*
+
 COPY fluent.conf /fluentd/etc/
-COPY entrypoint.sh /bin/
-COPY healthy.sh /bin/
+COPY entrypoint.sh healthy.sh /bin/
 
 ENV FLUENTD_CONF="fluent.conf"
-ENV LD_PRELOAD=""
+ENV LD_PRELOAD="libjemalloc.so.2"
 EXPOSE 24224 5140
 
 USER fluent
 
-ENTRYPOINT ["tini",  "--", "/bin/entrypoint.sh"]
+ENTRYPOINT ["tini", "--", "/bin/entrypoint.sh"]
 CMD ["fluentd"]
 
+FROM runtime AS base
+
+COPY --from=build-base --chown=fluent:fluent /usr/local/bundle /usr/local/bundle
+
 ### Image with all the filters
-FROM base AS filters
-
-ADD ./filters/Gemfile /Gemfile.filters
-ADD ./filters/Gemfile.lock /Gemfile.filters.lock
-
-USER root
+FROM runtime AS filters
 
 ENV BUNDLE_WITHOUT="output,test,development"
 
-RUN apk add --no-cache $BUILD_DEPS \
- && touch /etc/gemrc \
- && fluent-gem install --file Gemfile.filters \
- && find /usr/local/bundle/gems/ -newer /etc/gemrc -exec chown fluent:fluent {} \; \
- && apk --no-cache del $BUILD_DEPS \
- && rm -rf /usr/local/bundle/cache/* && find /usr/local/bundle -name '*.o' -delete
-
-USER fluent
+COPY --from=build-filters --chown=fluent:fluent /usr/local/bundle /usr/local/bundle
 
 ### Image with all the filters and outputs
-FROM filters AS full
+FROM runtime AS full
 
-ADD ./outputs/Gemfile /Gemfile.outputs
-ADD ./outputs/Gemfile.lock /Gemfile.outputs.lock
+ENV BUNDLE_WITHOUT="output,test,development"
 
-USER root
-
-RUN apk add --no-cache libcurl $BUILD_DEPS \
- # Remove fortify headers to fix PATH_MAX compilation errors in native gems
- && rm -rf /usr/include/fortify \
- && touch /etc/gemrc \
- && fluent-gem specific_install -l https://github.com/kube-logging/fluent-plugin-syslog_rfc5424.git --ref 4ab9f7df3757b0e31e4bc209acab05a518efdce3 \
- && fluent-gem specific_install -l https://github.com/kube-logging/fluent-plugin-elasticsearch.git --ref f711c4322e37852a83caab0385ba4567031eb9ab \
- && fluent-gem install --file /Gemfile.outputs \
- && find /usr/local/bundle/gems/ -newer /etc/gemrc -exec chown fluent:fluent {} \; \
- && apk --no-cache del $BUILD_DEPS \
- && rm -rf /usr/local/bundle/cache/* && find /usr/local/bundle -name '*.o' -delete
-
-USER fluent
+COPY --from=build-full --chown=fluent:fluent /usr/local/bundle /usr/local/bundle
