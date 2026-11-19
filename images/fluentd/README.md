@@ -11,6 +11,11 @@ Image tags are constructed according to the following pattern:
 ghcr.io/kube-logging/logging-operator/fluentd:{LOGGING-OPERATOR-VERSION}-{IMAGE-TYPE}
 ```
 
+### Memory allocator
+
+Fluentd runs with [jemalloc](https://jemalloc.net/) preloaded through `LD_PRELOAD`, as recommended upstream, to keep heap fragmentation of long-running processes low.
+To fall back to the musl allocator, set the `LD_PRELOAD` environment variable of the fluentd container to an empty string.
+
 ### Add new plugins
 
 If you wish to add a new plugin, use this image as a base image in your `Dockerfile`:

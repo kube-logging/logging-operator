@@ -18,7 +18,7 @@ RUN addgroup -S -g 101 fluent && adduser -S -G fluent -u 100 fluent \
  && apk add --no-cache \
         ca-certificates \
         tini libmaxminddb geoip \
-        snappy libssl3 libcrypto3 \
+        snappy libssl3 libcrypto3 jemalloc \
  && apk add --no-cache $BUILD_DEPS \
  # Remove fortify headers to fix PATH_MAX compilation errors in native gems
  && rm -rf /usr/include/fortify \
@@ -39,7 +39,7 @@ COPY entrypoint.sh /bin/
 COPY healthy.sh /bin/
 
 ENV FLUENTD_CONF="fluent.conf"
-ENV LD_PRELOAD=""
+ENV LD_PRELOAD="/usr/lib/libjemalloc.so.2"
 EXPOSE 24224 5140
 
 USER fluent
