@@ -11,6 +11,13 @@ Image tags are constructed according to the following pattern:
 ghcr.io/kube-logging/logging-operator/fluentd:{LOGGING-OPERATOR-VERSION}-{IMAGE-TYPE}
 ```
 
+The images are based on the Debian variant of the official Ruby image (`ruby:<version>-slim-<debian-release>`).
+
+### Memory allocator
+
+Fluentd runs with [jemalloc](https://jemalloc.net/) preloaded through `LD_PRELOAD`, as recommended upstream, to keep heap fragmentation of long-running processes low.
+To fall back to the glibc allocator, set the `LD_PRELOAD` environment variable of the fluentd container to an empty string.
+
 ### Add new plugins
 
 If you wish to add a new plugin, use this image as a base image in your `Dockerfile`:
@@ -23,6 +30,18 @@ Then add your plugin:
 
 ```dockerfile
 RUN fluent-gem install PLUGIN_NAME -v PLUGIN_VERSION
+```
+
+Plugins with native extensions need a compiler and the matching `-dev` packages, which are installed with `apt-get` as `root`:
+
+```dockerfile
+USER root
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends build-essential \
+ && fluent-gem install PLUGIN_NAME -v PLUGIN_VERSION \
+ && apt-get purge -y --auto-remove build-essential \
+ && rm -rf /var/lib/apt/lists/*
+USER fluent
 ```
 
 ## Version Support Policy
