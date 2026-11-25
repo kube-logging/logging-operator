@@ -208,6 +208,8 @@ Duration in seconds for graceful pod termination. Set higher than expected clean
 
 ### workers (int32, optional) {#fluentdspec-workers}
 
+Number of Fluentd workers. With metrics enabled, each worker listens on its own port, from `metrics.port` to `metrics.port + workers - 1`. This range must not include an input port. If `metrics.port` is unset, it is 24231, or the port above the highest input port when 24231 would overlap. 
+
 
 
 ## ConfigCheckPodOverrides
