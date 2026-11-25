@@ -17,6 +17,8 @@ package v1beta1
 import (
 	"errors"
 	"fmt"
+	"slices"
+	"strconv"
 
 	"github.com/cisco-open/operator-tools/pkg/typeoverride"
 	"github.com/cisco-open/operator-tools/pkg/volume"
@@ -27,6 +29,11 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 
 	"github.com/kube-logging/logging-operator/pkg/sdk/logging/model/input"
+)
+
+const (
+	defaultFluentdPort        int32 = 24240
+	defaultFluentdMetricsPort int32 = 24231
 )
 
 // +name:"FluentdSpec"
@@ -84,8 +91,10 @@ type FluentdSpec struct {
 	BufferVolumeLivenessProbe *corev1.Probe                     `json:"bufferVolumeLivenessProbe,omitempty"`
 	Security                  *Security                         `json:"security,omitempty"`
 	Scaling                   *FluentdScaling                   `json:"scaling,omitempty"`
-	Workers                   int32                             `json:"workers,omitempty"`
-	RootDir                   string                            `json:"rootDir,omitempty"`
+	// Number of Fluentd workers. With metrics enabled, each worker listens on its own port, from `metrics.port` to `metrics.port + workers - 1`.
+	// This range must not include an input port. If `metrics.port` is unset, it is 24231, or the port above the highest input port when 24231 would overlap.
+	Workers int32  `json:"workers,omitempty"`
+	RootDir string `json:"rootDir,omitempty"`
 	// Set the logging format. Allowed values are: "text" (default) and "json".
 	// +kubebuilder:validation:enum=json,text
 	LogFormat string `json:"logFormat,omitempty"`
@@ -233,9 +242,12 @@ func (f *FluentdSpec) SetDefaults() error { //nolint: gocyclo
 		if f.Workers <= 0 {
 			f.Workers = 1
 		}
+		if f.Port == 0 {
+			f.Port = defaultFluentdPort
+		}
 		if f.Metrics != nil {
-			if f.Metrics.Port == 0 {
-				f.Metrics.Port = 24231
+			if err := f.setMetricsPortDefault(); err != nil {
+				return err
 			}
 			if f.Metrics.Timeout == "" {
 				f.Metrics.Timeout = "5s"
@@ -347,9 +359,6 @@ func (f *FluentdSpec) SetDefaults() error { //nolint: gocyclo
 				corev1.ResourceMemory: resource.MustParse("100M"),
 				corev1.ResourceCPU:    resource.MustParse("500m"),
 			}
-		}
-		if f.Port == 0 {
-			f.Port = 24240
 		}
 		if f.Scaling == nil {
 			f.Scaling = new(FluentdScaling)
@@ -465,6 +474,39 @@ func (f *FluentdSpec) SetDefaults() error { //nolint: gocyclo
 				e.Volume = &volume.KubernetesVolume{}
 			}
 		}
+	}
+	return nil
+}
+
+// forwardInputPort returns the port the forward input listens on, which is configured independently of Port.
+func (f *FluentdSpec) forwardInputPort() int32 {
+	if f.ForwardInputConfig != nil {
+		if port, err := strconv.ParseInt(f.ForwardInputConfig.Port, 10, 32); err == nil {
+			return int32(port)
+		}
+	}
+	return defaultFluentdPort
+}
+
+// setMetricsPortDefault keeps the metrics ports of all workers clear of the input ports.
+// The Prometheus plugin makes each worker listen on Metrics.Port plus its worker index.
+func (f *FluentdSpec) setMetricsPortDefault() error {
+	inputPorts := []int32{f.Port, f.forwardInputPort()}
+	overlaps := func(port int32) bool {
+		return port >= f.Metrics.Port && port < f.Metrics.Port+f.Workers
+	}
+
+	if f.Metrics.Port == 0 {
+		f.Metrics.Port = defaultFluentdMetricsPort
+		if slices.ContainsFunc(inputPorts, overlaps) {
+			f.Metrics.Port = slices.Max(inputPorts) + 1
+		}
+		return nil
+	}
+
+	if i := slices.IndexFunc(inputPorts, overlaps); i >= 0 && f.Metrics.IsEnabled() {
+		return fmt.Errorf("metrics ports %d-%d of %d fluentd worker(s) overlap with port %d, set metrics.port to a free range",
+			f.Metrics.Port, f.Metrics.Port+f.Workers-1, f.Workers, inputPorts[i])
 	}
 	return nil
 }
